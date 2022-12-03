@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ESPROG.Views;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +21,12 @@ namespace ESPROG
     /// </summary>
     public partial class MainWindow : Window
     {
+        private MainWindowVM view;
         public MainWindow()
         {
             InitializeComponent();
+            this.view = new();
+            this.DataContext = this.view;
         }
     }
 }

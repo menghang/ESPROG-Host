@@ -1,12 +1,295 @@
-﻿<Window x:Class="ESPROG.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ESPROG"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-
-    </Grid>
+﻿<Window
+    x:Class="ESPROG.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:ESPROG"
+    mc:Ignorable="d"
+    Title="ESPROG-HOST"
+    Height="700"
+    Width="450">
+    <DockPanel>
+        <Menu
+            DockPanel.Dock="Top">
+            <MenuItem
+                Header="File"
+                Width="50">
+                <MenuItem
+                    Header="Close" />
+            </MenuItem>
+            <MenuItem
+                Header="Help"
+                Width="50">
+                <MenuItem
+                    Header="About" />
+            </MenuItem>
+        </Menu>
+        <TabControl
+            DockPanel.Dock="Top"
+            Margin="5">
+            <TabItem
+                Header="Settings">
+                <DockPanel>
+                    <DockPanel
+                        DockPanel.Dock="Bottom">
+                        <Image
+                            Source="pack://application:,,,/NVT.png"
+                            Height="45"
+                            VerticalAlignment="Bottom"
+                            DockPanel.Dock="Right"
+                            Margin="10" />
+                        <Image
+                            Source="pack://application:,,,/QR_NuVolta.png"
+                            Height="90"
+                            DockPanel.Dock="Left"
+                            Margin="10" />
+                    </DockPanel>
+                    <StackPanel
+                        DockPanel.Dock="Top">
+                        <DockPanel
+                            Margin="5">
+                            <Label
+                                Content="COM Port:"
+                                VerticalContentAlignment="Center"
+                                Height="30" />
+                            <ComboBox
+                                SelectedItem="{Binding SelectedPort}"
+                                ItemsSource="{Binding PortList}"
+                                IsEnabled="{Binding PortNotLocked}"
+                                VerticalContentAlignment="Center"
+                                HorizontalContentAlignment="Center"
+                                IsReadOnly="True"
+                                Height="30" />
+                        </DockPanel>
+                        <DockPanel
+                            Margin="5">
+                            <Label
+                                Content="ESPROG Info:"
+                                Height="30"
+                                VerticalContentAlignment="Center" />
+                            <TextBox
+                                Text="{Binding EsprogInfo}"
+                                VerticalContentAlignment="Center"
+                                HorizontalContentAlignment="Center"
+                                IsReadOnly="True"
+                                Height="30" />
+                        </DockPanel>
+                        <DockPanel
+                            Margin="5">
+                            <Label
+                                Content="ESPROG Compile Time:"
+                                Height="30"
+                                VerticalContentAlignment="Center" />
+                            <TextBox
+                                Text="{Binding EsprogCompileTime}"
+                                VerticalContentAlignment="Center"
+                                HorizontalContentAlignment="Center"
+                                IsReadOnly="True"
+                                Height="30" />
+                        </DockPanel>
+                        <UniformGrid
+                            Rows="2"
+                            Columns="2">
+                            <Button
+                                Content="Reload Port List"
+                                IsEnabled="{Binding PortNotLocked}"
+                                Height="30"
+                                Margin="5" />
+                            <Button
+                                Content="{Binding BtnConnectPortText}"
+                                IsEnabled="{Binding PortCanOperate}"
+                                Height="30"
+                                Margin="5" />
+                            <Button
+                                Content="Autodetect Port"
+                                IsEnabled="{Binding PortCanOperate}"
+                                Height="30"
+                                Margin="5" />
+                        </UniformGrid>
+                    </StackPanel>
+                </DockPanel>
+            </TabItem>
+            <TabItem
+                Header="Firmware">
+                <DockPanel>
+                    <ProgressBar
+                        Value="{Binding Progress}"
+                        Minimum="0"
+                        Maximum="{Binding ProgressMax}"
+                        Foreground="{Binding ProgressColor}"
+                        DockPanel.Dock="Bottom"
+                        Height="30"
+                        Margin="5" />
+                    <StackPanel
+                        DockPanel.Dock="Top">
+                        <UniformGrid
+                            Rows="1"
+                            Columns="2">
+                            <DockPanel
+                                Margin="5">
+                                <Label
+                                    Content="Chip Address:"
+                                    VerticalContentAlignment="Center"
+                                    Height="30" />
+                                <ComboBox
+                                    SelectedItem="{Binding SelectedChipAddr}"
+                                    ItemsSource="{Binding ChipAddrList}"
+                                    IsEnabled="{Binding EnableChipAddrSelection}"
+                                    VerticalContentAlignment="Center"
+                                    HorizontalContentAlignment="Center"
+                                    IsReadOnly="True"
+                                    Height="30" />
+                            </DockPanel>
+                            <CheckBox
+                                Content="Autodetect Chip Address"
+                                IsChecked="{Binding EnableAutoChipAddr}"
+                                VerticalContentAlignment="Center"
+                                Height="30"
+                                Margin="5" />
+                        </UniformGrid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition
+                                    Width="2*" />
+                                <ColumnDefinition
+                                    Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <DockPanel
+                                Grid.Column="0"
+                                Margin="5">
+                                <Label
+                                    Content="Chip Info:"
+                                    VerticalContentAlignment="Center"
+                                    Height="30" />
+                                <TextBox
+                                    Text="{Binding ChipInfo}"
+                                    IsReadOnly="True"
+                                    VerticalContentAlignment="Center"
+                                    HorizontalContentAlignment="Center"
+                                    Height="30" />
+                            </DockPanel>
+                            <Button
+                                Content="Detect Chip"
+                                IsEnabled="{Binding EnableOperate}"
+                                Height="30"
+                                Grid.Column="1"
+                                Margin="5" />
+                        </Grid>
+                        <DockPanel
+                            Grid.Column="0"
+                            Margin="5">
+                            <Label
+                                Content="Firmware:"
+                                VerticalContentAlignment="Center"
+                                Height="30" />
+                            <TextBox
+                                Text="{Binding FwFile}"
+                                IsReadOnly="True"
+                                VerticalContentAlignment="Center"
+                                HorizontalContentAlignment="Center"
+                                Height="30" />
+                        </DockPanel>
+                        <UniformGrid
+                            Rows="1"
+                            Columns="2">
+                            <Button
+                                Content="Program Chip"
+                                Height="30"
+                                Margin="5" />
+                            <Button
+                                Content="Program ESPROG"
+                                Height="30"
+                                Margin="5" />
+                        </UniformGrid>
+                    </StackPanel>
+                    <GroupBox
+                        DataContext="{Binding FwContent}"
+                        Header="Firmware Content"
+                        Margin="5">
+                        <DockPanel>
+                            <UniformGrid
+                                Rows="1"
+                                Columns="2"
+                                DockPanel.Dock="Bottom">
+                                <DockPanel
+                                    Margin="5">
+                                    <Label
+                                        Content="Checksum:"
+                                        VerticalContentAlignment="Center"
+                                        Height="30" />
+                                    <TextBox
+                                        Text="{Binding Checksum,Mode=OneWay}"
+                                        Height="30"
+                                        VerticalContentAlignment="Center"
+                                        HorizontalContentAlignment="Center"
+                                        IsReadOnly="True" />
+                                </DockPanel>
+                                <DockPanel
+                                    Margin="5">
+                                    <Label
+                                        Content="Size:"
+                                        VerticalContentAlignment="Center"
+                                        Height="30" />
+                                    <TextBox
+                                        Text="{Binding Size,Mode=OneWay}"
+                                        Height="30"
+                                        VerticalContentAlignment="Center"
+                                        HorizontalContentAlignment="Center"
+                                        IsReadOnly="True" />
+                                </DockPanel>
+                            </UniformGrid>
+                            <TextBox
+                                Text="{Binding Content,Mode=OneWay}"
+                                IsReadOnly="True"
+                                FontFamily="Consolas"
+                                FontSize="11"
+                                VerticalScrollBarVisibility="Auto"
+                                Margin="5" />
+                        </DockPanel>
+                    </GroupBox>
+                </DockPanel>
+            </TabItem>
+            <TabItem
+                Header="Log">
+                <DockPanel>
+                    <UniformGrid
+                        Rows="1"
+                        Columns="2"
+                        DockPanel.Dock="Bottom">
+                        <Button
+                            Content="Clear"
+                            Height="30"
+                            Margin="5" />
+                    </UniformGrid>
+                    <TextBox
+                        x:Name="TextBoxLog"
+                        IsReadOnly="True"
+                        HorizontalScrollBarVisibility="Auto"
+                        VerticalScrollBarVisibility="Auto"
+                        Margin="5" />
+                </DockPanel>
+            </TabItem>
+            <TabItem
+                Header="Commands">
+                <DockPanel>
+                    <UniformGrid
+                        Rows="1"
+                        Columns="2"
+                        DockPanel.Dock="Bottom">
+                        <Button
+                            Content="Clear"
+                            Height="30"
+                            Margin="5" />
+                    </UniformGrid>
+                    <TextBox
+                        x:Name="TextBoxCmds"
+                        IsReadOnly="True"
+                        HorizontalScrollBarVisibility="Auto"
+                        VerticalScrollBarVisibility="Auto"
+                        Margin="5" />
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
 </Window>
