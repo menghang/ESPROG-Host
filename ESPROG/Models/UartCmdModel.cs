@@ -1,12 +1,6 @@
 ﻿using ESPROG.Utils;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ESPROG.Models
 {
@@ -94,6 +88,39 @@ namespace ESPROG.Models
                 cmd.Val.Add(items[ii]);
             }
             return cmd;
+        }
+
+        public static UartCmdModel? GetFwWriteBufCmd(uint addr, byte[] data)
+        {
+            UartCmdModel cmd = new(CmdFwWriteBuf);
+            cmd.Val.Add(HexUtil.GetHexStr(addr));
+            cmd.Val.Add(HexUtil.GetHexStr(HexUtil.GetChecksum(data)));
+            cmd.Val.Add(HexUtil.GetBase64Str(data));
+            return cmd;
+        }
+
+        public static (uint addr, byte[] data)? ParseFwReadBufCmd(UartCmdModel? cmd)
+        {
+            if (cmd == null || cmd.Rsp == null || cmd.Rsp != 0 || cmd.Val.Count != 3)
+            {
+                return null;
+            }
+            uint? addr = HexUtil.GetUint32(cmd.Val[0]);
+            if (addr == null)
+            {
+                return null;
+            }
+            byte[]? data = HexUtil.GetBytes(cmd.Val[2]);
+            if (data == null)
+            {
+                return null;
+            }
+            uint? checksum = HexUtil.GetUint32(cmd.Val[1]);
+            if (checksum == null || checksum != HexUtil.GetChecksum(data))
+            {
+                return null;
+            }
+            return (addr.Value, data);
         }
     }
 }
