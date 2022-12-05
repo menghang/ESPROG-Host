@@ -5,10 +5,10 @@
         private bool portConnected;
         public bool PortConnected
         {
-            get => this.portConnected;
+            get => portConnected;
             set
             {
-                this.portConnected = value;
+                portConnected = value;
                 EsprogSelView.PortNotLocked = !value;
                 ChipSelView.PortConnected = value;
             }
@@ -17,8 +17,8 @@
         private string fwFile;
         public string FwFile
         {
-            get => this.fwFile;
-            set => SetProperty(ref this.fwFile, value);
+            get => fwFile;
+            set => SetProperty(ref fwFile, value);
         }
 
         public EsprogSelVM EsprogSelView { get; private set; }

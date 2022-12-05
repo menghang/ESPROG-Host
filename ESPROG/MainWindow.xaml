@@ -174,16 +174,13 @@
                                 <UniformGrid
                                     Rows="1"
                                     Columns="2">
-                                    <CheckBox
-                                        Content="Autodetect Chip Address"
-                                        IsChecked="{Binding EnableAutoChipAddr}"
-                                        VerticalContentAlignment="Center"
+                                    <Button
+                                        Content="Autodetect Chip"
                                         Height="30"
                                         Margin="5" />
                                     <Button
-                                        Content="Detect Chip"
+                                        Content="Get Chip Info"
                                         Height="30"
-                                        Grid.Column="1"
                                         Margin="5" />
                                 </UniformGrid>
                             </StackPanel>
