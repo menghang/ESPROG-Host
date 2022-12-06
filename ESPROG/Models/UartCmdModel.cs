@@ -74,7 +74,7 @@ namespace ESPROG.Models
             {
                 return cmd;
             }
-            cmd.Rsp = HexUtil.GetUint8(items[1]);
+            cmd.Rsp = HexUtil.GetByteFromStr(items[1]);
             if (cmd.Rsp == null)
             {
                 return null;
@@ -88,40 +88,6 @@ namespace ESPROG.Models
                 cmd.Val.Add(items[ii]);
             }
             return cmd;
-        }
-
-        public static UartCmdModel? GetFwWriteBufCmd(uint addr, byte[] data)
-        {
-            if (data == null || data.Length == 0)
-            {
-                return null;
-            }
-            UartCmdModel cmd = new(CmdFwWriteBuf);
-            return cmd.AddVal(addr).AddVal(HexUtil.GetChecksum(data)).AddVal(data);
-        }
-
-        public static (uint addr, byte[] data)? ParseFwReadBufCmd(UartCmdModel? cmd)
-        {
-            if (cmd == null || cmd.Rsp == null || cmd.Rsp != 0 || cmd.Val.Count != 3)
-            {
-                return null;
-            }
-            uint? addr = HexUtil.GetUint32(cmd.Val[0]);
-            if (addr == null)
-            {
-                return null;
-            }
-            byte[]? data = HexUtil.GetBytes(cmd.Val[2]);
-            if (data == null)
-            {
-                return null;
-            }
-            uint? checksum = HexUtil.GetUint32(cmd.Val[1]);
-            if (checksum == null || checksum != HexUtil.GetChecksum(data))
-            {
-                return null;
-            }
-            return (addr.Value, data);
         }
 
         public UartCmdModel AddVal(byte val)
@@ -145,6 +111,12 @@ namespace ESPROG.Models
         public UartCmdModel AddVal(byte[] val)
         {
             Val.Add(HexUtil.GetBase64Str(val));
+            return this;
+        }
+
+        public UartCmdModel AddVal(string val)
+        {
+            Val.Add(val);
             return this;
         }
     }

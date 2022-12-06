@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace ESPROG.Views
 {
     class ChipSelVM : BaseViewModel
     {
-        private static readonly Dictionary<string, List<string>> chips = new()
+        public static readonly Dictionary<string, List<string>> Chips = new()
         {
             { "NU1705",new(){"0x50","0x51","0x52","0x53"} },
             { "NU1708",new(){"0x50","0x51","0x52","0x53"} },
@@ -13,15 +14,23 @@ namespace ESPROG.Views
 
         public List<string> ChipList { get; private set; }
 
+
+        public delegate void SelectedChipChangedHandler(object sender, EventArgs e);
+        public event SelectedChipChangedHandler? SelectedChipChanged;
+
         private string selectedChip;
         public string SelectedChip
         {
             get => selectedChip;
             set
             {
-                SetProperty(ref selectedChip, value);
-                SetProperty(ref chipAddrList, chips[selectedChip], nameof(ChipAddrList));
-                SetProperty(ref selectedChipAddr, chipAddrList[1], nameof(SelectedChipAddr));
+                if (selectedChip != value)
+                {
+                    SetProperty(ref selectedChip, value);
+                    SetProperty(ref chipAddrList, Chips[selectedChip], nameof(ChipAddrList));
+                    SetProperty(ref selectedChipAddr, chipAddrList[1], nameof(SelectedChipAddr));
+                    SelectedChipChanged?.Invoke(this, EventArgs.Empty);
+                }
             }
         }
 
@@ -63,12 +72,12 @@ namespace ESPROG.Views
         public ChipSelVM()
         {
             ChipList = new();
-            foreach (string chip in chips.Keys)
+            foreach (string chip in Chips.Keys)
             {
                 ChipList.Add(chip);
             }
             selectedChip = ChipList[1];
-            chipAddrList = chips[selectedChip];
+            chipAddrList = Chips[selectedChip];
             selectedChipAddr = ChipAddrList[1];
             chipInfo = string.Empty;
             portConnected = false;

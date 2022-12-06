@@ -41,6 +41,17 @@ namespace ESPROG.Services
             });
         }
 
+        public void Error(string log)
+        {
+            string fullLog = BuildFullLog(log, "E");
+            Log.Error(fullLog);
+            ui.Dispatcher.BeginInvoke(() =>
+            {
+                ui.AppendText(fullLog);
+                ui.ScrollToEnd();
+            });
+        }
+
         public void ClearLogBox()
         {
             ui.Dispatcher.BeginInvoke(() => ui.Clear());

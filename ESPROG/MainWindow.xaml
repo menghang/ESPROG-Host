@@ -7,8 +7,8 @@
     xmlns:local="clr-namespace:ESPROG"
     mc:Ignorable="d"
     Title="ESPROG-HOST"
-    Height="750"
-    MinHeight="750"
+    Height="700"
+    MinHeight="700"
     Width="450"
     MinWidth="450"
     Loaded="MainWindow_Loaded">
@@ -22,12 +22,35 @@
                     Header="Close" />
             </MenuItem>
             <MenuItem
+                Header="View"
+                Width="50">
+                <MenuItem
+                    Header="Show Log Box" />
+                <MenuItem
+                    Header="Show Cmds Box" />
+            </MenuItem>
+            <MenuItem
                 Header="Help"
                 Width="50">
                 <MenuItem
                     Header="About" />
             </MenuItem>
         </Menu>
+        <Grid
+            DockPanel.Dock="Bottom"
+            Margin="5">
+            <ProgressBar
+                DockPanel.Dock="Bottom"
+                Foreground="DeepSkyBlue"
+                Maximum="100"
+                Value="100"
+                Height="30"
+                IsIndeterminate="False" />
+            <TextBlock
+                Text="Busy"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center" />
+        </Grid>
         <TabControl
             DockPanel.Dock="Top"
             Margin="5">
@@ -177,11 +200,13 @@
                                     <Button
                                         Content="Autodetect Chip"
                                         Height="30"
-                                        Margin="5" />
+                                        Margin="5"
+                                        Click="ButtonAutodetectChip_Click" />
                                     <Button
                                         Content="Get Chip Info"
                                         Height="30"
-                                        Margin="5" />
+                                        Margin="5"
+                                        Click="ButtonGetChipInfo_Click" />
                                 </UniformGrid>
                             </StackPanel>
                         </GroupBox>
@@ -189,20 +214,11 @@
                 </DockPanel>
             </TabItem>
             <TabItem
-                Header="Firmware">
+                Header="Write Firmware">
                 <DockPanel>
-                    <ProgressBar
-                        Value="{Binding Progress}"
-                        Minimum="0"
-                        Maximum="{Binding ProgressMax}"
-                        Foreground="{Binding ProgressColor}"
-                        DockPanel.Dock="Bottom"
-                        Height="30"
-                        Margin="5" />
                     <StackPanel
                         DockPanel.Dock="Top">
                         <DockPanel
-                            Grid.Column="0"
                             Margin="5">
                             <Label
                                 Content="Firmware:"
@@ -212,8 +228,8 @@
                                 Text="{Binding FwFile}"
                                 IsReadOnly="True"
                                 VerticalContentAlignment="Center"
-                                HorizontalContentAlignment="Center"
-                                Height="30" />
+                                Height="30"
+                                MouseDoubleClick="TextBoxFwFile_MouseDoubleClick" />
                         </DockPanel>
                         <UniformGrid
                             Rows="1"
@@ -229,7 +245,7 @@
                         </UniformGrid>
                     </StackPanel>
                     <GroupBox
-                        DataContext="{Binding FwContent}"
+                        DataContext="{Binding WriteFwContent}"
                         Header="Firmware Content"
                         Margin="5">
                         <DockPanel>
@@ -276,6 +292,131 @@
                 </DockPanel>
             </TabItem>
             <TabItem
+                Header="Read Firmware">
+                <DockPanel>
+                    <StackPanel
+                        DockPanel.Dock="Top">
+                        <UniformGrid
+                            Rows="1"
+                            Columns="2">
+                            <Button
+                                Content="Read Chip"
+                                Height="30"
+                                Margin="5" />
+                            <Button
+                                Content="Save to File"
+                                Height="30"
+                                Margin="5" />
+                        </UniformGrid>
+                    </StackPanel>
+                    <GroupBox
+                        DataContext="{Binding ReadFwContent}"
+                        Header="Firmware Content"
+                        Margin="5">
+                        <DockPanel>
+                            <UniformGrid
+                                Rows="1"
+                                Columns="2"
+                                DockPanel.Dock="Bottom">
+                                <DockPanel
+                                    Margin="5">
+                                    <Label
+                                        Content="Checksum:"
+                                        VerticalContentAlignment="Center"
+                                        Height="30" />
+                                    <TextBox
+                                        Text="{Binding Checksum,Mode=OneWay}"
+                                        Height="30"
+                                        VerticalContentAlignment="Center"
+                                        HorizontalContentAlignment="Center"
+                                        IsReadOnly="True" />
+                                </DockPanel>
+                                <DockPanel
+                                    Margin="5">
+                                    <Label
+                                        Content="Size:"
+                                        VerticalContentAlignment="Center"
+                                        Height="30" />
+                                    <TextBox
+                                        Text="{Binding Size,Mode=OneWay}"
+                                        Height="30"
+                                        VerticalContentAlignment="Center"
+                                        HorizontalContentAlignment="Center"
+                                        IsReadOnly="True" />
+                                </DockPanel>
+                            </UniformGrid>
+                            <TextBox
+                                Text="{Binding Content,Mode=OneWay}"
+                                IsReadOnly="True"
+                                FontFamily="Consolas"
+                                FontSize="11"
+                                VerticalScrollBarVisibility="Auto"
+                                Margin="5" />
+                        </DockPanel>
+                    </GroupBox>
+                </DockPanel>
+            </TabItem>
+            <TabItem
+                Header="Other">
+                <StackPanel>
+                    <GroupBox
+                        Header="Read/Write I2C Reg"
+                        Margin="5">
+                        <StackPanel>
+                            <DockPanel
+                                Margin="5">
+                                <Label
+                                    Content="Reg Addr:"
+                                    VerticalContentAlignment="Center"
+                                    Height="30" />
+                                <TextBox
+                                    Text="{Binding RegAddr}"
+                                    VerticalContentAlignment="Center"
+                                    Height="30" />
+                            </DockPanel>
+                            <DockPanel
+                                Margin="5">
+                                <Label
+                                    Content="Reg Val:"
+                                    VerticalContentAlignment="Center"
+                                    Height="30" />
+                                <TextBox
+                                    Text="{Binding RegVal}"
+                                    VerticalContentAlignment="Center"
+                                    Height="30" />
+                            </DockPanel>
+                            <UniformGrid
+                                Rows="1"
+                                Columns="2">
+                                <Button
+                                    Content="Read Reg"
+                                    Height="30"
+                                    Margin="5" />
+                                <Button
+                                    Content="Write Reg"
+                                    Height="30"
+                                    Margin="5" />
+                            </UniformGrid>
+                        </StackPanel>
+                    </GroupBox>
+                    <GroupBox
+                        Header="ESPROG"
+                        Margin="5">
+                        <StackPanel>
+                            <UniformGrid
+                                Rows="1"
+                                Columns="2">
+                                <Button
+                                    Content="Format ESPROG Storage"
+                                    Height="30"
+                                    Margin="5"
+                                    Click="ButtonFormatEsprogStorage_Click" />
+                            </UniformGrid>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </TabItem>
+            <TabItem
                 Header="Log">
                 <DockPanel>
                     <UniformGrid
@@ -285,7 +426,8 @@
                         <Button
                             Content="Clear"
                             Height="30"
-                            Margin="5" />
+                            Margin="5"
+                            Click="ButtonClearLog_Click" />
                     </UniformGrid>
                     <TextBox
                         x:Name="TextBoxLog"
@@ -305,7 +447,8 @@
                         <Button
                             Content="Clear"
                             Height="30"
-                            Margin="5" />
+                            Margin="5"
+                            Click="ButtonClearCmds_Click" />
                     </UniformGrid>
                     <TextBox
                         x:Name="TextBoxCmds"
