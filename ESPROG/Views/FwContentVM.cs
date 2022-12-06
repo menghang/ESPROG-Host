@@ -8,7 +8,7 @@ namespace ESPROG.Views
 {
     internal class FwContentVM : BaseViewModel
     {
-        public long MaxFwSize { private get; set; }
+        public long MaxFwSize { get; set; }
 
         public string Content { get; private set; }
 

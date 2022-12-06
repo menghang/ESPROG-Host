@@ -34,6 +34,21 @@ namespace ESPROG.Views
             }
         }
 
+        public static uint? GetChipVal(string chip)
+        {
+            switch (chip)
+            {
+                case "NU1705":
+                    return 0x1705;
+                case "NU1708":
+                    return 0x1708;
+                case "NU1718":
+                    return 0x1718;
+                default:
+                    return null;
+            }
+        }
+
         private List<string> chipAddrList;
         public List<string> ChipAddrList
         {

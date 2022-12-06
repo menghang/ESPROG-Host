@@ -119,6 +119,21 @@
                                         IsReadOnly="True"
                                         Height="30" />
                                 </DockPanel>
+                                <DockPanel
+                                    Margin="5">
+                                    <Label
+                                        Content="Gate Control Mode:"
+                                        VerticalContentAlignment="Center"
+                                        Height="30" />
+                                    <ComboBox
+                                        SelectedItem="{Binding SelectedGateCtrlMode}"
+                                        ItemsSource="{Binding GateCtrlModeList}"
+                                        IsEnabled="{Binding PortConnected}"
+                                        VerticalContentAlignment="Center"
+                                        HorizontalContentAlignment="Center"
+                                        IsReadOnly="True"
+                                        Height="30" />
+                                </DockPanel>
                                 <UniformGrid
                                     Rows="2"
                                     Columns="2">
@@ -237,11 +252,13 @@
                             <Button
                                 Content="Program Chip"
                                 Height="30"
-                                Margin="5" />
+                                Margin="5"
+                                Click="ButtonProgChip_Click" />
                             <Button
                                 Content="Program ESPROG"
                                 Height="30"
-                                Margin="5" />
+                                Margin="5"
+                                Click="ButtonProgEsprog_Click" />
                         </UniformGrid>
                     </StackPanel>
                     <GroupBox
@@ -401,6 +418,7 @@
                     </GroupBox>
                     <GroupBox
                         Header="ESPROG"
+                        DataContext="{Binding EsprogSelView}"
                         Margin="5">
                         <StackPanel>
                             <UniformGrid

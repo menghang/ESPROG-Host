@@ -12,7 +12,7 @@ namespace ESPROG.Utils
         }
         public static string GetHexStr(uint val)
         {
-            return "0x" + Convert.ToString(val, 16).PadLeft(4, '0');
+            return "0x" + Convert.ToString(val, 16).PadLeft(8, '0');
         }
 
         public static string GetHexStr(byte val)

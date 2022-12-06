@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace ESPROG.Views
 {
@@ -35,12 +37,37 @@ namespace ESPROG.Views
             {
                 SetProperty(ref portNotLocked, value);
                 OnPropertyChanged(nameof(BtnConnectPortText));
+                OnPropertyChanged(nameof(PortConnected));
             }
         }
 
         public string BtnConnectPortText
         {
             get => portNotLocked ? "Connect Port" : "Close Port";
+        }
+
+        public bool PortConnected
+        {
+            get => !portNotLocked;
+        }
+
+        public delegate void SelectedGateCtrlModeChangedHandler(object sender, EventArgs e);
+        public event SelectedGateCtrlModeChangedHandler? SelectedGateCtrlModeChanged;
+
+        public List<string> GateCtrlModeList { get; private set; }
+
+        private string selectedGateCtrlMode;
+        public string SelectedGateCtrlMode
+        {
+            get => selectedGateCtrlMode;
+            set
+            {
+                if (selectedGateCtrlMode != value)
+                {
+                    SetProperty(ref selectedGateCtrlMode, value);
+                    SelectedGateCtrlModeChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
         }
 
         public EsprogSelVM()
@@ -50,6 +77,8 @@ namespace ESPROG.Views
             esprogInfo = string.Empty;
             esprogCompileTime = string.Empty;
             portNotLocked = true;
+            GateCtrlModeList = new() { "On Demand", "Always On", "Always Off" };
+            selectedGateCtrlMode = GateCtrlModeList[0];
         }
     }
 }

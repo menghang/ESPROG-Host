@@ -215,7 +215,7 @@ namespace ESPROG.Services
 
         public async Task<bool> FwWriteBuf(uint fwAddr, byte[] fwData)
         {
-            UartCmdModel sendCmd = new(UartCmdModel.CmdGetChip);
+            UartCmdModel sendCmd = new(UartCmdModel.CmdFwWriteBuf);
             sendCmd.AddVal(fwAddr).AddVal(HexUtil.GetChecksum(fwData)).AddVal(fwData);
             UartCmdModel? RecvCmd = await SendCmdAsync(sendCmd);
             if (RecvCmd == null || RecvCmd.Val.Count != 1)
@@ -227,7 +227,7 @@ namespace ESPROG.Services
 
         public async Task<byte[]?> FwReadBuf(uint fwAddr)
         {
-            UartCmdModel sendCmd = new(UartCmdModel.CmdGetChip);
+            UartCmdModel sendCmd = new(UartCmdModel.CmdFwReadBuf);
             sendCmd.AddVal(fwAddr);
             UartCmdModel? RecvCmd = await SendCmdAsync(sendCmd);
             if (RecvCmd == null || RecvCmd.Val.Count != 3)
@@ -296,6 +296,7 @@ namespace ESPROG.Services
                     return false;
                 }
             }
+            log.Info("Write firmware to ESPROG succeed");
             return true;
         }
 
@@ -319,6 +320,7 @@ namespace ESPROG.Services
                 else if (fwAddr + fwBuffer.LongLength == fwSize)
                 {
                     Array.Copy(fwBuffer, 0, fwData, fwAddr, fwBuffer.LongLength);
+                    log.Info("Read firmware from ESPROG succeed");
                     return fwData;
                 }
                 else
@@ -328,6 +330,26 @@ namespace ESPROG.Services
                     return null;
                 }
             }
+        }
+
+        public async Task<bool> SetGateCtrl(byte mode)
+        {
+            UartCmdModel sendCmd = new(UartCmdModel.CmdSetGateCtrl);
+            sendCmd.AddVal(mode);
+            UartCmdModel? RecvCmd = await SendCmdAsync(sendCmd);
+            return RecvCmd != null;
+        }
+
+        public async Task<byte?> GetGateCtrl()
+        {
+            UartCmdModel sendCmd = new(UartCmdModel.CmdGetGateCtrl);
+            sendCmd.AddVal(true);
+            UartCmdModel? RecvCmd = await SendCmdAsync(sendCmd);
+            if (RecvCmd == null || RecvCmd.Val.Count != 1)
+            {
+                return null;
+            }
+            return HexUtil.GetByteFromStr(RecvCmd.Val[0]);
         }
     }
 }

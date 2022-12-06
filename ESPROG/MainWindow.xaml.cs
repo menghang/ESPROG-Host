@@ -33,6 +33,25 @@ namespace ESPROG
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             ReloadSerialPort();
+            view.EsprogSelView.SelectedGateCtrlModeChanged += EsprogSelView_SelectedGateCtrlModeChanged;
+        }
+
+        private async void EsprogSelView_SelectedGateCtrlModeChanged(object sender, EventArgs e)
+        {
+            byte mode = view.EsprogSelView.SelectedGateCtrlMode switch
+            {
+                "Always On" => 0x01,
+                "Always Off" => 0x02,
+                _ => 0x00,
+            };
+            if (await nuprog.SetGateCtrl(mode))
+            {
+                log.Info(string.Format("Set gate mode ({0}) succeed", view.EsprogSelView.SelectedGateCtrlMode));
+            }
+            else
+            {
+                log.Error(string.Format("Set gate mode ({0}) fail", view.EsprogSelView.SelectedGateCtrlMode));
+            }
         }
 
         private void ReloadSerialPort()
@@ -138,24 +157,15 @@ namespace ESPROG
 
         private async Task<string?> GetChipInfo(string chipStr, string devAddrStr)
         {
-            uint chip;
-            switch (chipStr)
+            uint? chip = ChipSelVM.GetChipVal(chipStr);
+            if (chip == null)
             {
-                case "NU1705":
-                    chip = 0x1705;
-                    break;
-                case "NU1708":
-                    chip = 0x1708;
-                    break;
-                case "NU1718":
-                    chip = 0x1718;
-                    break;
-                default:
-                    return null;
+                log.Error(string.Format("Chip ({0}) is invalid", chipStr));
+                return null;
             }
-            if (!await nuprog.SetChip(chip))
+            if (!await nuprog.SetChip(chip.Value))
             {
-                log.Error(string.Format("Set chip ({0}) fail", chipStr));
+                log.Error(string.Format("Set chip (0x{0}) fail", Convert.ToString(chip.Value, 16)));
                 return null;
             }
             byte? devAddr = HexUtil.GetByteFromStr(devAddrStr);
@@ -166,7 +176,7 @@ namespace ESPROG
             }
             if (!await nuprog.SetDevAddr(devAddr.Value))
             {
-                log.Error(string.Format("Set chip addr ({0}) fail", devAddr.Value));
+                log.Error(string.Format("Set chip addr ({0}) fail", HexUtil.GetHexStr(devAddr.Value)));
                 return null;
             }
             (byte chipPn, byte chipVersion)? chipInfo = await nuprog.GetChipInfo();
@@ -230,6 +240,31 @@ namespace ESPROG
             else
             {
                 log.Error("Format ESPROG storage fail");
+            }
+        }
+
+        private void ButtonProgChip_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private async void ButtonProgEsprog_Click(object sender, RoutedEventArgs e)
+        {
+            if (view.WriteFwContent.FwData == null)
+            {
+                return;
+            }
+            if (!await nuprog.WriteFwToEsprog(view.WriteFwContent.FwData, view.WriteFwContent.MaxFwSize))
+            {
+                return;
+            }
+            if (!await nuprog.SaveToEsprog())
+            {
+                log.Error("Save config to ESPROG fail");
+            }
+            else
+            {
+                log.Info("Save config to ESPROG succeed");
             }
         }
     }
