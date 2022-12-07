@@ -47,18 +47,8 @@ namespace ESPROG.Views
 
         private void UpdateMaxFwSizeWithChip()
         {
-            switch (ChipSelView.SelectedChip)
-            {
-                case "NU1705":
-                case "NU1708":
-                    WriteFwContent.MaxFwSize = 32 * 1024;
-                    ReadFwContent.MaxFwSize = 32 * 1024;
-                    break;
-                case "NU1718":
-                    WriteFwContent.MaxFwSize = 64 * 1024;
-                    ReadFwContent.MaxFwSize = 64 * 1024;
-                    break;
-            }
+            WriteFwContent.MaxFwSize = ChipSelVM.ChipSizeDict[ChipSelView.SelectedChip];
+            ReadFwContent.MaxFwSize = ChipSelVM.ChipSizeDict[ChipSelView.SelectedChip];
         }
     }
 }

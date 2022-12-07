@@ -126,8 +126,10 @@
                                         VerticalContentAlignment="Center"
                                         Height="30" />
                                     <ComboBox
-                                        SelectedItem="{Binding SelectedGateCtrlMode}"
                                         ItemsSource="{Binding GateCtrlModeList}"
+                                        DisplayMemberPath="Display"
+                                        SelectedValuePath="Value"
+                                        SelectedValue="{Binding SelectedGateCtrlMode}"
                                         IsEnabled="{Binding PortConnected}"
                                         VerticalContentAlignment="Center"
                                         HorizontalContentAlignment="Center"
@@ -159,10 +161,10 @@
                         </GroupBox>
                         <GroupBox
                             Header="Chip Selection"
-                            DataContext="{Binding ChipSelView}"
-                            IsEnabled="{Binding PortConnected}"
                             Margin="5">
-                            <StackPanel>
+                            <StackPanel
+                                DataContext="{Binding ChipSelView}"
+                                IsEnabled="{Binding PortConnected}">
                                 <UniformGrid
                                     Rows="1"
                                     Columns="2">
@@ -173,8 +175,10 @@
                                             VerticalContentAlignment="Center"
                                             Height="30" />
                                         <ComboBox
-                                            SelectedItem="{Binding SelectedChip}"
                                             ItemsSource="{Binding ChipList}"
+                                            DisplayMemberPath="Display"
+                                            SelectedValuePath="Value"
+                                            SelectedValue="{Binding SelectedChip}"
                                             VerticalContentAlignment="Center"
                                             HorizontalContentAlignment="Center"
                                             IsReadOnly="True"
@@ -187,8 +191,10 @@
                                             VerticalContentAlignment="Center"
                                             Height="30" />
                                         <ComboBox
-                                            SelectedItem="{Binding SelectedChipAddr}"
                                             ItemsSource="{Binding ChipAddrList}"
+                                            DisplayMemberPath="Display"
+                                            SelectedValuePath="Value"
+                                            SelectedValue="{Binding SelectedChipAddr}"
                                             VerticalContentAlignment="Center"
                                             HorizontalContentAlignment="Center"
                                             IsReadOnly="True"
@@ -319,11 +325,13 @@
                             <Button
                                 Content="Read Chip"
                                 Height="30"
-                                Margin="5" />
+                                Margin="5"
+                                Click="ButtonReadChip_Click" />
                             <Button
                                 Content="Save to File"
                                 Height="30"
-                                Margin="5" />
+                                Margin="5"
+                                Click="ButtonSaveFw_Click" />
                         </UniformGrid>
                     </StackPanel>
                     <GroupBox

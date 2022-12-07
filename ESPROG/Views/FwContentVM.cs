@@ -1,6 +1,5 @@
 ﻿using ESPROG.Utils;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -99,6 +98,71 @@ namespace ESPROG.Views
             OnPropertyChanged(nameof(Size));
             OnPropertyChanged(nameof(Checksum));
             OnPropertyChanged(nameof(Content));
+            return res;
+        }
+
+        public bool LoadFwData(byte[] data, out string log)
+        {
+            bool res = false;
+            if (data.LongLength > MaxFwSize)
+            {
+                log = string.Format("Firmware size ({0}) exceed limit ({1})", data.LongLength, MaxFwSize);
+                size = 0;
+                checksum = 0;
+                Content = string.Empty;
+            }
+            else
+            {
+                FwData = data;
+                Content = GetFwContent(FwData);
+                checksum = HexUtil.GetChecksum(FwData);
+                size = FwData.LongLength;
+                log = "Firmware file load succeed";
+                res = true;
+            }
+            OnPropertyChanged(nameof(Size));
+            OnPropertyChanged(nameof(Checksum));
+            OnPropertyChanged(nameof(Content));
+            return res;
+        }
+
+        private static readonly int writeBufferSize = 1024;
+        public bool SaveFwData(string file, out string log)
+        {
+            bool res = false;
+            try
+            {
+                if (FwData != null)
+                {
+                    using (FileStream fs = new(file, FileMode.Create))
+                    {
+                        using (BufferedStream bs = new(fs))
+                        {
+                            byte[] buf = new byte[writeBufferSize];
+                            long pos = 0;
+                            while (pos < FwData.LongLength)
+                            {
+                                long bufLength =
+                                    FwData.LongLength - pos < writeBufferSize ?
+                                    FwData.LongLength - pos : writeBufferSize;
+                                Array.Copy(FwData, pos, buf, 0, bufLength);
+                                bs.Write(buf, 0, (int)bufLength);
+                            }
+                            bs.Flush();
+                            log = "Save firmware succeed";
+                            res = true;
+                        }
+                    }
+                }
+                else
+                {
+                    log = "Firmware data does not exist";
+                }
+            }
+            catch (Exception ex)
+            {
+                log = "Save firmware fail" + Environment.NewLine + ex.ToString();
+            }
             return res;
         }
 

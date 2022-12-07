@@ -1,4 +1,5 @@
-﻿using ESPROG.Services;
+﻿using ESPROG.Models;
+using ESPROG.Services;
 using ESPROG.Utils;
 using ESPROG.Views;
 using Microsoft.Win32;
@@ -38,13 +39,7 @@ namespace ESPROG
 
         private async void EsprogSelView_SelectedGateCtrlModeChanged(object sender, EventArgs e)
         {
-            byte mode = view.EsprogSelView.SelectedGateCtrlMode switch
-            {
-                "Always On" => 0x01,
-                "Always Off" => 0x02,
-                _ => 0x00,
-            };
-            if (await nuprog.SetGateCtrl(mode))
+            if (await nuprog.SetGateCtrl(view.EsprogSelView.SelectedGateCtrlMode))
             {
                 log.Info(string.Format("Set gate mode ({0}) succeed", view.EsprogSelView.SelectedGateCtrlMode));
             }
@@ -83,17 +78,24 @@ namespace ESPROG
             string? version = await nuprog.GetEsprogVersionAsync();
             if (version == null)
             {
-                log.Debug(string.Format("Can not find ESPROG on port({0})", port));
+                log.Debug(string.Format("Can not get ESPROG version on port({0})", port));
                 return false;
             }
             string? compileTime = await nuprog.GetEsprogCompileTimeAsync();
             if (compileTime == null)
             {
-                log.Debug(string.Format("Can not find ESPROG on port({0})", port));
+                log.Debug(string.Format("Can not get ESPROG compile time on port({0})", port));
+                return false;
+            }
+            byte? gateCtrlMode = await nuprog.GetGateCtrl();
+            if (gateCtrlMode == null)
+            {
+                log.Debug(string.Format("Can not get ESPROG gate ctrl mode on port({0})", port));
                 return false;
             }
             view.EsprogSelView.EsprogInfo = version;
             view.EsprogSelView.EsprogCompileTime = compileTime;
+            view.EsprogSelView.UpdateSelectedGateCtrlMode(gateCtrlMode.Value);
             log.Info(string.Format("Find ESPROG on port({0})", port));
             return true;
         }
@@ -155,28 +157,10 @@ namespace ESPROG
             }
         }
 
-        private async Task<string?> GetChipInfo(string chipStr, string devAddrStr)
+        private async Task<string?> GetChipInfo(uint chip, byte devAddr)
         {
-            uint? chip = ChipSelVM.GetChipVal(chipStr);
-            if (chip == null)
+            if (!await nuprog.SetChipAndAddr(chip, devAddr))
             {
-                log.Error(string.Format("Chip ({0}) is invalid", chipStr));
-                return null;
-            }
-            if (!await nuprog.SetChip(chip.Value))
-            {
-                log.Error(string.Format("Set chip (0x{0}) fail", Convert.ToString(chip.Value, 16)));
-                return null;
-            }
-            byte? devAddr = HexUtil.GetByteFromStr(devAddrStr);
-            if (devAddr == null)
-            {
-                log.Error(string.Format("Wrong chip addr ({0})", devAddrStr));
-                return null;
-            }
-            if (!await nuprog.SetDevAddr(devAddr.Value))
-            {
-                log.Error(string.Format("Set chip addr ({0}) fail", HexUtil.GetHexStr(devAddr.Value)));
                 return null;
             }
             (byte chipPn, byte chipVersion)? chipInfo = await nuprog.GetChipInfo();
@@ -215,15 +199,15 @@ namespace ESPROG
         private async void ButtonAutodetectChip_Click(object sender, RoutedEventArgs e)
         {
             view.ChipSelView.ChipInfo = string.Empty;
-            foreach (string chipStr in ChipSelVM.Chips.Keys)
+            foreach (uint chip in ChipSelVM.ChipDict.Keys)
             {
-                foreach (string devAddrStr in ChipSelVM.Chips[chipStr])
+                foreach (ComboBoxModel<string, byte> devAddr in ChipSelVM.ChipDict[chip])
                 {
-                    string? chipInfo = await GetChipInfo(chipStr, devAddrStr);
+                    string? chipInfo = await GetChipInfo(chip, devAddr.Value);
                     if (chipInfo != null)
                     {
-                        view.ChipSelView.SelectedChip = chipStr;
-                        view.ChipSelView.SelectedChipAddr = devAddrStr;
+                        view.ChipSelView.SelectedChip = chip;
+                        view.ChipSelView.SelectedChipAddr = devAddr.Value;
                         view.ChipSelView.ChipInfo = chipInfo;
                         return;
                     }
@@ -243,28 +227,96 @@ namespace ESPROG
             }
         }
 
-        private void ButtonProgChip_Click(object sender, RoutedEventArgs e)
+        private async void ButtonProgChip_Click(object sender, RoutedEventArgs e)
         {
+            if (!await SendFwToESPROG())
+            {
+                return;
+            }
+            if (!await nuprog.FwWriteStart())
+            {
+                log.Error("Program chip fail");
+                return;
+            }
+            log.Error("Program chip succeed");
+            return;
+        }
 
+        private async Task<bool> SendFwToESPROG()
+        {
+            if (view.WriteFwContent.FwData == null)
+            {
+                log.Error("Firmware is not available");
+                return false;
+            }
+            if (!await nuprog.SetChipAndAddr(view.ChipSelView.SelectedChip, view.ChipSelView.SelectedChipAddr))
+            {
+                return false;
+            }
+            if (!await nuprog.WriteFwToEsprog(view.WriteFwContent.FwData, view.WriteFwContent.MaxFwSize))
+            {
+                return false;
+            }
+            if (!await nuprog.FwWriteChecksum(view.WriteFwContent.FwData))
+            {
+                log.Error("Write checksum fail");
+                return false;
+            }
+            return true;
         }
 
         private async void ButtonProgEsprog_Click(object sender, RoutedEventArgs e)
         {
-            if (view.WriteFwContent.FwData == null)
-            {
-                return;
-            }
-            if (!await nuprog.WriteFwToEsprog(view.WriteFwContent.FwData, view.WriteFwContent.MaxFwSize))
+            if (!await SendFwToESPROG())
             {
                 return;
             }
             if (!await nuprog.SaveToEsprog())
             {
                 log.Error("Save config to ESPROG fail");
+                return;
+            }
+            log.Info("Save config to ESPROG succeed");
+        }
+
+        private async void ButtonReadChip_Click(object sender, RoutedEventArgs e)
+        {
+            if (!await nuprog.SetChipAndAddr(view.ChipSelView.SelectedChip, view.ChipSelView.SelectedChipAddr))
+            {
+                return;
+            }
+            byte[]? fwData = await nuprog.ReadFwFromEsprog(view.WriteFwContent.MaxFwSize);
+            if (fwData == null)
+            {
+                return;
+            }
+            if (view.ReadFwContent.LoadFwData(fwData, out string logMsg))
+            {
+                log.Info(logMsg);
             }
             else
             {
-                log.Info("Save config to ESPROG succeed");
+                log.Error(logMsg);
+            }
+        }
+
+        private void ButtonSaveFw_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog dialog = new()
+            {
+                Title = "Save firmware file",
+                Filter = "Binary File (*.bin)|*.bin"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                if (view.ReadFwContent.SaveFwData(dialog.FileName, out string logMsg))
+                {
+                    log.Info(logMsg);
+                }
+                else
+                {
+                    log.Error(logMsg);
+                }
             }
         }
     }

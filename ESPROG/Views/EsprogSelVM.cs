@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ESPROG.Models;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
@@ -54,10 +55,10 @@ namespace ESPROG.Views
         public delegate void SelectedGateCtrlModeChangedHandler(object sender, EventArgs e);
         public event SelectedGateCtrlModeChangedHandler? SelectedGateCtrlModeChanged;
 
-        public List<string> GateCtrlModeList { get; private set; }
+        public List<ComboBoxModel<string, byte>> GateCtrlModeList { get; private set; }
 
-        private string selectedGateCtrlMode;
-        public string SelectedGateCtrlMode
+        private byte selectedGateCtrlMode;
+        public byte SelectedGateCtrlMode
         {
             get => selectedGateCtrlMode;
             set
@@ -70,6 +71,11 @@ namespace ESPROG.Views
             }
         }
 
+        public void UpdateSelectedGateCtrlMode(byte mode)
+        {
+            SetProperty(ref selectedGateCtrlMode, mode, nameof(SelectedGateCtrlMode));
+        }
+
         public EsprogSelVM()
         {
             PortList = new();
@@ -77,8 +83,8 @@ namespace ESPROG.Views
             esprogInfo = string.Empty;
             esprogCompileTime = string.Empty;
             portNotLocked = true;
-            GateCtrlModeList = new() { "On Demand", "Always On", "Always Off" };
-            selectedGateCtrlMode = GateCtrlModeList[0];
+            GateCtrlModeList = new() { new("On Demand", 0x00), new("Always On", 0x01), new("Always Off", 0x02) };
+            selectedGateCtrlMode = GateCtrlModeList[0].Value;
         }
     }
 }
