@@ -235,7 +235,7 @@
                 </DockPanel>
             </TabItem>
             <TabItem
-                Header="Write Firmware">
+                Header="Write FW">
                 <DockPanel>
                     <StackPanel
                         DockPanel.Dock="Top">
@@ -315,7 +315,7 @@
                 </DockPanel>
             </TabItem>
             <TabItem
-                Header="Read Firmware">
+                Header="Read FW">
                 <DockPanel>
                     <StackPanel
                         DockPanel.Dock="Top">
@@ -464,7 +464,7 @@
                 </DockPanel>
             </TabItem>
             <TabItem
-                Header="Commands">
+                Header="Cmds">
                 <DockPanel>
                     <UniformGrid
                         Rows="1"
