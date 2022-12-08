@@ -156,6 +156,12 @@
                                         Height="30"
                                         Margin="5"
                                         Click="ButtonAutodetectPort_Click" />
+                                    <Button
+                                        Content="Format ESPROG Storage"
+                                        IsEnabled="{Binding PortConnected}"
+                                        Height="30"
+                                        Margin="5"
+                                        Click="ButtonFormatEsprogStorage_Click" />
                                 </UniformGrid>
                             </StackPanel>
                         </GroupBox>
@@ -421,22 +427,6 @@
                                     Content="Write Reg"
                                     Height="30"
                                     Margin="5" />
-                            </UniformGrid>
-                        </StackPanel>
-                    </GroupBox>
-                    <GroupBox
-                        Header="ESPROG"
-                        DataContext="{Binding EsprogSelView}"
-                        Margin="5">
-                        <StackPanel>
-                            <UniformGrid
-                                Rows="1"
-                                Columns="2">
-                                <Button
-                                    Content="Format ESPROG Storage"
-                                    Height="30"
-                                    Margin="5"
-                                    Click="ButtonFormatEsprogStorage_Click" />
                             </UniformGrid>
                         </StackPanel>
                     </GroupBox>
