@@ -12,9 +12,9 @@ namespace ESPROG.Services
         private readonly UartService uart;
         private readonly Queue<UartCmdModel> cmdQueue;
 
-        private static readonly int shortCheckInterval = 5;
+        private static readonly int shortCheckInterval = 20;
         private static readonly int shortCheckTimeout = 200;
-        private static readonly int midCheckInterval = 20;
+        private static readonly int midCheckInterval = 50;
         private static readonly int midCheckTimeout = 1000;
         private static readonly int longCheckInterval = 100;
         private static readonly int longCheckTimeout = 2000;
@@ -42,6 +42,7 @@ namespace ESPROG.Services
             cmdQueue.Clear();
             uart.SendCmd(cmd);
             DateTime start = DateTime.Now;
+            await Task.Delay(interval);
             while (true)
             {
                 if ((DateTime.Now - start).TotalMilliseconds > timeout) // Timeout
