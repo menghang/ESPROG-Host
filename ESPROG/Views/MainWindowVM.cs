@@ -48,6 +48,13 @@ namespace ESPROG.Views
             set => SetProperty(ref regVal, HexUtil.GetByteFromStr(value));
         }
 
+        private string sendCmd;
+        public string SendCmd
+        {
+            get => sendCmd;
+            set => SetProperty(ref sendCmd, value);
+        }
+
         public EsprogSettingVM EsprogSettingView { get; private set; }
         public ChipSettingVM ChipSettingView { get; private set; }
         public FwContentVM WriteFwContent { get; private set; }
@@ -59,6 +66,7 @@ namespace ESPROG.Views
             fwFile = string.Empty;
             regAddr = null;
             regVal = null;
+            sendCmd = string.Empty;
             EsprogSettingView = new();
             ChipSettingView = new();
             ChipSettingView.SelectedChipChanged += ChipSelView_SelectedChipChanged;

@@ -350,5 +350,11 @@ namespace ESPROG
                     view.RegAddr, HexUtil.GetHexStr(view.ChipSettingView.SelectedChipAddr)));
             }
         }
+
+        private void ButtonSendCmd_Click(object sender, RoutedEventArgs e)
+        {
+            string cmd = view.SendCmd.Trim() + "\r\n";
+            uart.SendCmd(cmd);
+        }
     }
 }

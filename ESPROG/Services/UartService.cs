@@ -109,9 +109,13 @@ namespace ESPROG.Services
 
         public void SendCmd(UartCmdModel cmd)
         {
-            string cmdStr = cmd.ToString();
-            LogCmd(true, cmdStr);
-            port?.Write(cmdStr);
+            SendCmd(cmd.ToString());
+        }
+
+        public void SendCmd(string cmd)
+        {
+            LogCmd(true, cmd);
+            port?.Write(cmd);
         }
 
         public void Close()
