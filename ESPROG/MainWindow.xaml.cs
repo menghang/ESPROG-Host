@@ -7,6 +7,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using static ESPROG.Views.EsprogSettingVM;
 
 namespace ESPROG
 {
@@ -37,16 +38,31 @@ namespace ESPROG
             view.EsprogSettingView.SelectedGateCtrlModeChanged += EsprogSelView_SelectedGateCtrlModeChanged;
         }
 
-        private async void EsprogSelView_SelectedGateCtrlModeChanged(object sender, EventArgs e)
+        private async void EsprogSelView_SelectedGateCtrlModeChanged(object sender, GateCtrlModeEventArgs e)
         {
-            if (await nuprog.SetGateCtrl(view.EsprogSettingView.SelectedGateCtrlMode))
+            view.IsIdle = false;
+            view.ProgressView.SetSate(ProgressVM.State.Running);
+            if (!await nuprog.SetGateCtrl(e.NewMode))
             {
-                log.Info(string.Format("Set gate mode ({0}) succeed", view.EsprogSettingView.SelectedGateCtrlMode));
+                log.Error(string.Format("Set gate mode ({0}) fail", view.EsprogSettingView.SelectedGateCtrlMode));
+                view.EsprogSettingView.UpdateSelectedGateCtrlMode(e.LastMode);
+                view.ProgressView.SetSate(ProgressVM.State.Fail);
             }
             else
             {
-                log.Error(string.Format("Set gate mode ({0}) fail", view.EsprogSettingView.SelectedGateCtrlMode));
+                log.Info(string.Format("Set gate mode ({0}) succeed", view.EsprogSettingView.SelectedGateCtrlMode));
+                view.ProgressView.SetSate(ProgressVM.State.Succeed);
             }
+            view.IsIdle = true;
+        }
+
+        private async Task<bool> UpdateGateCtrlModeSubTask()
+        {
+            if (!await nuprog.SetGateCtrl(view.EsprogSettingView.SelectedGateCtrlMode))
+            {
+                return false;
+            }
+            return true;
         }
 
         private void ReloadSerialPort()
@@ -107,17 +123,17 @@ namespace ESPROG
 
         private async void ButtonOpenPort_Click(object sender, RoutedEventArgs e)
         {
-            if (!view.PortConnected)
+            if (!view.IsPortConnected)
             {
                 if (await TryConnectPort(view.EsprogSettingView.SelectedPort))
                 {
-                    view.PortConnected = true;
+                    view.IsPortConnected = true;
                 }
             }
             else
             {
                 uart.Close();
-                view.PortConnected = false;
+                view.IsPortConnected = false;
             }
         }
 
@@ -129,7 +145,7 @@ namespace ESPROG
                 if (await TryConnectPort(port))
                 {
                     view.EsprogSettingView.SelectedPort = port;
-                    view.PortConnected = true;
+                    view.IsPortConnected = true;
                     return;
                 }
             }
@@ -181,9 +197,22 @@ namespace ESPROG
 
         private async void ButtonGetChipInfo_Click(object sender, RoutedEventArgs e)
         {
+            await RunTask(GetChipInfoSubTask);
+        }
+
+        private async Task<bool> GetChipInfoSubTask()
+        {
             view.ChipSettingView.ChipInfo = string.Empty;
             string? chipInfo = await GetChipInfo(view.ChipSettingView.SelectedChip, view.ChipSettingView.SelectedChipAddr);
-            view.ChipSettingView.ChipInfo = string.IsNullOrEmpty(chipInfo) ? string.Empty : chipInfo;
+            if (chipInfo == null)
+            {
+                return false;
+            }
+            else
+            {
+                view.ChipSettingView.ChipInfo = chipInfo;
+                return true;
+            }
         }
 
         private void ButtonClearLog_Click(object sender, RoutedEventArgs e)
@@ -198,6 +227,11 @@ namespace ESPROG
 
         private async void ButtonAutodetectChip_Click(object sender, RoutedEventArgs e)
         {
+            await RunTask(AutodetectChipSubTask);
+        }
+
+        private async Task<bool> AutodetectChipSubTask()
+        {
             view.ChipSettingView.ChipInfo = string.Empty;
             foreach (uint chip in ChipSettingVM.ChipDict.Keys)
             {
@@ -209,37 +243,48 @@ namespace ESPROG
                         view.ChipSettingView.SelectedChip = chip;
                         view.ChipSettingView.SelectedChipAddr = devAddr.Value;
                         view.ChipSettingView.ChipInfo = chipInfo;
-                        return;
+                        return true;
                     }
                 }
             }
+            return false;
         }
 
         private async void ButtonFormatEsprogStorage_Click(object sender, RoutedEventArgs e)
         {
-            if (await nuprog.FormatEsprog())
-            {
-                log.Info("Format ESPROG storage succeed");
-            }
-            else
+            await RunTask(FormatEsprogStorageSubTask);
+        }
+
+        private async Task<bool> FormatEsprogStorageSubTask()
+        {
+
+            if (!await nuprog.FormatEsprog())
             {
                 log.Error("Format ESPROG storage fail");
+                return false;
             }
+            log.Info("Format ESPROG storage succeed");
+            return true;
         }
 
         private async void ButtonProgChip_Click(object sender, RoutedEventArgs e)
         {
+            await RunTask(ProgChipSubTask);
+        }
+
+        private async Task<bool> ProgChipSubTask()
+        {
             if (!await SendFwToESPROG())
             {
-                return;
+                return false;
             }
             if (!await nuprog.FwWriteStart())
             {
                 log.Error("Program chip fail");
-                return;
+                return false;
             }
             log.Error("Program chip succeed");
-            return;
+            return true;
         }
 
         private async Task<bool> SendFwToESPROG()
@@ -267,42 +312,53 @@ namespace ESPROG
 
         private async void ButtonProgEsprog_Click(object sender, RoutedEventArgs e)
         {
+            await RunTask(ProgEsprogSubTask);
+        }
+
+        private async Task<bool> ProgEsprogSubTask()
+        {
             if (!await SendFwToESPROG())
             {
-                return;
+                return false;
             }
             if (!await nuprog.SaveToEsprog())
             {
                 log.Error("Save config to ESPROG fail");
-                return;
+                return false;
             }
             log.Info("Save config to ESPROG succeed");
+            return true;
         }
 
         private async void ButtonReadChip_Click(object sender, RoutedEventArgs e)
         {
+            await RunTask(ReadChipSubTask);
+        }
+
+        private async Task<bool> ReadChipSubTask()
+        {
             if (!await nuprog.SetChipAndAddr(view.ChipSettingView.SelectedChip, view.ChipSettingView.SelectedChipAddr))
             {
-                return;
+                return false;
             }
             if (!await nuprog.FwReadStart())
             {
                 log.Error("Read firmware from chip fail");
-                return;
+                return false;
             }
             byte[]? fwData = await nuprog.ReadFwFromEsprog(view.WriteFwContent.MaxFwSize);
             if (fwData == null)
             {
-                return;
+                return false;
             }
-            if (view.ReadFwContent.LoadFwData(fwData, out string logMsg))
-            {
-                log.Info(logMsg);
-            }
-            else
+            if (!view.ReadFwContent.LoadFwData(fwData, out string logMsg))
             {
                 log.Error(logMsg);
+                return false;
+
             }
+            log.Info(logMsg);
+            return true;
         }
 
         private void ButtonSaveFw_Click(object sender, RoutedEventArgs e)
@@ -327,34 +383,65 @@ namespace ESPROG
 
         private async void ButtonReadReg_Click(object sender, RoutedEventArgs e)
         {
+            await RunTask(ReadRegSubTask);
+        }
+
+        private async Task<bool> ReadRegSubTask()
+        {
             if (view.RegAddr == null)
             {
-                return;
+                return false;
             }
             if ((view.RegVal = await nuprog.ReadReg(view.RegAddr.Value)) == null)
             {
                 log.Error(string.Format("Read reg ({0}) from dev ({1}) fail",
                     view.RegAddr, HexUtil.GetHexStr(view.ChipSettingView.SelectedChipAddr)));
+                return false;
             }
+            return true;
         }
 
         private async void ButtonWriteReg_Click(object sender, RoutedEventArgs e)
         {
+            await RunTask(WriteRegSubTask);
+        }
+
+        private async Task<bool> WriteRegSubTask()
+        {
             if (view.RegAddr == null || view.RegVal == null)
             {
-                return;
+                return false;
             }
             if (!await nuprog.WriteReg(view.RegAddr.Value, view.RegVal.Value))
             {
                 log.Error(string.Format("Read reg ({0}) from dev ({1}) fail",
                     view.RegAddr, HexUtil.GetHexStr(view.ChipSettingView.SelectedChipAddr)));
+                return false;
             }
+            return true;
         }
 
         private void ButtonSendCmd_Click(object sender, RoutedEventArgs e)
         {
             string cmd = view.SendCmd.Trim() + "\r\n";
             uart.SendCmd(cmd);
+        }
+
+        private delegate Task<bool> SubTaskHandler();
+
+        private async Task RunTask(SubTaskHandler subTask)
+        {
+            view.IsIdle = false;
+            view.ProgressView.SetSate(ProgressVM.State.Running);
+            if (await subTask())
+            {
+                view.ProgressView.SetSate(ProgressVM.State.Succeed);
+            }
+            else
+            {
+                view.ProgressView.SetSate(ProgressVM.State.Fail);
+            }
+            view.IsIdle = true;
         }
     }
 }

@@ -1,20 +1,28 @@
 ﻿using ESPROG.Utils;
 using System;
+using System.Windows.Media;
 
 namespace ESPROG.Views
 {
     internal class MainWindowVM : BaseViewModel
     {
-        private bool portConnected;
-        public bool PortConnected
+        private bool isPortConnected;
+        public bool IsPortConnected
         {
-            get => portConnected;
+            get => isPortConnected;
             set
             {
-                portConnected = value;
-                EsprogSettingView.PortNotLocked = !value;
-                ChipSettingView.PortConnected = value;
+                SetProperty(ref isPortConnected, value);
+                EsprogSettingView.IsPortConnected = value;
+                ChipSettingView.IsPortConnected = value;
             }
+        }
+
+        private bool isIdle;
+        public bool IsIdle
+        {
+            get => isIdle;
+            set => SetProperty(ref isIdle, value);
         }
 
         private string fwFile;
@@ -59,10 +67,12 @@ namespace ESPROG.Views
         public ChipSettingVM ChipSettingView { get; private set; }
         public FwContentVM WriteFwContent { get; private set; }
         public FwContentVM ReadFwContent { get; private set; }
+        public ProgressVM ProgressView { get; private set; }
 
         public MainWindowVM()
         {
-            portConnected = false;
+            isPortConnected = false;
+            isIdle = true;
             fwFile = string.Empty;
             regAddr = null;
             regVal = null;
@@ -72,6 +82,7 @@ namespace ESPROG.Views
             ChipSettingView.SelectedChipChanged += ChipSelView_SelectedChipChanged;
             WriteFwContent = new();
             ReadFwContent = new();
+            ProgressView = new();
             UpdateMaxFwSizeWithChip();
         }
 

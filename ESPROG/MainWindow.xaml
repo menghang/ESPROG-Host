@@ -38,16 +38,17 @@
         </Menu>
         <Grid
             DockPanel.Dock="Bottom"
+            DataContext="{Binding ProgressView}"
             Margin="5">
             <ProgressBar
                 DockPanel.Dock="Bottom"
-                Foreground="DeepSkyBlue"
+                Foreground="{Binding Color}"
                 Maximum="100"
                 Value="100"
                 Height="30"
-                IsIndeterminate="False" />
+                IsIndeterminate="{Binding IsBusy}" />
             <TextBlock
-                Text="Busy"
+                Text="{Binding Text}"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center" />
         </Grid>
@@ -56,383 +57,398 @@
             Margin="5">
             <TabItem
                 Header="Settings">
-                <DockPanel>
-                    <DockPanel
-                        DockPanel.Dock="Bottom">
-                        <Image
-                            Source="pack://application:,,,/NVT.png"
-                            Height="45"
-                            VerticalAlignment="Bottom"
-                            DockPanel.Dock="Right"
-                            Margin="10" />
-                        <Image
-                            Source="pack://application:,,,/QR_NuVolta.png"
-                            Height="90"
-                            DockPanel.Dock="Left"
-                            Margin="10" />
+                <Grid>
+                    <DockPanel>
+                        <DockPanel
+                            DockPanel.Dock="Bottom">
+                            <Image
+                                Source="pack://application:,,,/NVT.png"
+                                Height="45"
+                                VerticalAlignment="Bottom"
+                                DockPanel.Dock="Right"
+                                Margin="10" />
+                            <Image
+                                Source="pack://application:,,,/QR_NuVolta.png"
+                                Height="90"
+                                DockPanel.Dock="Left"
+                                Margin="10" />
+                        </DockPanel>
+                        <StackPanel
+                            IsEnabled="{Binding IsIdle}"
+                            DockPanel.Dock="Top">
+                            <GroupBox
+                                Header="ESPROG Selection"
+                                DataContext="{Binding EsprogSettingView}"
+                                Margin="5">
+                                <StackPanel>
+                                    <DockPanel
+                                        Margin="5">
+                                        <Label
+                                            Content="COM Port:"
+                                            VerticalContentAlignment="Center"
+                                            Height="30" />
+                                        <ComboBox
+                                            SelectedItem="{Binding SelectedPort}"
+                                            ItemsSource="{Binding PortList}"
+                                            IsEnabled="{Binding IsPortNotLocked}"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            IsReadOnly="True"
+                                            Height="30" />
+                                    </DockPanel>
+                                    <DockPanel
+                                        Margin="5">
+                                        <Label
+                                            Content="ESPROG Info:"
+                                            Height="30"
+                                            VerticalContentAlignment="Center" />
+                                        <TextBox
+                                            Text="{Binding EsprogInfo}"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            IsReadOnly="True"
+                                            Height="30" />
+                                    </DockPanel>
+                                    <DockPanel
+                                        Margin="5">
+                                        <Label
+                                            Content="ESPROG Compile Time:"
+                                            Height="30"
+                                            VerticalContentAlignment="Center" />
+                                        <TextBox
+                                            Text="{Binding EsprogCompileTime}"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            IsReadOnly="True"
+                                            Height="30" />
+                                    </DockPanel>
+                                    <DockPanel
+                                        Margin="5">
+                                        <Label
+                                            Content="Gate Control Mode:"
+                                            VerticalContentAlignment="Center"
+                                            Height="30" />
+                                        <ComboBox
+                                            ItemsSource="{Binding GateCtrlModeList}"
+                                            DisplayMemberPath="Display"
+                                            SelectedValuePath="Value"
+                                            SelectedValue="{Binding SelectedGateCtrlMode}"
+                                            IsEnabled="{Binding IsPortConnected}"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            IsReadOnly="True"
+                                            Height="30" />
+                                    </DockPanel>
+                                    <UniformGrid
+                                        Rows="2"
+                                        Columns="2">
+                                        <Button
+                                            Content="Reload Port List"
+                                            IsEnabled="{Binding IsPortNotLocked}"
+                                            Height="30"
+                                            Margin="5"
+                                            Click="ButtonReloadPortList_Click" />
+                                        <Button
+                                            Content="{Binding BtnConnectPortText}"
+                                            Height="30"
+                                            Margin="5"
+                                            Click="ButtonOpenPort_Click" />
+                                        <Button
+                                            Content="Autodetect Port"
+                                            IsEnabled="{Binding IsPortNotLocked}"
+                                            Height="30"
+                                            Margin="5"
+                                            Click="ButtonAutodetectPort_Click" />
+                                        <Button
+                                            Content="Format ESPROG Storage"
+                                            IsEnabled="{Binding IsPortConnected}"
+                                            Height="30"
+                                            Margin="5"
+                                            Click="ButtonFormatEsprogStorage_Click" />
+                                    </UniformGrid>
+                                </StackPanel>
+                            </GroupBox>
+                            <GroupBox
+                                Header="Chip Selection"
+                                DataContext="{Binding ChipSettingView}"
+                                Margin="5">
+                                <StackPanel>
+                                    <UniformGrid
+                                        Rows="1"
+                                        Columns="2">
+                                        <DockPanel
+                                            Margin="5">
+                                            <Label
+                                                Content="Chip:"
+                                                VerticalContentAlignment="Center"
+                                                Height="30" />
+                                            <ComboBox
+                                                ItemsSource="{Binding ChipList}"
+                                                DisplayMemberPath="Display"
+                                                SelectedValuePath="Value"
+                                                SelectedValue="{Binding SelectedChip}"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                IsReadOnly="True"
+                                                Height="30" />
+                                        </DockPanel>
+                                        <DockPanel
+                                            Margin="5">
+                                            <Label
+                                                Content="Chip Address:"
+                                                VerticalContentAlignment="Center"
+                                                Height="30" />
+                                            <ComboBox
+                                                ItemsSource="{Binding ChipAddrList}"
+                                                DisplayMemberPath="Display"
+                                                SelectedValuePath="Value"
+                                                SelectedValue="{Binding SelectedChipAddr}"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                IsReadOnly="True"
+                                                Height="30" />
+                                        </DockPanel>
+                                    </UniformGrid>
+                                    <DockPanel
+                                        Grid.Column="0"
+                                        Margin="5">
+                                        <Label
+                                            Content="Chip Info:"
+                                            VerticalContentAlignment="Center"
+                                            Height="30" />
+                                        <TextBox
+                                            Text="{Binding ChipInfo}"
+                                            IsReadOnly="True"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            Height="30" />
+                                    </DockPanel>
+                                    <UniformGrid
+                                        Rows="1"
+                                        Columns="2"
+                                        IsEnabled="{Binding IsPortConnected}">
+                                        <Button
+                                            Content="Autodetect Chip"
+                                            Height="30"
+                                            Margin="5"
+                                            Click="ButtonAutodetectChip_Click" />
+                                        <Button
+                                            Content="Get Chip Info"
+                                            Height="30"
+                                            Margin="5"
+                                            Click="ButtonGetChipInfo_Click" />
+                                    </UniformGrid>
+                                </StackPanel>
+                            </GroupBox>
+                        </StackPanel>
                     </DockPanel>
-                    <StackPanel
-                        DockPanel.Dock="Top">
+                </Grid>
+            </TabItem>
+            <TabItem
+                Header="Write FW">
+                <Grid>
+                    <DockPanel
+                        IsEnabled="{Binding IsIdle}">
+                        <StackPanel
+                            DockPanel.Dock="Top">
+                            <DockPanel
+                                Margin="5">
+                                <Label
+                                    Content="Firmware:"
+                                    VerticalContentAlignment="Center"
+                                    Height="30" />
+                                <TextBox
+                                    Text="{Binding FwFile}"
+                                    IsReadOnly="True"
+                                    VerticalContentAlignment="Center"
+                                    Height="30"
+                                    MouseDoubleClick="TextBoxFwFile_MouseDoubleClick" />
+                            </DockPanel>
+                            <UniformGrid
+                                Rows="1"
+                                Columns="2"
+                                IsEnabled="{Binding IsPortConnected}">
+                                <Button
+                                    Content="Program Chip"
+                                    Height="30"
+                                    Margin="5"
+                                    Click="ButtonProgChip_Click" />
+                                <Button
+                                    Content="Program ESPROG"
+                                    Height="30"
+                                    Margin="5"
+                                    Click="ButtonProgEsprog_Click" />
+                            </UniformGrid>
+                        </StackPanel>
                         <GroupBox
-                            Header="ESPROG Selection"
-                            DataContext="{Binding EsprogSettingView}"
+                            DataContext="{Binding WriteFwContent}"
+                            Header="Firmware Content"
+                            Margin="5">
+                            <DockPanel>
+                                <UniformGrid
+                                    Rows="1"
+                                    Columns="2"
+                                    DockPanel.Dock="Bottom">
+                                    <DockPanel
+                                        Margin="5">
+                                        <Label
+                                            Content="Checksum:"
+                                            VerticalContentAlignment="Center"
+                                            Height="30" />
+                                        <TextBox
+                                            Text="{Binding Checksum,Mode=OneWay}"
+                                            Height="30"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            IsReadOnly="True" />
+                                    </DockPanel>
+                                    <DockPanel
+                                        Margin="5">
+                                        <Label
+                                            Content="Size:"
+                                            VerticalContentAlignment="Center"
+                                            Height="30" />
+                                        <TextBox
+                                            Text="{Binding Size,Mode=OneWay}"
+                                            Height="30"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            IsReadOnly="True" />
+                                    </DockPanel>
+                                </UniformGrid>
+                                <TextBox
+                                    Text="{Binding Content,Mode=OneWay}"
+                                    IsReadOnly="True"
+                                    FontFamily="Consolas"
+                                    FontSize="11"
+                                    VerticalScrollBarVisibility="Auto"
+                                    Margin="5" />
+                            </DockPanel>
+                        </GroupBox>
+                    </DockPanel>
+                </Grid>
+            </TabItem>
+            <TabItem
+                Header="Read FW">
+                <Grid>
+                    <DockPanel
+                        IsEnabled="{Binding IsIdle}">
+                        <StackPanel
+                            DockPanel.Dock="Top">
+                            <UniformGrid
+                                Rows="1"
+                                Columns="2"
+                                IsEnabled="{Binding IsPortConnected}">
+                                <Button
+                                    Content="Read Chip"
+                                    Height="30"
+                                    Margin="5"
+                                    Click="ButtonReadChip_Click" />
+                                <Button
+                                    Content="Save to File"
+                                    Height="30"
+                                    Margin="5"
+                                    Click="ButtonSaveFw_Click" />
+                            </UniformGrid>
+                        </StackPanel>
+                        <GroupBox
+                            DataContext="{Binding ReadFwContent}"
+                            Header="Firmware Content"
+                            Margin="5">
+                            <DockPanel>
+                                <UniformGrid
+                                    Rows="1"
+                                    Columns="2"
+                                    DockPanel.Dock="Bottom">
+                                    <DockPanel
+                                        Margin="5">
+                                        <Label
+                                            Content="Checksum:"
+                                            VerticalContentAlignment="Center"
+                                            Height="30" />
+                                        <TextBox
+                                            Text="{Binding Checksum,Mode=OneWay}"
+                                            Height="30"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            IsReadOnly="True" />
+                                    </DockPanel>
+                                    <DockPanel
+                                        Margin="5">
+                                        <Label
+                                            Content="Size:"
+                                            VerticalContentAlignment="Center"
+                                            Height="30" />
+                                        <TextBox
+                                            Text="{Binding Size,Mode=OneWay}"
+                                            Height="30"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            IsReadOnly="True" />
+                                    </DockPanel>
+                                </UniformGrid>
+                                <TextBox
+                                    Text="{Binding Content,Mode=OneWay}"
+                                    IsReadOnly="True"
+                                    FontFamily="Consolas"
+                                    FontSize="11"
+                                    VerticalScrollBarVisibility="Auto"
+                                    Margin="5" />
+                            </DockPanel>
+                        </GroupBox>
+                    </DockPanel>
+                </Grid>
+            </TabItem>
+            <TabItem
+                Header="I2C">
+                <Grid>
+                    <StackPanel
+                        IsEnabled="{Binding IsIdle}">
+                        <GroupBox
+                            Header="Read/Write I2C Reg"
                             Margin="5">
                             <StackPanel>
                                 <DockPanel
                                     Margin="5">
                                     <Label
-                                        Content="COM Port:"
-                                        VerticalContentAlignment="Center"
-                                        Height="30" />
-                                    <ComboBox
-                                        SelectedItem="{Binding SelectedPort}"
-                                        ItemsSource="{Binding PortList}"
-                                        IsEnabled="{Binding PortNotLocked}"
-                                        VerticalContentAlignment="Center"
-                                        HorizontalContentAlignment="Center"
-                                        IsReadOnly="True"
-                                        Height="30" />
-                                </DockPanel>
-                                <DockPanel
-                                    Margin="5">
-                                    <Label
-                                        Content="ESPROG Info:"
-                                        Height="30"
-                                        VerticalContentAlignment="Center" />
-                                    <TextBox
-                                        Text="{Binding EsprogInfo}"
-                                        VerticalContentAlignment="Center"
-                                        HorizontalContentAlignment="Center"
-                                        IsReadOnly="True"
-                                        Height="30" />
-                                </DockPanel>
-                                <DockPanel
-                                    Margin="5">
-                                    <Label
-                                        Content="ESPROG Compile Time:"
-                                        Height="30"
-                                        VerticalContentAlignment="Center" />
-                                    <TextBox
-                                        Text="{Binding EsprogCompileTime}"
-                                        VerticalContentAlignment="Center"
-                                        HorizontalContentAlignment="Center"
-                                        IsReadOnly="True"
-                                        Height="30" />
-                                </DockPanel>
-                                <DockPanel
-                                    Margin="5">
-                                    <Label
-                                        Content="Gate Control Mode:"
-                                        VerticalContentAlignment="Center"
-                                        Height="30" />
-                                    <ComboBox
-                                        ItemsSource="{Binding GateCtrlModeList}"
-                                        DisplayMemberPath="Display"
-                                        SelectedValuePath="Value"
-                                        SelectedValue="{Binding SelectedGateCtrlMode}"
-                                        IsEnabled="{Binding PortConnected}"
-                                        VerticalContentAlignment="Center"
-                                        HorizontalContentAlignment="Center"
-                                        IsReadOnly="True"
-                                        Height="30" />
-                                </DockPanel>
-                                <UniformGrid
-                                    Rows="2"
-                                    Columns="2">
-                                    <Button
-                                        Content="Reload Port List"
-                                        IsEnabled="{Binding PortNotLocked}"
-                                        Height="30"
-                                        Margin="5"
-                                        Click="ButtonReloadPortList_Click" />
-                                    <Button
-                                        Content="{Binding BtnConnectPortText}"
-                                        Height="30"
-                                        Margin="5"
-                                        Click="ButtonOpenPort_Click" />
-                                    <Button
-                                        Content="Autodetect Port"
-                                        IsEnabled="{Binding PortNotLocked}"
-                                        Height="30"
-                                        Margin="5"
-                                        Click="ButtonAutodetectPort_Click" />
-                                    <Button
-                                        Content="Format ESPROG Storage"
-                                        IsEnabled="{Binding PortConnected}"
-                                        Height="30"
-                                        Margin="5"
-                                        Click="ButtonFormatEsprogStorage_Click" />
-                                </UniformGrid>
-                            </StackPanel>
-                        </GroupBox>
-                        <GroupBox
-                            Header="Chip Selection"
-                            Margin="5">
-                            <StackPanel
-                                DataContext="{Binding ChipSettingView}"
-                                IsEnabled="{Binding PortConnected}">
-                                <UniformGrid
-                                    Rows="1"
-                                    Columns="2">
-                                    <DockPanel
-                                        Margin="5">
-                                        <Label
-                                            Content="Chip:"
-                                            VerticalContentAlignment="Center"
-                                            Height="30" />
-                                        <ComboBox
-                                            ItemsSource="{Binding ChipList}"
-                                            DisplayMemberPath="Display"
-                                            SelectedValuePath="Value"
-                                            SelectedValue="{Binding SelectedChip}"
-                                            VerticalContentAlignment="Center"
-                                            HorizontalContentAlignment="Center"
-                                            IsReadOnly="True"
-                                            Height="30" />
-                                    </DockPanel>
-                                    <DockPanel
-                                        Margin="5">
-                                        <Label
-                                            Content="Chip Address:"
-                                            VerticalContentAlignment="Center"
-                                            Height="30" />
-                                        <ComboBox
-                                            ItemsSource="{Binding ChipAddrList}"
-                                            DisplayMemberPath="Display"
-                                            SelectedValuePath="Value"
-                                            SelectedValue="{Binding SelectedChipAddr}"
-                                            VerticalContentAlignment="Center"
-                                            HorizontalContentAlignment="Center"
-                                            IsReadOnly="True"
-                                            Height="30" />
-                                    </DockPanel>
-                                </UniformGrid>
-                                <DockPanel
-                                    Grid.Column="0"
-                                    Margin="5">
-                                    <Label
-                                        Content="Chip Info:"
+                                        Content="Reg Addr:"
                                         VerticalContentAlignment="Center"
                                         Height="30" />
                                     <TextBox
-                                        Text="{Binding ChipInfo}"
-                                        IsReadOnly="True"
+                                        Text="{Binding RegAddrText}"
                                         VerticalContentAlignment="Center"
-                                        HorizontalContentAlignment="Center"
+                                        Height="30" />
+                                </DockPanel>
+                                <DockPanel
+                                    Margin="5">
+                                    <Label
+                                        Content="Reg Val:"
+                                        VerticalContentAlignment="Center"
+                                        Height="30" />
+                                    <TextBox
+                                        Text="{Binding RegValText}"
+                                        VerticalContentAlignment="Center"
                                         Height="30" />
                                 </DockPanel>
                                 <UniformGrid
                                     Rows="1"
-                                    Columns="2">
+                                    Columns="2"
+                                    IsEnabled="{Binding IsPortConnected}">
                                     <Button
-                                        Content="Autodetect Chip"
+                                        Content="Read Reg"
                                         Height="30"
                                         Margin="5"
-                                        Click="ButtonAutodetectChip_Click" />
+                                        Click="ButtonReadReg_Click" />
                                     <Button
-                                        Content="Get Chip Info"
+                                        Content="Write Reg"
                                         Height="30"
                                         Margin="5"
-                                        Click="ButtonGetChipInfo_Click" />
+                                        Click="ButtonWriteReg_Click" />
                                 </UniformGrid>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
-                </DockPanel>
-            </TabItem>
-            <TabItem
-                Header="Write FW">
-                <DockPanel>
-                    <StackPanel
-                        DockPanel.Dock="Top">
-                        <DockPanel
-                            Margin="5">
-                            <Label
-                                Content="Firmware:"
-                                VerticalContentAlignment="Center"
-                                Height="30" />
-                            <TextBox
-                                Text="{Binding FwFile}"
-                                IsReadOnly="True"
-                                VerticalContentAlignment="Center"
-                                Height="30"
-                                MouseDoubleClick="TextBoxFwFile_MouseDoubleClick" />
-                        </DockPanel>
-                        <UniformGrid
-                            Rows="1"
-                            Columns="2">
-                            <Button
-                                Content="Program Chip"
-                                Height="30"
-                                Margin="5"
-                                Click="ButtonProgChip_Click" />
-                            <Button
-                                Content="Program ESPROG"
-                                Height="30"
-                                Margin="5"
-                                Click="ButtonProgEsprog_Click" />
-                        </UniformGrid>
-                    </StackPanel>
-                    <GroupBox
-                        DataContext="{Binding WriteFwContent}"
-                        Header="Firmware Content"
-                        Margin="5">
-                        <DockPanel>
-                            <UniformGrid
-                                Rows="1"
-                                Columns="2"
-                                DockPanel.Dock="Bottom">
-                                <DockPanel
-                                    Margin="5">
-                                    <Label
-                                        Content="Checksum:"
-                                        VerticalContentAlignment="Center"
-                                        Height="30" />
-                                    <TextBox
-                                        Text="{Binding Checksum,Mode=OneWay}"
-                                        Height="30"
-                                        VerticalContentAlignment="Center"
-                                        HorizontalContentAlignment="Center"
-                                        IsReadOnly="True" />
-                                </DockPanel>
-                                <DockPanel
-                                    Margin="5">
-                                    <Label
-                                        Content="Size:"
-                                        VerticalContentAlignment="Center"
-                                        Height="30" />
-                                    <TextBox
-                                        Text="{Binding Size,Mode=OneWay}"
-                                        Height="30"
-                                        VerticalContentAlignment="Center"
-                                        HorizontalContentAlignment="Center"
-                                        IsReadOnly="True" />
-                                </DockPanel>
-                            </UniformGrid>
-                            <TextBox
-                                Text="{Binding Content,Mode=OneWay}"
-                                IsReadOnly="True"
-                                FontFamily="Consolas"
-                                FontSize="11"
-                                VerticalScrollBarVisibility="Auto"
-                                Margin="5" />
-                        </DockPanel>
-                    </GroupBox>
-                </DockPanel>
-            </TabItem>
-            <TabItem
-                Header="Read FW">
-                <DockPanel>
-                    <StackPanel
-                        DockPanel.Dock="Top">
-                        <UniformGrid
-                            Rows="1"
-                            Columns="2">
-                            <Button
-                                Content="Read Chip"
-                                Height="30"
-                                Margin="5"
-                                Click="ButtonReadChip_Click" />
-                            <Button
-                                Content="Save to File"
-                                Height="30"
-                                Margin="5"
-                                Click="ButtonSaveFw_Click" />
-                        </UniformGrid>
-                    </StackPanel>
-                    <GroupBox
-                        DataContext="{Binding ReadFwContent}"
-                        Header="Firmware Content"
-                        Margin="5">
-                        <DockPanel>
-                            <UniformGrid
-                                Rows="1"
-                                Columns="2"
-                                DockPanel.Dock="Bottom">
-                                <DockPanel
-                                    Margin="5">
-                                    <Label
-                                        Content="Checksum:"
-                                        VerticalContentAlignment="Center"
-                                        Height="30" />
-                                    <TextBox
-                                        Text="{Binding Checksum,Mode=OneWay}"
-                                        Height="30"
-                                        VerticalContentAlignment="Center"
-                                        HorizontalContentAlignment="Center"
-                                        IsReadOnly="True" />
-                                </DockPanel>
-                                <DockPanel
-                                    Margin="5">
-                                    <Label
-                                        Content="Size:"
-                                        VerticalContentAlignment="Center"
-                                        Height="30" />
-                                    <TextBox
-                                        Text="{Binding Size,Mode=OneWay}"
-                                        Height="30"
-                                        VerticalContentAlignment="Center"
-                                        HorizontalContentAlignment="Center"
-                                        IsReadOnly="True" />
-                                </DockPanel>
-                            </UniformGrid>
-                            <TextBox
-                                Text="{Binding Content,Mode=OneWay}"
-                                IsReadOnly="True"
-                                FontFamily="Consolas"
-                                FontSize="11"
-                                VerticalScrollBarVisibility="Auto"
-                                Margin="5" />
-                        </DockPanel>
-                    </GroupBox>
-                </DockPanel>
-            </TabItem>
-            <TabItem
-                Header="I2C">
-                <StackPanel>
-                    <GroupBox
-                        Header="Read/Write I2C Reg"
-                        Margin="5">
-                        <StackPanel>
-                            <DockPanel
-                                Margin="5">
-                                <Label
-                                    Content="Reg Addr:"
-                                    VerticalContentAlignment="Center"
-                                    Height="30" />
-                                <TextBox
-                                    Text="{Binding RegAddrText}"
-                                    VerticalContentAlignment="Center"
-                                    Height="30" />
-                            </DockPanel>
-                            <DockPanel
-                                Margin="5">
-                                <Label
-                                    Content="Reg Val:"
-                                    VerticalContentAlignment="Center"
-                                    Height="30" />
-                                <TextBox
-                                    Text="{Binding RegValText}"
-                                    VerticalContentAlignment="Center"
-                                    Height="30" />
-                            </DockPanel>
-                            <UniformGrid
-                                Rows="1"
-                                Columns="2">
-                                <Button
-                                    Content="Read Reg"
-                                    Height="30"
-                                    Margin="5"
-                                    Click="ButtonReadReg_Click" />
-                                <Button
-                                    Content="Write Reg"
-                                    Height="30"
-                                    Margin="5"
-                                    Click="ButtonWriteReg_Click" />
-                            </UniformGrid>
-                        </StackPanel>
-                    </GroupBox>
-                </StackPanel>
+                </Grid>
             </TabItem>
             <TabItem
                 Header="Log">
@@ -459,6 +475,7 @@
                 Header="Cmds">
                 <DockPanel>
                     <Grid
+                        IsEnabled="{Binding IsIdle}"
                         DockPanel.Dock="Top">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition
@@ -474,6 +491,7 @@
                             Grid.Column="0" />
                         <Button
                             Content="Send"
+                            IsEnabled="{Binding IsPortConnected}"
                             Height="30"
                             Margin="5"
                             Grid.Column="1"

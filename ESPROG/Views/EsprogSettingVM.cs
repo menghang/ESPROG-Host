@@ -30,29 +30,32 @@ namespace ESPROG.Views
             set => SetProperty(ref esprogCompileTime, value);
         }
 
-        private bool portNotLocked;
-        public bool PortNotLocked
+        public bool IsPortNotLocked
         {
-            get => portNotLocked;
-            set
-            {
-                SetProperty(ref portNotLocked, value);
-                OnPropertyChanged(nameof(BtnConnectPortText));
-                OnPropertyChanged(nameof(PortConnected));
-            }
+            get => !isPortConnected;
         }
 
         public string BtnConnectPortText
         {
-            get => portNotLocked ? "Connect Port" : "Close Port";
+            get => isPortConnected ? "Disconnect ESPROG" : "Connect ESPROG";
         }
 
-        public bool PortConnected
+        private bool isPortConnected;
+        public bool IsPortConnected
         {
-            get => !portNotLocked;
+            get => isPortConnected;
+            set
+            {
+                if (isPortConnected != value)
+                {
+                    SetProperty(ref isPortConnected, value);
+                    OnPropertyChanged(nameof(IsPortNotLocked));
+                    OnPropertyChanged(nameof(BtnConnectPortText));
+                }
+            }
         }
 
-        public delegate void SelectedGateCtrlModeChangedHandler(object sender, EventArgs e);
+        public delegate void SelectedGateCtrlModeChangedHandler(object sender, GateCtrlModeEventArgs e);
         public event SelectedGateCtrlModeChangedHandler? SelectedGateCtrlModeChanged;
 
         public List<ComboBoxModel<string, byte>> GateCtrlModeList { get; private set; }
@@ -65,9 +68,20 @@ namespace ESPROG.Views
             {
                 if (selectedGateCtrlMode != value)
                 {
+                    SelectedGateCtrlModeChanged?.Invoke(this, new(value, selectedGateCtrlMode));
                     SetProperty(ref selectedGateCtrlMode, value);
-                    SelectedGateCtrlModeChanged?.Invoke(this, EventArgs.Empty);
                 }
+            }
+        }
+
+        public class GateCtrlModeEventArgs : EventArgs
+        {
+            public byte NewMode { get; private set; }
+            public byte LastMode { get; private set; }
+            public GateCtrlModeEventArgs(byte newMode, byte lastMode)
+            {
+                NewMode = newMode;
+                LastMode = lastMode;
             }
         }
 
@@ -82,7 +96,7 @@ namespace ESPROG.Views
             selectedPort = string.Empty;
             esprogInfo = string.Empty;
             esprogCompileTime = string.Empty;
-            portNotLocked = true;
+            isPortConnected = false;
             GateCtrlModeList = new() { new("On Demand", 0x00), new("Always On", 0x01), new("Always Off", 0x02) };
             selectedGateCtrlMode = GateCtrlModeList[0].Value;
         }

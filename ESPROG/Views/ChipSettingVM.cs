@@ -67,11 +67,11 @@ namespace ESPROG.Views
             set => SetProperty(ref chipInfo, value);
         }
 
-        private bool portConnected;
-        public bool PortConnected
+        private bool isPortConnected;
+        public bool IsPortConnected
         {
-            get => portConnected;
-            set => SetProperty(ref portConnected, value);
+            get => isPortConnected;
+            set => SetProperty(ref isPortConnected, value);
         }
 
         public ChipSettingVM()
@@ -85,7 +85,7 @@ namespace ESPROG.Views
             chipAddrList = ChipDict[selectedChip];
             selectedChipAddr = ChipAddrList[1].Value;
             chipInfo = string.Empty;
-            portConnected = false;
+            isPortConnected = false;
         }
     }
 }
