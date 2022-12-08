@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 
 namespace ESPROG.Views
 {
-    class EsprogSelVM : BaseViewModel
+    class EsprogSettingVM : BaseViewModel
     {
         public ObservableCollection<string> PortList { get; private set; }
 
@@ -76,7 +76,7 @@ namespace ESPROG.Views
             SetProperty(ref selectedGateCtrlMode, mode, nameof(SelectedGateCtrlMode));
         }
 
-        public EsprogSelVM()
+        public EsprogSettingVM()
         {
             PortList = new();
             selectedPort = string.Empty;

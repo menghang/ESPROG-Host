@@ -11,8 +11,8 @@ namespace ESPROG.Views
             set
             {
                 portConnected = value;
-                EsprogSelView.PortNotLocked = !value;
-                ChipSelView.PortConnected = value;
+                EsprogSettingView.PortNotLocked = !value;
+                ChipSettingView.PortConnected = value;
             }
         }
 
@@ -23,8 +23,8 @@ namespace ESPROG.Views
             set => SetProperty(ref fwFile, value);
         }
 
-        public EsprogSelVM EsprogSelView { get; private set; }
-        public ChipSelVM ChipSelView { get; private set; }
+        public EsprogSettingVM EsprogSettingView { get; private set; }
+        public ChipSettingVM ChipSettingView { get; private set; }
         public FwContentVM WriteFwContent { get; private set; }
         public FwContentVM ReadFwContent { get; private set; }
 
@@ -32,9 +32,9 @@ namespace ESPROG.Views
         {
             portConnected = false;
             fwFile = string.Empty;
-            EsprogSelView = new();
-            ChipSelView = new();
-            ChipSelView.SelectedChipChanged += ChipSelView_SelectedChipChanged;
+            EsprogSettingView = new();
+            ChipSettingView = new();
+            ChipSettingView.SelectedChipChanged += ChipSelView_SelectedChipChanged;
             WriteFwContent = new();
             ReadFwContent = new();
             UpdateMaxFwSizeWithChip();
@@ -47,8 +47,8 @@ namespace ESPROG.Views
 
         private void UpdateMaxFwSizeWithChip()
         {
-            WriteFwContent.MaxFwSize = ChipSelVM.ChipSizeDict[ChipSelView.SelectedChip];
-            ReadFwContent.MaxFwSize = ChipSelVM.ChipSizeDict[ChipSelView.SelectedChip];
+            WriteFwContent.MaxFwSize = ChipSettingVM.ChipSizeDict[ChipSettingView.SelectedChip];
+            ReadFwContent.MaxFwSize = ChipSettingVM.ChipSizeDict[ChipSettingView.SelectedChip];
         }
     }
 }

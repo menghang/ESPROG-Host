@@ -75,7 +75,7 @@
                         DockPanel.Dock="Top">
                         <GroupBox
                             Header="ESPROG Selection"
-                            DataContext="{Binding EsprogSelView}"
+                            DataContext="{Binding EsprogSettingView}"
                             Margin="5">
                             <StackPanel>
                                 <DockPanel
@@ -163,7 +163,7 @@
                             Header="Chip Selection"
                             Margin="5">
                             <StackPanel
-                                DataContext="{Binding ChipSelView}"
+                                DataContext="{Binding ChipSettingView}"
                                 IsEnabled="{Binding PortConnected}">
                                 <UniformGrid
                                     Rows="1"

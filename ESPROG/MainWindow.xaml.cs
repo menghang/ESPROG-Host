@@ -34,42 +34,42 @@ namespace ESPROG
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             ReloadSerialPort();
-            view.EsprogSelView.SelectedGateCtrlModeChanged += EsprogSelView_SelectedGateCtrlModeChanged;
+            view.EsprogSettingView.SelectedGateCtrlModeChanged += EsprogSelView_SelectedGateCtrlModeChanged;
         }
 
         private async void EsprogSelView_SelectedGateCtrlModeChanged(object sender, EventArgs e)
         {
-            if (await nuprog.SetGateCtrl(view.EsprogSelView.SelectedGateCtrlMode))
+            if (await nuprog.SetGateCtrl(view.EsprogSettingView.SelectedGateCtrlMode))
             {
-                log.Info(string.Format("Set gate mode ({0}) succeed", view.EsprogSelView.SelectedGateCtrlMode));
+                log.Info(string.Format("Set gate mode ({0}) succeed", view.EsprogSettingView.SelectedGateCtrlMode));
             }
             else
             {
-                log.Error(string.Format("Set gate mode ({0}) fail", view.EsprogSelView.SelectedGateCtrlMode));
+                log.Error(string.Format("Set gate mode ({0}) fail", view.EsprogSettingView.SelectedGateCtrlMode));
             }
         }
 
         private void ReloadSerialPort()
         {
-            view.EsprogSelView.PortList.Clear();
+            view.EsprogSettingView.PortList.Clear();
             string[] ports = uart.Scan();
             if (ports.Length > 0)
             {
                 foreach (string port in ports)
                 {
-                    view.EsprogSelView.PortList.Add(port);
+                    view.EsprogSettingView.PortList.Add(port);
                 }
-                if (!ports.Contains(view.EsprogSelView.SelectedPort))
+                if (!ports.Contains(view.EsprogSettingView.SelectedPort))
                 {
-                    view.EsprogSelView.SelectedPort = ports[0];
+                    view.EsprogSettingView.SelectedPort = ports[0];
                 }
             }
         }
 
         private async Task<bool> TryConnectPort(string port)
         {
-            view.EsprogSelView.EsprogInfo = string.Empty;
-            view.EsprogSelView.EsprogCompileTime = string.Empty;
+            view.EsprogSettingView.EsprogInfo = string.Empty;
+            view.EsprogSettingView.EsprogCompileTime = string.Empty;
             if (!uart.Open(port))
             {
                 log.Debug(string.Format("Port({0}) open fail", port));
@@ -93,9 +93,9 @@ namespace ESPROG
                 log.Debug(string.Format("Can not get ESPROG gate ctrl mode on port({0})", port));
                 return false;
             }
-            view.EsprogSelView.EsprogInfo = version;
-            view.EsprogSelView.EsprogCompileTime = compileTime;
-            view.EsprogSelView.UpdateSelectedGateCtrlMode(gateCtrlMode.Value);
+            view.EsprogSettingView.EsprogInfo = version;
+            view.EsprogSettingView.EsprogCompileTime = compileTime;
+            view.EsprogSettingView.UpdateSelectedGateCtrlMode(gateCtrlMode.Value);
             log.Info(string.Format("Find ESPROG on port({0})", port));
             return true;
         }
@@ -109,7 +109,7 @@ namespace ESPROG
         {
             if (!view.PortConnected)
             {
-                if (await TryConnectPort(view.EsprogSelView.SelectedPort))
+                if (await TryConnectPort(view.EsprogSettingView.SelectedPort))
                 {
                     view.PortConnected = true;
                 }
@@ -124,11 +124,11 @@ namespace ESPROG
         private async void ButtonAutodetectPort_Click(object sender, RoutedEventArgs e)
         {
             ReloadSerialPort();
-            foreach (string port in view.EsprogSelView.PortList)
+            foreach (string port in view.EsprogSettingView.PortList)
             {
                 if (await TryConnectPort(port))
                 {
-                    view.EsprogSelView.SelectedPort = port;
+                    view.EsprogSettingView.SelectedPort = port;
                     view.PortConnected = true;
                     return;
                 }
@@ -181,9 +181,9 @@ namespace ESPROG
 
         private async void ButtonGetChipInfo_Click(object sender, RoutedEventArgs e)
         {
-            view.ChipSelView.ChipInfo = string.Empty;
-            string? chipInfo = await GetChipInfo(view.ChipSelView.SelectedChip, view.ChipSelView.SelectedChipAddr);
-            view.ChipSelView.ChipInfo = string.IsNullOrEmpty(chipInfo) ? string.Empty : chipInfo;
+            view.ChipSettingView.ChipInfo = string.Empty;
+            string? chipInfo = await GetChipInfo(view.ChipSettingView.SelectedChip, view.ChipSettingView.SelectedChipAddr);
+            view.ChipSettingView.ChipInfo = string.IsNullOrEmpty(chipInfo) ? string.Empty : chipInfo;
         }
 
         private void ButtonClearLog_Click(object sender, RoutedEventArgs e)
@@ -198,17 +198,17 @@ namespace ESPROG
 
         private async void ButtonAutodetectChip_Click(object sender, RoutedEventArgs e)
         {
-            view.ChipSelView.ChipInfo = string.Empty;
-            foreach (uint chip in ChipSelVM.ChipDict.Keys)
+            view.ChipSettingView.ChipInfo = string.Empty;
+            foreach (uint chip in ChipSettingVM.ChipDict.Keys)
             {
-                foreach (ComboBoxModel<string, byte> devAddr in ChipSelVM.ChipDict[chip])
+                foreach (ComboBoxModel<string, byte> devAddr in ChipSettingVM.ChipDict[chip])
                 {
                     string? chipInfo = await GetChipInfo(chip, devAddr.Value);
                     if (chipInfo != null)
                     {
-                        view.ChipSelView.SelectedChip = chip;
-                        view.ChipSelView.SelectedChipAddr = devAddr.Value;
-                        view.ChipSelView.ChipInfo = chipInfo;
+                        view.ChipSettingView.SelectedChip = chip;
+                        view.ChipSettingView.SelectedChipAddr = devAddr.Value;
+                        view.ChipSettingView.ChipInfo = chipInfo;
                         return;
                     }
                 }
@@ -249,7 +249,7 @@ namespace ESPROG
                 log.Error("Firmware is not available");
                 return false;
             }
-            if (!await nuprog.SetChipAndAddr(view.ChipSelView.SelectedChip, view.ChipSelView.SelectedChipAddr))
+            if (!await nuprog.SetChipAndAddr(view.ChipSettingView.SelectedChip, view.ChipSettingView.SelectedChipAddr))
             {
                 return false;
             }
@@ -281,7 +281,7 @@ namespace ESPROG
 
         private async void ButtonReadChip_Click(object sender, RoutedEventArgs e)
         {
-            if (!await nuprog.SetChipAndAddr(view.ChipSelView.SelectedChip, view.ChipSelView.SelectedChipAddr))
+            if (!await nuprog.SetChipAndAddr(view.ChipSettingView.SelectedChip, view.ChipSettingView.SelectedChipAddr))
             {
                 return;
             }

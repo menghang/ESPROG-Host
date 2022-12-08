@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace ESPROG.Views
 {
-    class ChipSelVM : BaseViewModel
+    class ChipSettingVM : BaseViewModel
     {
         public static readonly Dictionary<uint, List<ComboBoxModel<string, byte>>> ChipDict = new()
         {
@@ -74,7 +74,7 @@ namespace ESPROG.Views
             set => SetProperty(ref portConnected, value);
         }
 
-        public ChipSelVM()
+        public ChipSettingVM()
         {
             ChipList = new();
             foreach (uint chip in ChipDict.Keys)
