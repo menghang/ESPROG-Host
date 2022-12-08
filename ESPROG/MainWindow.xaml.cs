@@ -324,5 +324,31 @@ namespace ESPROG
                 }
             }
         }
+
+        private async void ButtonReadReg_Click(object sender, RoutedEventArgs e)
+        {
+            if (view.RegAddr == null)
+            {
+                return;
+            }
+            if ((view.RegVal = await nuprog.ReadReg(view.RegAddr.Value)) == null)
+            {
+                log.Error(string.Format("Read reg ({0}) from dev ({1}) fail",
+                    view.RegAddr, HexUtil.GetHexStr(view.ChipSettingView.SelectedChipAddr)));
+            }
+        }
+
+        private async void ButtonWriteReg_Click(object sender, RoutedEventArgs e)
+        {
+            if (view.RegAddr == null || view.RegVal == null)
+            {
+                return;
+            }
+            if (!await nuprog.WriteReg(view.RegAddr.Value, view.RegVal.Value))
+            {
+                log.Error(string.Format("Read reg ({0}) from dev ({1}) fail",
+                    view.RegAddr, HexUtil.GetHexStr(view.ChipSettingView.SelectedChipAddr)));
+            }
+        }
     }
 }

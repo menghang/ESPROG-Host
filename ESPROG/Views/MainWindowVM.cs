@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ESPROG.Utils;
+using System;
 
 namespace ESPROG.Views
 {
@@ -23,6 +24,30 @@ namespace ESPROG.Views
             set => SetProperty(ref fwFile, value);
         }
 
+        private byte? regAddr;
+        public byte? RegAddr
+        {
+            get => regAddr;
+            set => SetProperty(ref regAddr, value, nameof(RegAddrText));
+        }
+        public string RegAddrText
+        {
+            get => regAddr.HasValue ? HexUtil.GetHexStr(regAddr.Value) : string.Empty;
+            set => SetProperty(ref regAddr, HexUtil.GetByteFromStr(value));
+        }
+
+        private byte? regVal;
+        public byte? RegVal
+        {
+            get => regVal;
+            set => SetProperty(ref regVal, value, nameof(RegValText));
+        }
+        public string RegValText
+        {
+            get => regVal.HasValue ? HexUtil.GetHexStr(regVal.Value) : string.Empty;
+            set => SetProperty(ref regVal, HexUtil.GetByteFromStr(value));
+        }
+
         public EsprogSettingVM EsprogSettingView { get; private set; }
         public ChipSettingVM ChipSettingView { get; private set; }
         public FwContentVM WriteFwContent { get; private set; }
@@ -32,6 +57,8 @@ namespace ESPROG.Views
         {
             portConnected = false;
             fwFile = string.Empty;
+            regAddr = null;
+            regVal = null;
             EsprogSettingView = new();
             ChipSettingView = new();
             ChipSettingView.SelectedChipChanged += ChipSelView_SelectedChipChanged;

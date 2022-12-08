@@ -388,7 +388,7 @@
                 </DockPanel>
             </TabItem>
             <TabItem
-                Header="Other">
+                Header="I2C">
                 <StackPanel>
                     <GroupBox
                         Header="Read/Write I2C Reg"
@@ -401,7 +401,7 @@
                                     VerticalContentAlignment="Center"
                                     Height="30" />
                                 <TextBox
-                                    Text="{Binding RegAddr}"
+                                    Text="{Binding RegAddrText}"
                                     VerticalContentAlignment="Center"
                                     Height="30" />
                             </DockPanel>
@@ -412,7 +412,7 @@
                                     VerticalContentAlignment="Center"
                                     Height="30" />
                                 <TextBox
-                                    Text="{Binding RegVal}"
+                                    Text="{Binding RegValText}"
                                     VerticalContentAlignment="Center"
                                     Height="30" />
                             </DockPanel>
@@ -422,11 +422,13 @@
                                 <Button
                                     Content="Read Reg"
                                     Height="30"
-                                    Margin="5" />
+                                    Margin="5"
+                                    Click="ButtonReadReg_Click" />
                                 <Button
                                     Content="Write Reg"
                                     Height="30"
-                                    Margin="5" />
+                                    Margin="5"
+                                    Click="ButtonWriteReg_Click" />
                             </UniformGrid>
                         </StackPanel>
                     </GroupBox>

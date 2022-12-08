@@ -150,7 +150,7 @@ namespace ESPROG.Services
 
         public async Task<bool> WriteReg(byte regAddr, byte regVal)
         {
-            UartCmdModel sendCmd = new(UartCmdModel.CmdSetDevAddr);
+            UartCmdModel sendCmd = new(UartCmdModel.CmdWriteReg);
             sendCmd.AddVal(regAddr).AddVal(regVal);
             UartCmdModel? RecvCmd = await SendCmdSlowRspAsync(sendCmd);
             return RecvCmd != null;
