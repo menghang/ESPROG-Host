@@ -285,6 +285,11 @@ namespace ESPROG
             {
                 return;
             }
+            if (!await nuprog.FwReadStart())
+            {
+                log.Error("Read firmware from chip fail");
+                return;
+            }
             byte[]? fwData = await nuprog.ReadFwFromEsprog(view.WriteFwContent.MaxFwSize);
             if (fwData == null)
             {

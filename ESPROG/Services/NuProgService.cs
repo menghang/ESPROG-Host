@@ -312,11 +312,11 @@ namespace ESPROG.Services
 
         public async Task<byte[]?> ReadFwFromEsprog(long fwSize)
         {
-            uint fwAddr = 0;
+            long fwAddr = 0;
             byte[] fwData = new byte[fwSize];
             while (true)
             {
-                byte[]? fwBuffer = await FwReadBuf(fwAddr);
+                byte[]? fwBuffer = await FwReadBuf((uint)fwAddr);
                 if (fwBuffer == null)
                 {
                     log.Error(string.Format("Read firmware from ESPROG fail at addr ({0})", fwAddr));
@@ -325,6 +325,7 @@ namespace ESPROG.Services
                 if (fwAddr + fwBuffer.LongLength < fwSize)
                 {
                     Array.Copy(fwBuffer, 0, fwData, fwAddr, fwBuffer.LongLength);
+                    fwAddr += fwBuffer.LongLength;
                     continue;
                 }
                 else if (fwAddr + fwBuffer.LongLength == fwSize)
