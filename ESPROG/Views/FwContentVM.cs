@@ -147,6 +147,7 @@ namespace ESPROG.Views
                                     FwData.LongLength - pos : writeBufferSize;
                                 Array.Copy(FwData, pos, buf, 0, bufLength);
                                 bs.Write(buf, 0, (int)bufLength);
+                                pos += bufLength;
                             }
                             bs.Flush();
                             log = "Save firmware succeed";
