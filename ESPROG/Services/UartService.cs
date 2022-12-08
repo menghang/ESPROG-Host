@@ -77,7 +77,7 @@ namespace ESPROG.Services
             }
             readBuffer += port.ReadExisting();
 
-            string regexStr = @"\[[a-zA-Z]+,[0-9]+(,[a-zA-Z0-9-:=\s\.\+\\]+)*]\r\n";
+            string regexStr = @"\[[a-zA-Z]+,[0-9]+(,[a-zA-Z0-9-:=\s\.\+\/]+)*]\r\n";
             MatchCollection mc = Regex.Matches(readBuffer, regexStr);
             if (mc.Count > 0)
             {
