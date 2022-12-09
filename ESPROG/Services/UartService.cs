@@ -130,6 +130,10 @@ namespace ESPROG.Services
             log.Debug(fullLog);
             ui.Dispatcher.BeginInvoke(() =>
             {
+                if (ui.LineCount > 512)
+                {
+                    ui.Clear();
+                }
                 ui.AppendText(fullLog);
                 ui.AppendText(Environment.NewLine);
                 ui.ScrollToEnd();
