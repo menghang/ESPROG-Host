@@ -471,50 +471,6 @@
                         Margin="5" />
                 </DockPanel>
             </TabItem>
-            <TabItem
-                Header="Cmds">
-                <DockPanel>
-                    <Grid
-                        IsEnabled="{Binding IsIdle}"
-                        DockPanel.Dock="Top">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition
-                                Width="2*" />
-                            <ColumnDefinition
-                                Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <TextBox
-                            Text="{Binding SendCmd}"
-                            VerticalContentAlignment="Center"
-                            Height="30"
-                            Margin="5"
-                            Grid.Column="0" />
-                        <Button
-                            Content="Send"
-                            IsEnabled="{Binding IsPortConnected}"
-                            Height="30"
-                            Margin="5"
-                            Grid.Column="1"
-                            Click="ButtonSendCmd_Click" />
-                    </Grid>
-                    <UniformGrid
-                        Rows="1"
-                        Columns="2"
-                        DockPanel.Dock="Bottom">
-                        <Button
-                            Content="Clear"
-                            Height="30"
-                            Margin="5"
-                            Click="ButtonClearCmds_Click" />
-                    </UniformGrid>
-                    <TextBox
-                        x:Name="TextBoxCmds"
-                        IsReadOnly="True"
-                        HorizontalScrollBarVisibility="Auto"
-                        VerticalScrollBarVisibility="Auto"
-                        Margin="5" />
-                </DockPanel>
-            </TabItem>
         </TabControl>
     </DockPanel>
 </Window>

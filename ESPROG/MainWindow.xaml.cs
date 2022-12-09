@@ -28,7 +28,7 @@ namespace ESPROG
             DataContext = view;
 
             log = new(TextBoxLog);
-            uart = new(log, TextBoxCmds);
+            uart = new(log);
             nuprog = new(log, uart);
         }
 
@@ -219,11 +219,6 @@ namespace ESPROG
         private void ButtonClearLog_Click(object sender, RoutedEventArgs e)
         {
             log.ClearLogBox();
-        }
-
-        private void ButtonClearCmds_Click(object sender, RoutedEventArgs e)
-        {
-            uart.ClearLogBox();
         }
 
         private async void ButtonAutodetectChip_Click(object sender, RoutedEventArgs e)

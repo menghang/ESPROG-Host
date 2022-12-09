@@ -5,7 +5,6 @@ using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows.Controls;
 
 namespace ESPROG.Services
 {
@@ -14,15 +13,13 @@ namespace ESPROG.Services
         public delegate void CmdReceivedHandler(object sender, UartCmdReceivedEventArgs e);
         public event CmdReceivedHandler? CmdReceived;
 
-        private readonly TextBox ui;
         private readonly LogService log;
         private SerialPort? port;
         private string readBuffer;
 
-        public UartService(LogService logControl, TextBox textbox)
+        public UartService(LogService logControl)
         {
             log = logControl;
-            ui = textbox;
             port = null;
             readBuffer = string.Empty;
             CmdReceived = null;
@@ -128,21 +125,6 @@ namespace ESPROG.Services
         {
             string fullLog = string.Format("[{0}] {1}", send ? "S" : "R", line.TrimEnd());
             log.Debug(fullLog);
-            ui.Dispatcher.BeginInvoke(() =>
-            {
-                if (ui.LineCount > 512)
-                {
-                    ui.Clear();
-                }
-                ui.AppendText(fullLog);
-                ui.AppendText(Environment.NewLine);
-                ui.ScrollToEnd();
-            });
-        }
-
-        public void ClearLogBox()
-        {
-            ui.Dispatcher.BeginInvoke(() => ui.Clear());
         }
 
         public class UartCmdReceivedEventArgs : EventArgs
