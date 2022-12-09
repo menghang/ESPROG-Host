@@ -14,7 +14,7 @@ namespace ESPROG.Services
         private readonly Queue<UartCmdModel> cmdQueue;
 
         private static readonly int shortCheckInterval = 20;
-        private static readonly int shortCheckTimeout = 200;
+        private static readonly int shortCheckTimeout = 500;
         private static readonly int midCheckInterval = 50;
         private static readonly int midCheckTimeout = 1000;
         private static readonly int longCheckInterval = 100;
