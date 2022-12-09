@@ -290,16 +290,21 @@ namespace ESPROG.Services
 
         public async Task<bool> WriteFwToEsprog(byte[] fwData, long fwSize)
         {
+            byte[] fwBuffer = new byte[esprogFwBlockSize];
             for (uint fwAddr = 0; fwAddr < fwSize; fwAddr += esprogFwBlockSize)
             {
-                byte[] fwBuffer = new byte[esprogFwBlockSize];
                 if (fwAddr + esprogFwBlockSize < fwData.LongLength)
                 {
                     Array.Copy(fwData, fwAddr, fwBuffer, 0, esprogFwBlockSize);
                 }
                 else if (fwAddr < fwData.LongLength)
                 {
+                    Array.Clear(fwBuffer);
                     Array.Copy(fwData, fwAddr, fwBuffer, 0, fwData.LongLength - fwAddr);
+                }
+                else
+                {
+                    Array.Clear(fwBuffer);
                 }
                 if (!await FwWriteBuf(fwAddr, fwBuffer))
                 {
