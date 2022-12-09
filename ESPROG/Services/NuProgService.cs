@@ -100,7 +100,7 @@ namespace ESPROG.Services
                 {
                     continue;
                 }
-                if (recvCmd.Rsp == null || recvCmd.Rsp != 0 || recvCmd.Val.Count != 1) // wrong rsp or wrong val size
+                if (recvCmd.Rsp == null || recvCmd.Rsp != 0 || recvCmd.ValCount != 1) // wrong rsp or wrong val size
                 {
                     return null;
                 }
@@ -117,57 +117,57 @@ namespace ESPROG.Services
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdGetAppVersion);
             sendCmd.AddVal(true);
-            UartCmdModel? RecvCmd = await SendCmdFastRspAsync(sendCmd);
-            if (RecvCmd == null || RecvCmd.Val.Count != 2)
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            if (recvCmd == null || recvCmd.ValCount != 2)
             {
                 return null;
             }
-            return string.Format("{0}({1})", RecvCmd.Val[0], RecvCmd.Val[1]);
+            return string.Format("{0}({1})", recvCmd.Val[0], recvCmd.Val[1]);
         }
 
         public async Task<string?> GetEsprogCompileTimeAsync()
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdGetAppCompileTime);
             sendCmd.AddVal(true);
-            UartCmdModel? RecvCmd = await SendCmdFastRspAsync(sendCmd);
-            if (RecvCmd == null || RecvCmd.Val.Count != 2)
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            if (recvCmd == null || recvCmd.ValCount != 2)
             {
                 return null;
             }
-            return string.Format("{0}, {1}", RecvCmd.Val[0], RecvCmd.Val[1]);
+            return string.Format("{0}, {1}", recvCmd.Val[0], recvCmd.Val[1]);
         }
 
         public async Task<byte?> ReadReg(byte regAddr)
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdReadReg);
             sendCmd.AddVal(regAddr);
-            UartCmdModel? RecvCmd = await SendCmdSlowRspAsync(sendCmd);
-            if (RecvCmd == null || RecvCmd.Val.Count != 1)
+            UartCmdModel? recvCmd = await SendCmdSlowRspAsync(sendCmd);
+            if (recvCmd == null || recvCmd.ValCount != 1)
             {
                 return null;
             }
-            return HexUtil.GetByteFromStr(RecvCmd.Val[0]);
+            return HexUtil.GetByteFromStr(recvCmd.Val[0]);
         }
 
         public async Task<bool> WriteReg(byte regAddr, byte regVal)
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdWriteReg);
             sendCmd.AddVal(regAddr).AddVal(regVal);
-            UartCmdModel? RecvCmd = await SendCmdSlowRspAsync(sendCmd);
-            return RecvCmd != null;
+            UartCmdModel? recvCmd = await SendCmdSlowRspAsync(sendCmd);
+            return recvCmd != null;
         }
 
         public async Task<(byte pn, byte version)?> GetChipInfo()
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdGetChipInfo);
             sendCmd.AddVal(true);
-            UartCmdModel? RecvCmd = await SendCmdSlowRspAsync(sendCmd);
-            if (RecvCmd == null || RecvCmd.Val.Count != 2)
+            UartCmdModel? recvCmd = await SendCmdSlowRspAsync(sendCmd);
+            if (recvCmd == null || recvCmd.ValCount != 2)
             {
                 return null;
             }
-            byte? pn = HexUtil.GetByteFromStr(RecvCmd.Val[0]);
-            byte? version = HexUtil.GetByteFromStr(RecvCmd.Val[1]);
+            byte? pn = HexUtil.GetByteFromStr(recvCmd.Val[0]);
+            byte? version = HexUtil.GetByteFromStr(recvCmd.Val[1]);
             return pn == null || version == null ? null : ((byte pn, byte version)?)(pn, version);
         }
 
@@ -175,12 +175,12 @@ namespace ESPROG.Services
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdGetChipUID);
             sendCmd.AddVal(true);
-            UartCmdModel? RecvCmd = await SendCmdSlowRspAsync(sendCmd);
-            if (RecvCmd == null || RecvCmd.Val.Count != 1)
+            UartCmdModel? recvCmd = await SendCmdSlowRspAsync(sendCmd);
+            if (recvCmd == null || recvCmd.ValCount != 1)
             {
                 return null;
             }
-            return HexUtil.GetUIntFromStr(RecvCmd.Val[0]);
+            return HexUtil.GetUIntFromStr(recvCmd.Val[0]);
 
         }
 
@@ -188,66 +188,66 @@ namespace ESPROG.Services
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdSetDevAddr);
             sendCmd.AddVal(devAddr);
-            UartCmdModel? RecvCmd = await SendCmdFastRspAsync(sendCmd);
-            return RecvCmd != null;
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            return recvCmd != null;
         }
 
         public async Task<byte?> GetDevAddr()
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdGetDevAddr);
             sendCmd.AddVal(true);
-            UartCmdModel? RecvCmd = await SendCmdFastRspAsync(sendCmd);
-            if (RecvCmd == null || RecvCmd.Val.Count != 1)
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            if (recvCmd == null || recvCmd.ValCount != 1)
             {
                 return null;
             }
-            return HexUtil.GetByteFromStr(RecvCmd.Val[0]);
+            return HexUtil.GetByteFromStr(recvCmd.Val[0]);
         }
 
         public async Task<bool> SetChip(uint chip)
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdSetChip);
             sendCmd.AddVal(chip);
-            UartCmdModel? RecvCmd = await SendCmdFastRspAsync(sendCmd);
-            return RecvCmd != null;
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            return recvCmd != null;
         }
 
         public async Task<uint?> GetChip()
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdGetChip);
             sendCmd.AddVal(true);
-            UartCmdModel? RecvCmd = await SendCmdFastRspAsync(sendCmd);
-            if (RecvCmd == null || RecvCmd.Val.Count != 1)
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            if (recvCmd == null || recvCmd.ValCount != 1)
             {
                 return null;
             }
-            return HexUtil.GetUIntFromStr(RecvCmd.Val[0]);
+            return HexUtil.GetUIntFromStr(recvCmd.Val[0]);
         }
 
         public async Task<bool> FwWriteBuf(uint fwAddr, byte[] fwData)
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdFwWriteBuf);
             sendCmd.AddVal(fwAddr).AddVal(HexUtil.GetChecksum(fwData)).AddVal(fwData);
-            UartCmdModel? RecvCmd = await SendCmdFastRspAsync(sendCmd);
-            if (RecvCmd == null || RecvCmd.Val.Count != 1)
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            if (recvCmd == null || recvCmd.ValCount != 1)
             {
                 return false;
             }
-            return HexUtil.GetUIntFromStr(RecvCmd.Val[0]) == fwAddr;
+            return HexUtil.GetUIntFromStr(recvCmd.Val[0]) == fwAddr;
         }
 
         public async Task<byte[]?> FwReadBuf(uint fwAddr)
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdFwReadBuf);
             sendCmd.AddVal(fwAddr);
-            UartCmdModel? RecvCmd = await SendCmdFastRspAsync(sendCmd);
-            if (RecvCmd == null || RecvCmd.Val.Count != 3)
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            if (recvCmd == null || recvCmd.ValCount != 3)
             {
                 return null;
             }
-            uint? fwAddrRead = HexUtil.GetUIntFromStr(RecvCmd.Val[0]);
-            uint? checksum = HexUtil.GetUIntFromStr(RecvCmd.Val[1]);
-            byte[]? fwData = HexUtil.GetBytesFromBase64Str(RecvCmd.Val[2]);
+            uint? fwAddrRead = HexUtil.GetUIntFromStr(recvCmd.Val[0]);
+            uint? checksum = HexUtil.GetUIntFromStr(recvCmd.Val[1]);
+            byte[]? fwData = HexUtil.GetBytesFromBase64Str(recvCmd.Val[2]);
             if (fwAddrRead != fwAddr || checksum == null || fwData == null)
             {
                 return null;
@@ -260,32 +260,32 @@ namespace ESPROG.Services
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdFwWriteStart);
             sendCmd.AddVal(true);
-            UartCmdModel? RecvCmd = await SendCmdMultiRspAsync(sendCmd, byte.MaxValue);
-            return RecvCmd != null;
+            UartCmdModel? recvCmd = await SendCmdMultiRspAsync(sendCmd, byte.MaxValue);
+            return recvCmd != null;
         }
 
         public async Task<bool> FwReadStart()
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdFwReadStart);
             sendCmd.AddVal(true);
-            UartCmdModel? RecvCmd = await SendCmdMultiRspAsync(sendCmd, byte.MaxValue);
-            return RecvCmd != null;
+            UartCmdModel? recvCmd = await SendCmdMultiRspAsync(sendCmd, byte.MaxValue);
+            return recvCmd != null;
         }
 
         public async Task<bool> SaveToEsprog()
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdSaveConfig);
             sendCmd.AddVal(true);
-            UartCmdModel? RecvCmd = await SendCmdMultiRspAsync(sendCmd, byte.MaxValue);
-            return RecvCmd != null;
+            UartCmdModel? recvCmd = await SendCmdMultiRspAsync(sendCmd, byte.MaxValue);
+            return recvCmd != null;
         }
 
         public async Task<bool> FormatEsprog()
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdFlashFormat);
             sendCmd.AddVal(true);
-            UartCmdModel? RecvCmd = await SendCmdMultiRspAsync(sendCmd, byte.MaxValue);
-            return RecvCmd != null;
+            UartCmdModel? recvCmd = await SendCmdMultiRspAsync(sendCmd, byte.MaxValue);
+            return recvCmd != null;
         }
 
         public async Task<bool> WriteFwToEsprog(byte[] fwData, long fwSize)
@@ -353,20 +353,20 @@ namespace ESPROG.Services
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdSetGateCtrl);
             sendCmd.AddVal(mode);
-            UartCmdModel? RecvCmd = await SendCmdFastRspAsync(sendCmd);
-            return RecvCmd != null;
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            return recvCmd != null;
         }
 
         public async Task<byte?> GetGateCtrl()
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdGetGateCtrl);
             sendCmd.AddVal(true);
-            UartCmdModel? RecvCmd = await SendCmdFastRspAsync(sendCmd);
-            if (RecvCmd == null || RecvCmd.Val.Count != 1)
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            if (recvCmd == null || recvCmd.ValCount != 1)
             {
                 return null;
             }
-            return HexUtil.GetByteFromStr(RecvCmd.Val[0]);
+            return HexUtil.GetByteFromStr(recvCmd.Val[0]);
         }
 
         public async Task<bool> SetChipAndAddr(uint chip, byte devAddr)
@@ -388,20 +388,20 @@ namespace ESPROG.Services
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdFwWriteChecksum);
             sendCmd.AddVal(HexUtil.GetChecksum(fwData));
-            UartCmdModel? RecvCmd = await SendCmdFastRspAsync(sendCmd);
-            return RecvCmd != null;
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            return recvCmd != null;
         }
 
         public async Task<uint?> FwReadChecksum()
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdFwReadChecksum);
             sendCmd.AddVal(true);
-            UartCmdModel? RecvCmd = await SendCmdFastRspAsync(sendCmd);
-            if (RecvCmd == null || RecvCmd.Val.Count != 1)
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            if (recvCmd == null || recvCmd.ValCount != 1)
             {
                 return null;
             }
-            return HexUtil.GetUIntFromStr(RecvCmd.Val[0]);
+            return HexUtil.GetUIntFromStr(recvCmd.Val[0]);
         }
     }
 }

@@ -32,13 +32,16 @@ namespace ESPROG.Models
 
         public byte? Rsp { private set; get; }
 
-        public List<string> Val { private set; get; }
+        public string[] Val { private set; get; }
+
+        public int ValCount { private set; get; }
 
         public UartCmdModel(string cmd)
         {
             Cmd = cmd;
             Rsp = null;
-            Val = new();
+            Val = new string[3];
+            ValCount = 0;
         }
 
         public override string ToString()
@@ -49,9 +52,9 @@ namespace ESPROG.Models
             {
                 sb.Append(',').Append(HexUtil.GetHexStr(Rsp.Value));
             }
-            foreach (string s in Val)
+            for (int ii = 0; ii < ValCount; ii++)
             {
-                sb.Append(',').Append(s);
+                sb.Append(',').Append(Val[ii]);
             }
             sb.Append("]\r\n");
             return sb.ToString();
@@ -65,7 +68,7 @@ namespace ESPROG.Models
             }
             line = line[1..^3];
             string[] items = line.Split(',');
-            if (items.Length == 0)
+            if (items.Length == 0 || items.Length > 5)
             {
                 return null;
             }
@@ -83,40 +86,46 @@ namespace ESPROG.Models
             {
                 return cmd;
             }
+            cmd.ValCount = items.Length - 2;
             for (int ii = 2; ii < items.Length; ii++)
             {
-                cmd.Val.Add(items[ii]);
+                cmd.Val[ii - 2] = items[ii];
             }
             return cmd;
         }
 
         public UartCmdModel AddVal(byte val)
         {
-            Val.Add(HexUtil.GetHexStr(val));
+            Val[ValCount] = HexUtil.GetHexStr(val);
+            ValCount++;
             return this;
         }
 
         public UartCmdModel AddVal(uint val)
         {
-            Val.Add(HexUtil.GetHexStr(val));
+            Val[ValCount] = HexUtil.GetHexStr(val);
+            ValCount++;
             return this;
         }
 
         public UartCmdModel AddVal(bool val)
         {
-            Val.Add(val ? "1" : "0");
+            Val[ValCount] = val ? "1" : "0";
+            ValCount++;
             return this;
         }
 
         public UartCmdModel AddVal(byte[] val)
         {
-            Val.Add(HexUtil.GetBase64Str(val));
+            Val[ValCount] = HexUtil.GetBase64Str(val);
+            ValCount++;
             return this;
         }
 
         public UartCmdModel AddVal(string val)
         {
-            Val.Add(val);
+            Val[ValCount] = val;
+            ValCount++;
             return this;
         }
     }
