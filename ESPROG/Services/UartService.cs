@@ -101,7 +101,7 @@ namespace ESPROG.Services
                     CmdReceived?.Invoke(this, new(cmds));
                 }
             }
-            if (readBuffer.Length > 1024 * 1024)
+            if (readBuffer.Length > 8 * 1024)
             {
                 readBuffer = string.Empty;
             }
