@@ -1,5 +1,6 @@
 ﻿using ESPROG.Models;
 using ESPROG.Utils;
+using ESPROG.Views;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -291,16 +292,16 @@ namespace ESPROG.Services
         public async Task<bool> WriteFwToEsprog(byte[] fwData, long fwSize)
         {
             byte[] fwBuffer = new byte[esprogFwBlockSize];
-            for (uint fwAddr = 0; fwAddr < fwSize; fwAddr += esprogFwBlockSize)
+            for (uint fwAddr = 0; fwAddr < ChipSettingVM.MaxFwSize; fwAddr += esprogFwBlockSize)
             {
-                if (fwAddr + esprogFwBlockSize < fwData.LongLength)
+                if (fwAddr + esprogFwBlockSize < fwSize)
                 {
                     Array.Copy(fwData, fwAddr, fwBuffer, 0, esprogFwBlockSize);
                 }
-                else if (fwAddr < fwData.LongLength)
+                else if (fwAddr < fwSize)
                 {
                     Array.Clear(fwBuffer);
-                    Array.Copy(fwData, fwAddr, fwBuffer, 0, fwData.LongLength - fwAddr);
+                    Array.Copy(fwData, fwAddr, fwBuffer, 0, fwSize - fwAddr);
                 }
                 else
                 {
@@ -316,35 +317,35 @@ namespace ESPROG.Services
             return true;
         }
 
-        public async Task<byte[]?> ReadFwFromEsprog(long fwSize)
+        public async Task<bool> ReadFwFromEsprog(byte[] fwData)
         {
+            Array.Clear(fwData);
             long fwAddr = 0;
-            byte[] fwData = new byte[fwSize];
             while (true)
             {
                 byte[]? fwBuffer = await FwReadBuf((uint)fwAddr);
                 if (fwBuffer == null)
                 {
                     log.Error(string.Format("Read firmware from ESPROG fail at addr ({0})", fwAddr));
-                    return null;
+                    return false;
                 }
-                if (fwAddr + fwBuffer.LongLength < fwSize)
+                if (fwAddr + fwBuffer.LongLength < ChipSettingVM.MaxFwSize)
                 {
                     Array.Copy(fwBuffer, 0, fwData, fwAddr, fwBuffer.LongLength);
                     fwAddr += fwBuffer.LongLength;
                     continue;
                 }
-                else if (fwAddr + fwBuffer.LongLength == fwSize)
+                else if (fwAddr + fwBuffer.LongLength == ChipSettingVM.MaxFwSize)
                 {
                     Array.Copy(fwBuffer, 0, fwData, fwAddr, fwBuffer.LongLength);
                     log.Info("Read firmware from ESPROG succeed");
-                    return fwData;
+                    return true;
                 }
                 else
                 {
                     log.Error(string.Format("Buffer size ({0}) exceed firmware size ({1}) at addr ({2})",
-                        fwBuffer.LongLength, fwSize, fwAddr));
-                    return null;
+                        fwBuffer.LongLength, ChipSettingVM.MaxFwSize, fwAddr));
+                    return false;
                 }
             }
         }

@@ -296,7 +296,7 @@
                                             VerticalContentAlignment="Center"
                                             Height="30" />
                                         <TextBox
-                                            Text="{Binding Checksum,Mode=OneWay}"
+                                            Text="{Binding ChecksumText,Mode=OneWay}"
                                             Height="30"
                                             VerticalContentAlignment="Center"
                                             HorizontalContentAlignment="Center"
@@ -309,7 +309,7 @@
                                             VerticalContentAlignment="Center"
                                             Height="30" />
                                         <TextBox
-                                            Text="{Binding Size,Mode=OneWay}"
+                                            Text="{Binding SizeText,Mode=OneWay}"
                                             Height="30"
                                             VerticalContentAlignment="Center"
                                             HorizontalContentAlignment="Center"
@@ -317,7 +317,7 @@
                                     </DockPanel>
                                 </UniformGrid>
                                 <TextBox
-                                    Text="{Binding Content,Mode=OneWay}"
+                                    Text="{Binding ContentText,Mode=OneWay}"
                                     IsReadOnly="True"
                                     FontFamily="Consolas"
                                     FontSize="11"
@@ -367,7 +367,7 @@
                                             VerticalContentAlignment="Center"
                                             Height="30" />
                                         <TextBox
-                                            Text="{Binding Checksum,Mode=OneWay}"
+                                            Text="{Binding ChecksumText,Mode=OneWay}"
                                             Height="30"
                                             VerticalContentAlignment="Center"
                                             HorizontalContentAlignment="Center"
@@ -380,7 +380,7 @@
                                             VerticalContentAlignment="Center"
                                             Height="30" />
                                         <TextBox
-                                            Text="{Binding Size,Mode=OneWay}"
+                                            Text="{Binding SizeText,Mode=OneWay}"
                                             Height="30"
                                             VerticalContentAlignment="Center"
                                             HorizontalContentAlignment="Center"
@@ -388,7 +388,7 @@
                                     </DockPanel>
                                 </UniformGrid>
                                 <TextBox
-                                    Text="{Binding Content,Mode=OneWay}"
+                                    Text="{Binding ContentText,Mode=OneWay}"
                                     IsReadOnly="True"
                                     FontFamily="Consolas"
                                     FontSize="11"

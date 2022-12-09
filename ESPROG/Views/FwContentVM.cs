@@ -7,47 +7,65 @@ namespace ESPROG.Views
 {
     internal class FwContentVM : BaseViewModel
     {
-        public long MaxFwSize { get; set; }
-
-        public string Content { get; private set; }
+        public string ContentText { get; private set; }
 
         private uint checksum;
-        public string Checksum
+        public uint Checksum
+        {
+            get => checksum;
+        }
+        public string ChecksumText
         {
             get => HexUtil.GetHexStr(checksum);
         }
 
         private long size;
-        public string Size
+        public long Size
+        {
+            get => size;
+            set => size = value <= FwData.LongLength ? value : FwData.LongLength;
+        }
+        public string SizeText
         {
             get => Convert.ToString(size);
         }
 
-        public byte[]? FwData { get; private set; }
+        public byte[] FwData { get; private set; }
 
-        private string GetFwContent(byte[] data)
+        public bool FwAvailable { get; set; }
+
+        public void UpdateDisplay()
         {
-            if (data == null || data.Length == 0)
+            if (FwAvailable)
             {
-                return string.Empty;
-            }
-            StringBuilder sb = new();
-            for (long line = 0; line < data.LongLength; line += 16)
-            {
-                sb.Append(HexUtil.GetHexStr(line)).Append(' ');
-                for (int ii = 0; (ii < 16) && (line + ii < data.Length); ii++)
+                StringBuilder sb = new();
+                for (long line = 0; line < size; line += 16)
                 {
-                    sb.Append(' ').Append(Convert.ToString(data[line + ii], 16).PadLeft(2, '0'));
+                    sb.Append(HexUtil.GetHexStr(line)).Append(' ');
+                    for (int ii = 0; (ii < 16) && (line + ii < size); ii++)
+                    {
+                        sb.Append(' ').Append(Convert.ToString(FwData[line + ii], 16).PadLeft(2, '0'));
+                    }
+                    sb.Append(Environment.NewLine);
                 }
-                sb.Append(Environment.NewLine);
+                ContentText = sb.ToString();
+                checksum = HexUtil.GetChecksum(FwData);
             }
-            return sb.ToString();
+            else
+            {
+                ContentText = string.Empty;
+                size = 0;
+                checksum = 0;
+            }
+            OnPropertyChanged(nameof(SizeText));
+            OnPropertyChanged(nameof(ChecksumText));
+            OnPropertyChanged(nameof(ContentText));
         }
 
         private static readonly int readBufferSize = 1024;
-        public bool LoadFwFile(string file, out string log)
+        public void LoadFwFile(string file, out string log)
         {
-            bool res = false;
+            FwAvailable = false;
             try
             {
                 if (File.Exists(file))
@@ -56,9 +74,10 @@ namespace ESPROG.Views
                     {
                         using (BufferedStream bs = new(fs))
                         {
-                            if (bs.Length <= MaxFwSize)
+                            if (bs.Length > 0 && bs.Length <= ChipSettingVM.MaxFwSize && bs.Length <= FwData.LongLength)
                             {
-                                FwData = new byte[bs.Length];
+                                size = bs.Length;
+                                Array.Clear(FwData);
                                 byte[] buf = new byte[readBufferSize];
                                 int readBytes = 0;
                                 long pos = 0;
@@ -67,15 +86,13 @@ namespace ESPROG.Views
                                     Array.Copy(buf, 0, FwData, pos, readBytes);
                                     pos += readBytes;
                                 }
-                                Content = GetFwContent(FwData);
-                                checksum = HexUtil.GetChecksum(FwData);
-                                size = FwData.LongLength;
                                 log = "Firmware file load succeed";
-                                res = true;
+                                FwAvailable = true;
                             }
                             else
                             {
-                                log = string.Format("Firmware size ({0}) exceed limit ({1})", bs.Length, MaxFwSize);
+                                log = string.Format("Firmware size ({0}) does not fit limit ({1})",
+                                    bs.Length, ChipSettingVM.MaxFwSize);
                             }
                         }
                     }
@@ -89,41 +106,7 @@ namespace ESPROG.Views
             {
                 log = "Firmware file load fail" + Environment.NewLine + ex.ToString();
             }
-            if (res == false)
-            {
-                size = 0;
-                checksum = 0;
-                Content = string.Empty;
-            }
-            OnPropertyChanged(nameof(Size));
-            OnPropertyChanged(nameof(Checksum));
-            OnPropertyChanged(nameof(Content));
-            return res;
-        }
-
-        public bool LoadFwData(byte[] data, out string log)
-        {
-            bool res = false;
-            if (data.LongLength > MaxFwSize)
-            {
-                log = string.Format("Firmware size ({0}) exceed limit ({1})", data.LongLength, MaxFwSize);
-                size = 0;
-                checksum = 0;
-                Content = string.Empty;
-            }
-            else
-            {
-                FwData = data;
-                Content = GetFwContent(FwData);
-                checksum = HexUtil.GetChecksum(FwData);
-                size = FwData.LongLength;
-                log = "Firmware file load succeed";
-                res = true;
-            }
-            OnPropertyChanged(nameof(Size));
-            OnPropertyChanged(nameof(Checksum));
-            OnPropertyChanged(nameof(Content));
-            return res;
+            UpdateDisplay();
         }
 
         private static readonly int writeBufferSize = 1024;
@@ -132,7 +115,7 @@ namespace ESPROG.Views
             bool res = false;
             try
             {
-                if (FwData != null)
+                if (FwAvailable)
                 {
                     using (FileStream fs = new(file, FileMode.Create))
                     {
@@ -140,11 +123,9 @@ namespace ESPROG.Views
                         {
                             byte[] buf = new byte[writeBufferSize];
                             long pos = 0;
-                            while (pos < FwData.LongLength)
+                            while (pos < size)
                             {
-                                long bufLength =
-                                    FwData.LongLength - pos < writeBufferSize ?
-                                    FwData.LongLength - pos : writeBufferSize;
+                                long bufLength = size - pos < writeBufferSize ? size - pos : writeBufferSize;
                                 Array.Copy(FwData, pos, buf, 0, bufLength);
                                 bs.Write(buf, 0, (int)bufLength);
                                 pos += bufLength;
@@ -169,9 +150,11 @@ namespace ESPROG.Views
 
         public FwContentVM()
         {
-            Content = string.Empty;
+            ContentText = string.Empty;
             checksum = 0;
             size = 0;
+            FwAvailable = false;
+            FwData = new byte[128 * 1024];
         }
     }
 }

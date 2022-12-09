@@ -79,22 +79,9 @@ namespace ESPROG.Views
             sendCmd = string.Empty;
             EsprogSettingView = new();
             ChipSettingView = new();
-            ChipSettingView.SelectedChipChanged += ChipSelView_SelectedChipChanged;
             WriteFwContent = new();
             ReadFwContent = new();
             ProgressView = new();
-            UpdateMaxFwSizeWithChip();
-        }
-
-        private void ChipSelView_SelectedChipChanged(object sender, EventArgs e)
-        {
-            UpdateMaxFwSizeWithChip();
-        }
-
-        private void UpdateMaxFwSizeWithChip()
-        {
-            WriteFwContent.MaxFwSize = ChipSettingVM.ChipSizeDict[ChipSettingView.SelectedChip];
-            ReadFwContent.MaxFwSize = ChipSettingVM.ChipSizeDict[ChipSettingView.SelectedChip];
         }
     }
 }

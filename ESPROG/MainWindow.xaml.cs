@@ -162,7 +162,8 @@ namespace ESPROG
             if (dialog.ShowDialog() == true)
             {
                 view.FwFile = dialog.FileName;
-                if (view.WriteFwContent.LoadFwFile(view.FwFile, out string logMsg))
+                view.WriteFwContent.LoadFwFile(view.FwFile, out string logMsg);
+                if (view.WriteFwContent.FwAvailable)
                 {
                     log.Info(logMsg);
                 }
@@ -298,7 +299,7 @@ namespace ESPROG
             {
                 return false;
             }
-            if (!await nuprog.WriteFwToEsprog(view.WriteFwContent.FwData, view.WriteFwContent.MaxFwSize))
+            if (!await nuprog.WriteFwToEsprog(view.WriteFwContent.FwData, view.WriteFwContent.Size))
             {
                 return false;
             }
@@ -346,19 +347,11 @@ namespace ESPROG
                 log.Error("Read firmware from chip fail");
                 return false;
             }
-            byte[]? fwData = await nuprog.ReadFwFromEsprog(view.WriteFwContent.MaxFwSize);
-            if (fwData == null)
-            {
-                return false;
-            }
-            if (!view.ReadFwContent.LoadFwData(fwData, out string logMsg))
-            {
-                log.Error(logMsg);
-                return false;
-
-            }
-            log.Info(logMsg);
-            return true;
+            bool res = await nuprog.ReadFwFromEsprog(view.ReadFwContent.FwData);
+            view.ReadFwContent.FwAvailable = res;
+            view.ReadFwContent.Size = ChipSettingVM.MaxFwSize;
+            view.ReadFwContent.UpdateDisplay();
+            return res;
         }
 
         private void ButtonSaveFw_Click(object sender, RoutedEventArgs e)
