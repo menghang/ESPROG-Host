@@ -151,7 +151,7 @@ namespace ESPROG
             }
         }
 
-        private void TextBoxFwFile_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private async void TextBoxFwFile_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             OpenFileDialog dialog = new()
             {
@@ -162,7 +162,7 @@ namespace ESPROG
             if (dialog.ShowDialog() == true)
             {
                 view.FwFile = dialog.FileName;
-                view.WriteFwContent.LoadFwFile(view.FwFile, out string logMsg);
+                string logMsg = await view.WriteFwContent.LoadFwFile(view.FwFile);
                 if (view.WriteFwContent.FwAvailable)
                 {
                     log.Info(logMsg);
@@ -349,7 +349,7 @@ namespace ESPROG
             return res;
         }
 
-        private void ButtonSaveFw_Click(object sender, RoutedEventArgs e)
+        private async void ButtonSaveFw_Click(object sender, RoutedEventArgs e)
         {
             SaveFileDialog dialog = new()
             {
@@ -358,7 +358,8 @@ namespace ESPROG
             };
             if (dialog.ShowDialog() == true)
             {
-                if (view.ReadFwContent.SaveFwData(dialog.FileName, out string logMsg))
+                (bool res, string logMsg) = await view.ReadFwContent.SaveFwData(dialog.FileName);
+                if (res)
                 {
                     log.Info(logMsg);
                 }

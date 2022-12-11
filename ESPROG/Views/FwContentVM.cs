@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace ESPROG.Views
 {
@@ -63,8 +64,9 @@ namespace ESPROG.Views
         }
 
         private static readonly int readBufferSize = 1024;
-        public void LoadFwFile(string file, out string log)
+        public async Task<string> LoadFwFile(string file)
         {
+            string log;
             FwAvailable = false;
             try
             {
@@ -81,7 +83,7 @@ namespace ESPROG.Views
                                 byte[] buf = new byte[readBufferSize];
                                 int readBytes = 0;
                                 long pos = 0;
-                                while ((readBytes = bs.Read(buf, 0, readBufferSize)) > 0)
+                                while ((readBytes = await bs.ReadAsync(buf, 0, readBufferSize)) > 0)
                                 {
                                     Array.Copy(buf, 0, FwData, pos, readBytes);
                                     pos += readBytes;
@@ -107,12 +109,14 @@ namespace ESPROG.Views
                 log = "Firmware file load fail" + Environment.NewLine + ex.ToString();
             }
             UpdateDisplay();
+            return log;
         }
 
         private static readonly int writeBufferSize = 1024;
-        public bool SaveFwData(string file, out string log)
+        public async Task<(bool res, string log)> SaveFwData(string file)
         {
             bool res = false;
+            string log;
             try
             {
                 if (FwAvailable)
@@ -127,7 +131,7 @@ namespace ESPROG.Views
                             {
                                 long bufLength = size - pos < writeBufferSize ? size - pos : writeBufferSize;
                                 Array.Copy(FwData, pos, buf, 0, bufLength);
-                                bs.Write(buf, 0, (int)bufLength);
+                                await bs.WriteAsync(buf, 0, (int)bufLength);
                                 pos += bufLength;
                             }
                             bs.Flush();
@@ -145,7 +149,7 @@ namespace ESPROG.Views
             {
                 log = "Save firmware fail" + Environment.NewLine + ex.ToString();
             }
-            return res;
+            return (res, log);
         }
 
         public FwContentVM()
