@@ -7,7 +7,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using static ESPROG.Views.EsprogSettingVM;
+using UsbMonitor;
 
 namespace ESPROG
 {
@@ -20,6 +20,7 @@ namespace ESPROG
         private readonly LogService log;
         private readonly UartService uart;
         private readonly NuProgService nuprog;
+        private readonly UsbMonitorManager usbMonitor;
 
         public MainWindow()
         {
@@ -30,6 +31,8 @@ namespace ESPROG
             log = new(TextBoxLog);
             uart = new(log);
             nuprog = new(log, uart);
+            usbMonitor = new(this);
+            usbMonitor.UsbDeviceInterface += UsbMonitor_UsbDeviceInterface;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -38,7 +41,7 @@ namespace ESPROG
             view.EsprogSettingView.SelectedGateCtrlModeChanged += EsprogSelView_SelectedGateCtrlModeChanged;
         }
 
-        private async void EsprogSelView_SelectedGateCtrlModeChanged(object sender, GateCtrlModeEventArgs e)
+        private async void EsprogSelView_SelectedGateCtrlModeChanged(object sender, EsprogSettingVM.GateCtrlModeEventArgs e)
         {
             view.IsIdle = false;
             view.ProgressView.SetSate(ProgressVM.State.Running);
@@ -56,29 +59,13 @@ namespace ESPROG
             view.IsIdle = true;
         }
 
-        private async Task<bool> UpdateGateCtrlModeSubTask()
-        {
-            if (!await nuprog.SetGateCtrl(view.EsprogSettingView.SelectedGateCtrlMode))
-            {
-                return false;
-            }
-            return true;
-        }
-
         private void ReloadSerialPort()
         {
-            view.EsprogSettingView.PortList.Clear();
             string[] ports = uart.Scan();
-            if (ports.Length > 0)
+            view.EsprogSettingView.PortList = new(ports);
+            if (ports.Length > 0 && !ports.Contains(view.EsprogSettingView.SelectedPort))
             {
-                foreach (string port in ports)
-                {
-                    view.EsprogSettingView.PortList.Add(port);
-                }
-                if (!ports.Contains(view.EsprogSettingView.SelectedPort))
-                {
-                    view.EsprogSettingView.SelectedPort = ports[0];
-                }
+                view.EsprogSettingView.SelectedPort = ports[0];
             }
         }
 
@@ -134,6 +121,29 @@ namespace ESPROG
             {
                 uart.Close();
                 view.IsPortConnected = false;
+            }
+        }
+
+        private void UsbMonitor_UsbDeviceInterface(object? sender, UsbEventDeviceInterfaceArgs e)
+        {
+            switch (e.Action)
+            {
+                case UsbDeviceChangeEvent.RemoveComplete:
+                    if (view.IsPortConnected)
+                    {
+                        if (!uart.Scan().Contains(view.EsprogSettingView.SelectedPort))
+                        {
+                            uart.Close();
+                            view.IsPortConnected = false;
+                        }
+                    }
+                    ReloadSerialPort();
+                    break;
+                case UsbDeviceChangeEvent.Arrival:
+                    ReloadSerialPort();
+                    break;
+                default:
+                    break;
             }
         }
 

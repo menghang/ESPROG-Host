@@ -7,7 +7,12 @@ namespace ESPROG.Views
 {
     class EsprogSettingVM : BaseViewModel
     {
-        public ObservableCollection<string> PortList { get; private set; }
+        private List<string> portList;
+        public List<string> PortList
+        {
+            get => portList;
+            set => SetProperty(ref portList, value);
+        }
 
         private string selectedPort;
         public string SelectedPort
@@ -92,7 +97,7 @@ namespace ESPROG.Views
 
         public EsprogSettingVM()
         {
-            PortList = new();
+            portList = new();
             selectedPort = string.Empty;
             esprogInfo = string.Empty;
             esprogCompileTime = string.Empty;
