@@ -270,6 +270,13 @@ namespace ESPROG
 
         private async Task<bool> ProgChipSubTask()
         {
+            string logMsg = await view.WriteFwContent.LoadFwFile(view.FwFile);
+            if (!view.WriteFwContent.FwAvailable)
+            {
+                log.Error(logMsg);
+                return false;
+            }
+            log.Info(logMsg);
             if (!await SendFwToESPROG())
             {
                 return false;
@@ -313,6 +320,13 @@ namespace ESPROG
 
         private async Task<bool> ProgEsprogSubTask()
         {
+            string logMsg = await view.WriteFwContent.LoadFwFile(view.FwFile);
+            if (!view.WriteFwContent.FwAvailable)
+            {
+                log.Error(logMsg);
+                return false;
+            }
+            log.Info(logMsg);
             if (!await SendFwToESPROG())
             {
                 return false;
