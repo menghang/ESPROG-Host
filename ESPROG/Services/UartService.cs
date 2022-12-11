@@ -48,7 +48,8 @@ namespace ESPROG.Services
                 ReadBufferSize = 1024 * 1024,
                 WriteBufferSize = 1024 * 1024,
                 Encoding = Encoding.ASCII,
-                ReadTimeout = 1000,
+                ReadTimeout = 100,
+                WriteTimeout = 100,
                 ReceivedBytesThreshold = 4
             };
             port.DataReceived += Port_DataReceived;
