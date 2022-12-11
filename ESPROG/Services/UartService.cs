@@ -112,8 +112,19 @@ namespace ESPROG.Services
 
         public void SendCmd(string cmd)
         {
-            LogCmd(true, cmd);
-            port?.Write(cmd);
+            try
+            {
+                if (port == null)
+                {
+                    return;
+                }
+                port.Write(cmd);
+                LogCmd(true, cmd);
+            }
+            catch (Exception ex)
+            {
+                log.Debug(ex.ToString());
+            }
         }
 
         public void Close()
