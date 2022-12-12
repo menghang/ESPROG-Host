@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO.Ports;
 using System.Linq;
+using System.Management;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -25,21 +26,42 @@ namespace ESPROG.Services
             CmdReceived = null;
         }
 
-        public string[] Scan()
+        public List<string> Scan()
         {
-            return SerialPort.GetPortNames();
+            List<string> ports = new();
+            log.Debug("scan port");
+            try
+            {
+                using (ManagementObjectSearcher searcher = new("select * from Win32_PnPEntity where Name like '%(COM%)'"))
+                {
+                    foreach (ManagementObject hwInfo in searcher.Get().Cast<ManagementObject>())
+                    {
+                        string? fullName = hwInfo.Properties["Name"].Value.ToString();
+                        if (fullName != null)
+                        {
+                            ports.Add(fullName);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Debug(ex.ToString());
+            }
+            return ports;
         }
 
         public bool Open(string portName)
         {
-            if (string.IsNullOrEmpty(portName))
+            Match m = Regex.Match(portName, @"\(COM[0-9]+\)");
+            if (!m.Success)
             {
-                return false;
+                log.Error(string.Format("Wrong port name ({0})", portName));
             }
             port?.Close();
             port = new()
             {
-                PortName = portName,
+                PortName = m.Value[1..^1],
                 BaudRate = 2000000,
                 DataBits = 8,
                 StopBits = StopBits.One,

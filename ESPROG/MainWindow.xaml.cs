@@ -3,8 +3,8 @@ using ESPROG.Services;
 using ESPROG.Utils;
 using ESPROG.Views;
 using Microsoft.Win32;
-using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using UsbMonitor;
@@ -21,6 +21,8 @@ namespace ESPROG
         private readonly UartService uart;
         private readonly NuProgService nuprog;
         private readonly UsbMonitorManager usbMonitor;
+        private readonly Timer usbRemovalTimer, usbArrivalTimer;
+        private static readonly int usbDelay = 100;
 
         public MainWindow()
         {
@@ -33,6 +35,22 @@ namespace ESPROG
             nuprog = new(log, uart);
             usbMonitor = new(this);
             usbMonitor.UsbDeviceInterface += UsbMonitor_UsbDeviceInterface;
+
+            usbRemovalTimer = new Timer(new((o) =>
+            {
+                usbRemovalTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+                if (!ReloadSerialPort())
+                {
+                    uart.Close();
+                    view.IsPortConnected = false;
+                }
+            }), null, Timeout.Infinite, Timeout.Infinite);
+
+            usbArrivalTimer = new Timer(new((o) =>
+            {
+                usbArrivalTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+                ReloadSerialPort();
+            }), null, Timeout.Infinite, Timeout.Infinite);
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -59,14 +77,21 @@ namespace ESPROG
             view.IsIdle = true;
         }
 
-        private void ReloadSerialPort()
+        private bool ReloadSerialPort()
         {
-            string[] ports = uart.Scan();
-            view.EsprogSettingView.PortList = new(ports);
-            if (ports.Length > 0 && !ports.Contains(view.EsprogSettingView.SelectedPort))
+            List<string> ports = uart.Scan();
+            view.EsprogSettingView.PortList = ports;
+            if (ports.Count == 0)
+            {
+                view.EsprogSettingView.SelectedPort = string.Empty;
+                return false;
+            }
+            else if (!ports.Contains(view.EsprogSettingView.SelectedPort))
             {
                 view.EsprogSettingView.SelectedPort = ports[0];
+                return false;
             }
+            return true;
         }
 
         private async Task<bool> TryConnectPort(string port)
@@ -129,18 +154,10 @@ namespace ESPROG
             switch (e.Action)
             {
                 case UsbDeviceChangeEvent.RemoveComplete:
-                    if (view.IsPortConnected)
-                    {
-                        if (!uart.Scan().Contains(view.EsprogSettingView.SelectedPort))
-                        {
-                            uart.Close();
-                            view.IsPortConnected = false;
-                        }
-                    }
-                    ReloadSerialPort();
+                    usbRemovalTimer.Change(usbDelay, Timeout.Infinite);
                     break;
                 case UsbDeviceChangeEvent.Arrival:
-                    ReloadSerialPort();
+                    usbArrivalTimer.Change(usbDelay, Timeout.Infinite);
                     break;
                 default:
                     break;
