@@ -97,8 +97,7 @@ namespace ESPROG.Services
             }
             readBuffer += port.ReadExisting();
 
-            string regexStr = @"\[([a-zA-Z]+,[0-9]+(,[a-zA-Z0-9-:=\s\.\+\/]+)*|Error)]\r\n";
-            MatchCollection mc = Regex.Matches(readBuffer, regexStr);
+            MatchCollection mc = Regex.Matches(readBuffer, @"\[([a-zA-Z]+,[0-9]+(,[a-zA-Z0-9-:=\s\.\+\/]+)*|Error)]\r\n");
             if (mc.Count > 0)
             {
                 Queue<UartCmdModel> cmds = new();
