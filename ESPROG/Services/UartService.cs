@@ -29,7 +29,6 @@ namespace ESPROG.Services
         public List<string> Scan()
         {
             List<string> ports = new();
-            log.Debug("scan port");
             try
             {
                 using (ManagementObjectSearcher searcher = new("select * from Win32_PnPEntity where Name like '%(COM%)'"))
