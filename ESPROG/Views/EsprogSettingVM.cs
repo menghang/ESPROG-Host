@@ -1,7 +1,6 @@
 ﻿using ESPROG.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace ESPROG.Views
 {

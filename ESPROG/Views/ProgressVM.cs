@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Windows.Media;
-using static ESPROG.Views.ProgressVM;
 
 namespace ESPROG.Views
 {

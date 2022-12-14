@@ -1,6 +1,4 @@
 ﻿using ESPROG.Utils;
-using System;
-using System.Windows.Media;
 
 namespace ESPROG.Views
 {
