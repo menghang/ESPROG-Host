@@ -10,7 +10,8 @@
     <Company>NuVolta Technologies</Company>
     <RepositoryUrl>https://github.com/menghang/ESPROG-HOST</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <Version>1.0</Version>
+    <AssemblyVersion>1.1</AssemblyVersion>
+    <FileVersion>1.1</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
