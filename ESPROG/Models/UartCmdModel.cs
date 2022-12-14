@@ -18,7 +18,7 @@ namespace ESPROG.Models
         public static readonly string CmdFwReadStart = "FwReadStart";
         public static readonly string CmdSaveConfig = "SaveConfig";
         public static readonly string CmdFlashFormat = "FlashFormat";
-        public static readonly string CmdGetAppVersion = "GetAppVersion";
+        public static readonly string CmdGetAppVersion = "GetInfo";
         public static readonly string CmdGetChipInfo = "GetChipInfo";
         public static readonly string CmdGetChipUID = "GetChipUID";
         public static readonly string CmdGetAppCompileTime = "GetAppCompileTime";

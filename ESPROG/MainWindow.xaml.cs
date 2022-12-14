@@ -103,7 +103,7 @@ namespace ESPROG
                 log.Debug(string.Format("Port({0}) open fail", port));
                 return false;
             }
-            string? version = await nuprog.GetEsprogVersionAsync();
+            string? version = await nuprog.GetEsprogInfoAsync();
             if (version == null)
             {
                 log.Debug(string.Format("Can not get ESPROG version on port({0})", port));

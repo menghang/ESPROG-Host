@@ -114,16 +114,16 @@ namespace ESPROG.Services
             }
         }
 
-        public async Task<string?> GetEsprogVersionAsync()
+        public async Task<string?> GetEsprogInfoAsync()
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdGetAppVersion);
             sendCmd.AddVal(true);
             UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
-            if (recvCmd == null || recvCmd.ValCount != 2)
+            if (recvCmd == null || recvCmd.ValCount != 3)
             {
                 return null;
             }
-            return string.Format("{0}({1})", recvCmd.Val[0], recvCmd.Val[1]);
+            return string.Format("{0}({1}/{2})", recvCmd.Val[0], recvCmd.Val[1], recvCmd.Val[2]);
         }
 
         public async Task<string?> GetEsprogCompileTimeAsync()
