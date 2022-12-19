@@ -8,22 +8,23 @@
     mc:Ignorable="d"
     Title="ESPROG-HOST"
     Height="700"
-    MinHeight="700"
-    Width="450"
-    MinWidth="450"
+    MinHeight="600"
+    Width="400"
+    MinWidth="400"
+    FontSize="10"
     Loaded="MainWindow_Loaded">
     <DockPanel>
         <Menu
             DockPanel.Dock="Top">
             <MenuItem
                 Header="File"
-                Width="50">
+                Width="40">
                 <MenuItem
                     Header="Close" />
             </MenuItem>
             <MenuItem
                 Header="View"
-                Width="50">
+                Width="40">
                 <MenuItem
                     Header="Show Log Box" />
                 <MenuItem
@@ -31,7 +32,7 @@
             </MenuItem>
             <MenuItem
                 Header="Help"
-                Width="50">
+                Width="40">
                 <MenuItem
                     Header="About" />
             </MenuItem>
@@ -39,13 +40,13 @@
         <Grid
             DockPanel.Dock="Bottom"
             DataContext="{Binding ProgressView}"
-            Margin="5">
+            Margin="3">
             <ProgressBar
                 DockPanel.Dock="Bottom"
                 Foreground="{Binding Color}"
                 Maximum="100"
                 Value="100"
-                Height="30"
+                Height="25"
                 IsIndeterminate="{Binding IsBusy}" />
             <TextBlock
                 Text="{Binding Text}"
@@ -54,7 +55,7 @@
         </Grid>
         <TabControl
             DockPanel.Dock="Top"
-            Margin="5">
+            Margin="3">
             <TabItem
                 Header="Settings">
                 <Grid>
@@ -79,14 +80,14 @@
                             <GroupBox
                                 Header="ESPROG Selection"
                                 DataContext="{Binding EsprogSettingView}"
-                                Margin="5">
+                                Margin="3">
                                 <StackPanel>
                                     <DockPanel
-                                        Margin="5">
+                                        Margin="3">
                                         <Label
                                             Content="COM Port:"
                                             VerticalContentAlignment="Center"
-                                            Height="30" />
+                                            Height="25" />
                                         <ComboBox
                                             SelectedItem="{Binding SelectedPort}"
                                             ItemsSource="{Binding PortList}"
@@ -94,40 +95,40 @@
                                             VerticalContentAlignment="Center"
                                             HorizontalContentAlignment="Center"
                                             IsReadOnly="True"
-                                            Height="30" />
+                                            Height="25" />
                                     </DockPanel>
                                     <DockPanel
-                                        Margin="5">
+                                        Margin="3">
                                         <Label
                                             Content="ESPROG Info:"
-                                            Height="30"
+                                            Height="25"
                                             VerticalContentAlignment="Center" />
                                         <TextBox
                                             Text="{Binding EsprogInfo}"
                                             VerticalContentAlignment="Center"
                                             HorizontalContentAlignment="Center"
                                             IsReadOnly="True"
-                                            Height="30" />
+                                            Height="25" />
                                     </DockPanel>
                                     <DockPanel
-                                        Margin="5">
+                                        Margin="3">
                                         <Label
                                             Content="ESPROG Compile Time:"
-                                            Height="30"
+                                            Height="25"
                                             VerticalContentAlignment="Center" />
                                         <TextBox
                                             Text="{Binding EsprogCompileTime}"
                                             VerticalContentAlignment="Center"
                                             HorizontalContentAlignment="Center"
                                             IsReadOnly="True"
-                                            Height="30" />
+                                            Height="25" />
                                     </DockPanel>
                                     <DockPanel
-                                        Margin="5">
+                                        Margin="3">
                                         <Label
                                             Content="Gate Control Mode:"
                                             VerticalContentAlignment="Center"
-                                            Height="30" />
+                                            Height="25" />
                                         <ComboBox
                                             ItemsSource="{Binding GateCtrlModeList}"
                                             DisplayMemberPath="Display"
@@ -137,7 +138,7 @@
                                             VerticalContentAlignment="Center"
                                             HorizontalContentAlignment="Center"
                                             IsReadOnly="True"
-                                            Height="30" />
+                                            Height="25" />
                                     </DockPanel>
                                     <UniformGrid
                                         Rows="2"
@@ -145,25 +146,25 @@
                                         <Button
                                             Content="Reload Port List"
                                             IsEnabled="{Binding IsPortNotLocked}"
-                                            Height="30"
-                                            Margin="5"
+                                            Height="25"
+                                            Margin="3"
                                             Click="ButtonReloadPortList_Click" />
                                         <Button
                                             Content="{Binding BtnConnectPortText}"
-                                            Height="30"
-                                            Margin="5"
+                                            Height="25"
+                                            Margin="3"
                                             Click="ButtonOpenPort_Click" />
                                         <Button
                                             Content="Autodetect Port"
                                             IsEnabled="{Binding IsPortNotLocked}"
-                                            Height="30"
-                                            Margin="5"
+                                            Height="25"
+                                            Margin="3"
                                             Click="ButtonAutodetectPort_Click" />
                                         <Button
                                             Content="Format ESPROG Storage"
                                             IsEnabled="{Binding IsPortConnected}"
-                                            Height="30"
-                                            Margin="5"
+                                            Height="25"
+                                            Margin="3"
                                             Click="ButtonFormatEsprogStorage_Click" />
                                     </UniformGrid>
                                 </StackPanel>
@@ -171,17 +172,17 @@
                             <GroupBox
                                 Header="Chip Selection"
                                 DataContext="{Binding ChipSettingView}"
-                                Margin="5">
+                                Margin="3">
                                 <StackPanel>
                                     <UniformGrid
                                         Rows="1"
                                         Columns="2">
                                         <DockPanel
-                                            Margin="5">
+                                            Margin="3">
                                             <Label
                                                 Content="Chip:"
                                                 VerticalContentAlignment="Center"
-                                                Height="30" />
+                                                Height="25" />
                                             <ComboBox
                                                 ItemsSource="{Binding ChipList}"
                                                 DisplayMemberPath="Display"
@@ -190,14 +191,14 @@
                                                 VerticalContentAlignment="Center"
                                                 HorizontalContentAlignment="Center"
                                                 IsReadOnly="True"
-                                                Height="30" />
+                                                Height="25" />
                                         </DockPanel>
                                         <DockPanel
-                                            Margin="5">
+                                            Margin="3">
                                             <Label
                                                 Content="Chip Address:"
                                                 VerticalContentAlignment="Center"
-                                                Height="30" />
+                                                Height="25" />
                                             <ComboBox
                                                 ItemsSource="{Binding ChipAddrList}"
                                                 DisplayMemberPath="Display"
@@ -206,22 +207,22 @@
                                                 VerticalContentAlignment="Center"
                                                 HorizontalContentAlignment="Center"
                                                 IsReadOnly="True"
-                                                Height="30" />
+                                                Height="25" />
                                         </DockPanel>
                                     </UniformGrid>
                                     <DockPanel
                                         Grid.Column="0"
-                                        Margin="5">
+                                        Margin="3">
                                         <Label
                                             Content="Chip Info:"
                                             VerticalContentAlignment="Center"
-                                            Height="30" />
+                                            Height="25" />
                                         <TextBox
                                             Text="{Binding ChipInfo}"
                                             IsReadOnly="True"
                                             VerticalContentAlignment="Center"
                                             HorizontalContentAlignment="Center"
-                                            Height="30" />
+                                            Height="25" />
                                     </DockPanel>
                                     <UniformGrid
                                         Rows="1"
@@ -229,13 +230,13 @@
                                         IsEnabled="{Binding IsPortConnected}">
                                         <Button
                                             Content="Autodetect Chip"
-                                            Height="30"
-                                            Margin="5"
+                                            Height="25"
+                                            Margin="3"
                                             Click="ButtonAutodetectChip_Click" />
                                         <Button
                                             Content="Get Chip Info"
-                                            Height="30"
-                                            Margin="5"
+                                            Height="25"
+                                            Margin="3"
                                             Click="ButtonGetChipInfo_Click" />
                                     </UniformGrid>
                                 </StackPanel>
@@ -252,16 +253,16 @@
                         <StackPanel
                             DockPanel.Dock="Top">
                             <DockPanel
-                                Margin="5">
+                                Margin="3">
                                 <Label
                                     Content="Firmware:"
                                     VerticalContentAlignment="Center"
-                                    Height="30" />
+                                    Height="25" />
                                 <TextBox
                                     Text="{Binding FwFile}"
                                     IsReadOnly="True"
                                     VerticalContentAlignment="Center"
-                                    Height="30"
+                                    Height="25"
                                     MouseDoubleClick="TextBoxFwFile_MouseDoubleClick" />
                             </DockPanel>
                             <UniformGrid
@@ -270,13 +271,13 @@
                                 IsEnabled="{Binding IsPortConnected}">
                                 <Button
                                     Content="Program Chip"
-                                    Height="30"
-                                    Margin="5"
+                                    Height="25"
+                                    Margin="3"
                                     Click="ButtonProgChip_Click" />
                                 <Button
                                     Content="Program ESPROG"
-                                    Height="30"
-                                    Margin="5"
+                                    Height="25"
+                                    Margin="3"
                                     Click="ButtonProgEsprog_Click" />
                             </UniformGrid>
                         </StackPanel>
@@ -341,13 +342,13 @@
                                 IsEnabled="{Binding IsPortConnected}">
                                 <Button
                                     Content="Read Chip"
-                                    Height="30"
-                                    Margin="5"
+                                    Height="25"
+                                    Margin="3"
                                     Click="ButtonReadChip_Click" />
                                 <Button
                                     Content="Save to File"
-                                    Height="30"
-                                    Margin="5"
+                                    Height="25"
+                                    Margin="3"
                                     Click="ButtonSaveFw_Click" />
                             </UniformGrid>
                         </StackPanel>
@@ -406,29 +407,29 @@
                         IsEnabled="{Binding IsIdle}">
                         <GroupBox
                             Header="Read/Write I2C Reg"
-                            Margin="5">
+                            Margin="3">
                             <StackPanel>
                                 <DockPanel
-                                    Margin="5">
+                                    Margin="3">
                                     <Label
                                         Content="Reg Addr:"
                                         VerticalContentAlignment="Center"
-                                        Height="30" />
+                                        Height="25" />
                                     <TextBox
                                         Text="{Binding RegAddrText}"
                                         VerticalContentAlignment="Center"
-                                        Height="30" />
+                                        Height="25" />
                                 </DockPanel>
                                 <DockPanel
-                                    Margin="5">
+                                    Margin="3">
                                     <Label
                                         Content="Reg Val:"
                                         VerticalContentAlignment="Center"
-                                        Height="30" />
+                                        Height="25" />
                                     <TextBox
                                         Text="{Binding RegValText}"
                                         VerticalContentAlignment="Center"
-                                        Height="30" />
+                                        Height="25" />
                                 </DockPanel>
                                 <UniformGrid
                                     Rows="1"
@@ -436,13 +437,13 @@
                                     IsEnabled="{Binding IsPortConnected}">
                                     <Button
                                         Content="Read Reg"
-                                        Height="30"
-                                        Margin="5"
+                                        Height="25"
+                                        Margin="3"
                                         Click="ButtonReadReg_Click" />
                                     <Button
                                         Content="Write Reg"
-                                        Height="30"
-                                        Margin="5"
+                                        Height="25"
+                                        Margin="3"
                                         Click="ButtonWriteReg_Click" />
                                 </UniformGrid>
                             </StackPanel>
@@ -459,8 +460,8 @@
                         DockPanel.Dock="Bottom">
                         <Button
                             Content="Clear"
-                            Height="30"
-                            Margin="5"
+                            Height="25"
+                            Margin="3"
                             Click="ButtonClearLog_Click" />
                     </UniformGrid>
                     <TextBox
@@ -468,7 +469,7 @@
                         IsReadOnly="True"
                         HorizontalScrollBarVisibility="Auto"
                         VerticalScrollBarVisibility="Auto"
-                        Margin="5" />
+                        Margin="3" />
                 </DockPanel>
             </TabItem>
         </TabControl>
