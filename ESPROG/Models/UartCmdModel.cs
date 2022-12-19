@@ -117,9 +117,9 @@ namespace ESPROG.Models
             return this;
         }
 
-        public UartCmdModel AddVal(byte[] val)
+        public UartCmdModel AddVal(byte[] val, bool invert)
         {
-            Val[ValCount] = HexUtil.GetBase64Str(val);
+            Val[ValCount] = invert ? HexUtil.GetBase64StrWithInvert(val) : HexUtil.GetBase64Str(val);
             ValCount++;
             return this;
         }

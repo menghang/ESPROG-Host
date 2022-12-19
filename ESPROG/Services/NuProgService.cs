@@ -233,10 +233,10 @@ namespace ESPROG.Services
             return HexUtil.GetUIntFromStr(recvCmd.Val[0]);
         }
 
-        public async Task<bool> FwWriteBuf(uint fwAddr, byte[] fwData)
+        public async Task<bool> FwWriteBuf(byte zone, uint fwAddr, byte[] fwData)
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdFwWriteBuf);
-            sendCmd.AddVal(fwAddr).AddVal(HexUtil.GetChecksum(fwData, fwData.LongLength)).AddVal(fwData);
+            sendCmd.AddVal(fwAddr).AddVal(HexUtil.GetChecksum(fwData, fwData.LongLength)).AddVal(fwData, zone == MtpZoneMask);
             UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
             if (recvCmd == null || recvCmd.ValCount != 1)
             {
@@ -245,7 +245,7 @@ namespace ESPROG.Services
             return HexUtil.GetUIntFromStr(recvCmd.Val[0]) == fwAddr;
         }
 
-        public async Task<byte[]?> FwReadBuf(uint fwAddr)
+        public async Task<byte[]?> FwReadBuf(uint fwAddr, bool invert)
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdFwReadBuf);
             sendCmd.AddVal(fwAddr);
@@ -256,7 +256,8 @@ namespace ESPROG.Services
             }
             uint? fwAddrRead = HexUtil.GetUIntFromStr(recvCmd.Val[0]);
             uint? checksum = HexUtil.GetUIntFromStr(recvCmd.Val[1]);
-            byte[]? fwData = HexUtil.GetBytesFromBase64Str(recvCmd.Val[2]);
+            byte[]? fwData = invert ?
+                HexUtil.GetBytesFromBase64StrWithInvert(recvCmd.Val[2]) : HexUtil.GetBytesFromBase64Str(recvCmd.Val[2]);
             if (fwAddrRead != fwAddr || checksum == null || fwData == null)
             {
                 return null;
@@ -335,7 +336,7 @@ namespace ESPROG.Services
                 {
                     Array.Clear(fwBuffer);
                 }
-                if (!await FwWriteBuf(fwAddr + fwAddrStart, fwBuffer))
+                if (!await FwWriteBuf(zone, fwAddr + fwAddrStart, fwBuffer))
                 {
                     log.Error(string.Format("Write firmware to ESPROG fail at addr ({0}) zone ({1})", fwAddr, zone));
                     return false;
@@ -371,7 +372,7 @@ namespace ESPROG.Services
             long fwAddr = 0;
             while (true)
             {
-                byte[]? fwBuffer = await FwReadBuf((uint)(fwAddr + fwAddrStart));
+                byte[]? fwBuffer = await FwReadBuf((uint)(fwAddr + fwAddrStart), zone == MtpZoneMask);
                 if (fwBuffer == null)
                 {
                     log.Error(string.Format("Read firmware from ESPROG fail at addr ({0}) zone ({1})", fwAddr, zone));

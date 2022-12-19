@@ -46,7 +46,7 @@ namespace ESPROG.Utils
             }
         }
 
-        public static byte[]? GetBytesFromBase64Str(string base64)
+        public static byte[]? GetBytesFromBase64StrWithInvert(string base64)
         {
             try
             {
@@ -64,7 +64,21 @@ namespace ESPROG.Utils
             }
         }
 
-        public static string GetBase64Str(byte[] data)
+        public static byte[]? GetBytesFromBase64Str(string base64)
+        {
+            try
+            {
+                byte[] data = Convert.FromBase64String(base64);
+                return data;
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(ex.ToString());
+                return null;
+            }
+        }
+
+        public static string GetBase64StrWithInvert(byte[] data)
         {
             byte[] data2 = new byte[data.Length];
             for (int ii = 0; ii < data.Length; ii++)
@@ -72,6 +86,11 @@ namespace ESPROG.Utils
                 data2[ii] = (byte)~data[ii];
             }
             return Convert.ToBase64String(data2);
+        }
+
+        public static string GetBase64Str(byte[] data)
+        {
+            return Convert.ToBase64String(data);
         }
 
         public static uint GetChecksum(byte[] data, long size)
