@@ -33,8 +33,8 @@ namespace ESPROG.Views
             set
             {
                 SetProperty(ref selectedChip, value);
-                SetProperty(ref chipAddrList, ChipDict[selectedChip], nameof(ChipAddrList));
-                SetProperty(ref selectedChipAddr, chipAddrList[1].Value, nameof(SelectedChipAddr));
+                ChipAddrList = ChipDict[selectedChip];
+                SelectedChipAddr = chipAddrList[1].Value;
 
                 MaxFwSize = ChipSizeDict[value].mtp;
                 MaxConfigSize = ChipSizeDict[value].cfg;
@@ -65,7 +65,15 @@ namespace ESPROG.Views
         public List<ComboBoxModel<string, byte>> ChipAddrList
         {
             get => chipAddrList;
-            set => SetProperty(ref chipAddrList, value);
+            set
+            {
+                if (value != chipAddrList)
+                {
+                    chipAddrList = value;
+                    OnPropertyChanged(nameof(ChipAddrList));
+                    OnPropertyChanged(nameof(SelectedChipAddr));
+                }
+            }
         }
 
         private byte selectedChipAddr;
