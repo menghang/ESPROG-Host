@@ -22,6 +22,14 @@ namespace ESPROG.Services
 
         private const uint esprogFwBlockSize = 512;
 
+        public const long MTPAddrStart = 0x00000000;
+        public const long CFGAddrStart = 0x00020200;
+        public const long TrimAddrStart = 0x00020000;
+
+        public const byte MtpZoneMask = 0x01;
+        public const byte CfgZoneMask = 0x02;
+        public const byte TrimZoneMask = 0x04;
+
         public NuProgService(LogService logService, UartService uartService)
         {
             log = logService;
@@ -228,7 +236,7 @@ namespace ESPROG.Services
         public async Task<bool> FwWriteBuf(uint fwAddr, byte[] fwData)
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdFwWriteBuf);
-            sendCmd.AddVal(fwAddr).AddVal(HexUtil.GetChecksum(fwData)).AddVal(fwData);
+            sendCmd.AddVal(fwAddr).AddVal(HexUtil.GetChecksum(fwData, fwData.LongLength)).AddVal(fwData);
             UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
             if (recvCmd == null || recvCmd.ValCount != 1)
             {
@@ -253,7 +261,7 @@ namespace ESPROG.Services
             {
                 return null;
             }
-            uint calcChecksum = HexUtil.GetChecksum(fwData);
+            uint calcChecksum = HexUtil.GetChecksum(fwData, fwData.LongLength);
             return calcChecksum != checksum ? null : fwData;
         }
 
@@ -289,10 +297,30 @@ namespace ESPROG.Services
             return recvCmd != null;
         }
 
-        public async Task<bool> WriteFwToEsprog(byte[] fwData, long fwSize)
+        public async Task<bool> WriteFwToEsprog(byte zone, byte[] fwData, long fwSize)
         {
             byte[] fwBuffer = new byte[esprogFwBlockSize];
-            for (uint fwAddr = 0; fwAddr < ChipSettingVM.MaxFwSize; fwAddr += esprogFwBlockSize)
+            uint fwAddrStart;
+            long maxSize;
+            switch (zone)
+            {
+                case MtpZoneMask:
+                    fwAddrStart = (uint)MTPAddrStart;
+                    maxSize = ChipSettingVM.MaxFwSize;
+                    break;
+                case CfgZoneMask:
+                    fwAddrStart = (uint)CFGAddrStart;
+                    maxSize = ChipSettingVM.MaxConfigSize;
+                    break;
+                case TrimZoneMask:
+                    fwAddrStart = (uint)TrimAddrStart;
+                    maxSize = ChipSettingVM.MaxTrimSize;
+                    break;
+                default:
+                    log.Error(string.Format("Wrong zone value ({0})", zone));
+                    return false;
+            }
+            for (uint fwAddr = 0; fwAddr < maxSize; fwAddr += esprogFwBlockSize)
             {
                 if (fwAddr + esprogFwBlockSize < fwSize)
                 {
@@ -307,9 +335,9 @@ namespace ESPROG.Services
                 {
                     Array.Clear(fwBuffer);
                 }
-                if (!await FwWriteBuf(fwAddr, fwBuffer))
+                if (!await FwWriteBuf(fwAddr + fwAddrStart, fwBuffer))
                 {
-                    log.Error(string.Format("Write firmware to ESPROG fail at addr ({0})", fwAddr));
+                    log.Error(string.Format("Write firmware to ESPROG fail at addr ({0}) zone ({1})", fwAddr, zone));
                     return false;
                 }
             }
@@ -317,25 +345,45 @@ namespace ESPROG.Services
             return true;
         }
 
-        public async Task<bool> ReadFwFromEsprog(byte[] fwData)
+        public async Task<bool> ReadFwFromEsprog(byte zone, byte[] fwData)
         {
             Array.Clear(fwData);
+            uint fwAddrStart;
+            long maxSize;
+            switch (zone)
+            {
+                case MtpZoneMask:
+                    fwAddrStart = (uint)MTPAddrStart;
+                    maxSize = ChipSettingVM.MaxFwSize;
+                    break;
+                case CfgZoneMask:
+                    fwAddrStart = (uint)CFGAddrStart;
+                    maxSize = ChipSettingVM.MaxConfigSize;
+                    break;
+                case TrimZoneMask:
+                    fwAddrStart = (uint)TrimAddrStart;
+                    maxSize = ChipSettingVM.MaxTrimSize;
+                    break;
+                default:
+                    log.Error(string.Format("Wrong zone value ({0})", zone));
+                    return false;
+            }
             long fwAddr = 0;
             while (true)
             {
-                byte[]? fwBuffer = await FwReadBuf((uint)fwAddr);
+                byte[]? fwBuffer = await FwReadBuf((uint)(fwAddr + fwAddrStart));
                 if (fwBuffer == null)
                 {
-                    log.Error(string.Format("Read firmware from ESPROG fail at addr ({0})", fwAddr));
+                    log.Error(string.Format("Read firmware from ESPROG fail at addr ({0}) zone ({1})", fwAddr, zone));
                     return false;
                 }
-                if (fwAddr + fwBuffer.LongLength < ChipSettingVM.MaxFwSize)
+                if (fwAddr + fwBuffer.LongLength < maxSize)
                 {
                     Array.Copy(fwBuffer, 0, fwData, fwAddr, fwBuffer.LongLength);
                     fwAddr += fwBuffer.LongLength;
                     continue;
                 }
-                else if (fwAddr + fwBuffer.LongLength == ChipSettingVM.MaxFwSize)
+                else if (fwAddr + fwBuffer.LongLength == maxSize)
                 {
                     Array.Copy(fwBuffer, 0, fwData, fwAddr, fwBuffer.LongLength);
                     log.Info("Read firmware from ESPROG succeed");
@@ -343,8 +391,8 @@ namespace ESPROG.Services
                 }
                 else
                 {
-                    log.Error(string.Format("Buffer size ({0}) exceed firmware size ({1}) at addr ({2})",
-                        fwBuffer.LongLength, ChipSettingVM.MaxFwSize, fwAddr));
+                    log.Error(string.Format("Buffer size ({0}) exceed firmware size ({1}) at addr ({2}) zone ({3})",
+                        fwBuffer.LongLength, maxSize, fwAddr));
                     return false;
                 }
             }
@@ -385,24 +433,44 @@ namespace ESPROG.Services
             return true;
         }
 
-        public async Task<bool> FwWriteChecksum(byte[] fwData)
+        public async Task<bool> FwWriteChecksum(byte zone, byte[] fwData, long size)
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdFwWriteChecksum);
-            sendCmd.AddVal(HexUtil.GetChecksum(fwData));
+            sendCmd.AddVal(zone).AddVal(HexUtil.GetChecksum(fwData, size));
             UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
             return recvCmd != null;
         }
 
-        public async Task<uint?> FwReadChecksum()
+        public async Task<uint?> FwReadChecksum(byte zone)
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdFwReadChecksum);
+            sendCmd.AddVal(zone);
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            if (recvCmd == null || recvCmd.ValCount != 2)
+            {
+                return null;
+            }
+            return HexUtil.GetUIntFromStr(recvCmd.Val[1]);
+        }
+
+        public async Task<bool> SetProgZone(byte zone)
+        {
+            UartCmdModel sendCmd = new(UartCmdModel.CmdSetZone);
+            sendCmd.AddVal(zone);
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            return recvCmd != null;
+        }
+
+        public async Task<byte?> GetProgZone()
+        {
+            UartCmdModel sendCmd = new(UartCmdModel.CmdGetZone);
             sendCmd.AddVal(true);
             UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
             if (recvCmd == null || recvCmd.ValCount != 1)
             {
                 return null;
             }
-            return HexUtil.GetUIntFromStr(recvCmd.Val[0]);
+            return HexUtil.GetByteFromStr(recvCmd.Val[0]);
         }
     }
 }

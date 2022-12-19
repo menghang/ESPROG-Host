@@ -13,12 +13,16 @@ namespace ESPROG.Views
             { 0x1718, new(){ new("0x70", 0x70), new("0x71", 0x71), new("0x72", 0x72), new("0x73", 0x73) } }
         };
 
-        public static readonly Dictionary<uint, long> ChipSizeDict = new()
+        public static readonly Dictionary<uint, (long mtp, long cfg, long trim)> ChipSizeDict = new()
         {
-            { 0x1705, 32 * 1024 }, { 0x1708, 32 * 1024 }, { 0x1718, 64 * 1024 }
+            { 0x1705, (32 * 1024, 3 * 512, 1 * 512) },
+            { 0x1708, (32 * 1024, 3 * 512, 1 * 512) },
+            { 0x1718, (64 * 1024, 3 * 512, 1 * 512) }
         };
 
-        public static long MaxFwSize = ChipSizeDict[0x1708];
+        public static long MaxFwSize = ChipSizeDict[0x1708].mtp;
+        public static long MaxConfigSize = ChipSizeDict[0x1708].cfg;
+        public static long MaxTrimSize = ChipSizeDict[0x1708].trim;
 
         public List<ComboBoxModel<string, uint>> ChipList { get; private set; }
 
@@ -31,7 +35,29 @@ namespace ESPROG.Views
                 SetProperty(ref selectedChip, value);
                 SetProperty(ref chipAddrList, ChipDict[selectedChip], nameof(ChipAddrList));
                 SetProperty(ref selectedChipAddr, chipAddrList[1].Value, nameof(SelectedChipAddr));
-                MaxFwSize = ChipSizeDict[value];
+
+                MaxFwSize = ChipSizeDict[value].mtp;
+                MaxConfigSize = ChipSizeDict[value].cfg;
+                MaxTrimSize = ChipSizeDict[value].trim;
+                SelectedChipChanged?.Invoke(this, new ChipChangedEventArgs(MaxFwSize, MaxConfigSize, MaxTrimSize));
+            }
+        }
+
+        public delegate void SelectedChipChangedHandler(object sender, ChipChangedEventArgs e);
+        public event SelectedChipChangedHandler? SelectedChipChanged;
+        public class ChipChangedEventArgs : EventArgs
+        {
+            public long FwSize { get; private set; }
+
+            public long CfgSize { get; private set; }
+
+            public long TrimSize { get; private set; }
+
+            public ChipChangedEventArgs(long fw, long cfg, long trim)
+            {
+                FwSize = fw;
+                CfgSize = cfg;
+                TrimSize = trim;
             }
         }
 
@@ -53,7 +79,7 @@ namespace ESPROG.Views
         public bool EnableAutoChipAddr
         {
             get => enableAutoChipAddr;
-            set => SetProperty(ref this.enableAutoChipAddr, value);
+            set => SetProperty(ref enableAutoChipAddr, value);
         }
 
         private string chipInfo;

@@ -31,9 +31,13 @@ namespace ESPROG.Views
             get => Convert.ToString(size);
         }
 
+        public long MaxSize { get; set; }
+
         public byte[] FwData { get; private set; }
 
         public bool FwAvailable { get; set; }
+
+        public long FwAddrStart { get; private set; }
 
         public void UpdateDisplay()
         {
@@ -42,7 +46,7 @@ namespace ESPROG.Views
                 StringBuilder sb = new();
                 for (long line = 0; line < size; line += 16)
                 {
-                    sb.Append(HexUtil.GetHexStr(line)).Append(' ');
+                    sb.Append(HexUtil.GetHexStr(line + FwAddrStart)).Append(' ');
                     for (int ii = 0; (ii < 16) && (line + ii < size); ii++)
                     {
                         sb.Append(' ').Append(Convert.ToString(FwData[line + ii], 16).PadLeft(2, '0'));
@@ -50,7 +54,7 @@ namespace ESPROG.Views
                     sb.Append(Environment.NewLine);
                 }
                 ContentText = sb.ToString();
-                checksum = HexUtil.GetChecksum(FwData);
+                checksum = HexUtil.GetChecksum(FwData, size);
             }
             else
             {
@@ -76,7 +80,7 @@ namespace ESPROG.Views
                     {
                         using (BufferedStream bs = new(fs))
                         {
-                            if (bs.Length > 0 && bs.Length <= ChipSettingVM.MaxFwSize && bs.Length <= FwData.LongLength)
+                            if (bs.Length > 0 && bs.Length <= MaxSize && bs.Length <= FwData.LongLength)
                             {
                                 size = bs.Length;
                                 Array.Clear(FwData);
@@ -88,25 +92,25 @@ namespace ESPROG.Views
                                     Array.Copy(buf, 0, FwData, pos, readBytes);
                                     pos += readBytes;
                                 }
-                                log = "Firmware file load succeed";
+                                log = "file load succeed";
                                 FwAvailable = true;
                             }
                             else
                             {
-                                log = string.Format("Firmware size ({0}) does not fit limit ({1})",
-                                    bs.Length, ChipSettingVM.MaxFwSize);
+                                log = string.Format("size ({0}) does not fit limit ({1})",
+                                    bs.Length, MaxSize);
                             }
                         }
                     }
                 }
                 else
                 {
-                    log = "Firmware file do not exist";
+                    log = "file do not exist";
                 }
             }
             catch (Exception ex)
             {
-                log = "Firmware file load fail" + Environment.NewLine + ex.ToString();
+                log = "file load fail" + Environment.NewLine + ex.ToString();
             }
             UpdateDisplay();
             return log;
@@ -135,30 +139,31 @@ namespace ESPROG.Views
                                 pos += bufLength;
                             }
                             bs.Flush();
-                            log = "Save firmware succeed";
+                            log = "data save succeed";
                             res = true;
                         }
                     }
                 }
                 else
                 {
-                    log = "Firmware data does not exist";
+                    log = "data does not exist";
                 }
             }
             catch (Exception ex)
             {
-                log = "Save firmware fail" + Environment.NewLine + ex.ToString();
+                log = "data save fail" + Environment.NewLine + ex.ToString();
             }
             return (res, log);
         }
 
-        public FwContentVM()
+        public FwContentVM(long fwAddrStart)
         {
             ContentText = string.Empty;
             checksum = 0;
             size = 0;
             FwAvailable = false;
             FwData = new byte[128 * 1024];
+            FwAddrStart = fwAddrStart;
         }
     }
 }

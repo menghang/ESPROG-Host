@@ -265,6 +265,48 @@
                                     Height="25"
                                     MouseDoubleClick="TextBoxFwFile_MouseDoubleClick" />
                             </DockPanel>
+                            <DockPanel
+                                Margin="3">
+                                <Label
+                                    Content="Config:"
+                                    VerticalContentAlignment="Center"
+                                    Height="25" />
+                                <TextBox
+                                    Text="{Binding ConfigFile}"
+                                    IsReadOnly="True"
+                                    VerticalContentAlignment="Center"
+                                    Height="25"
+                                    MouseDoubleClick="TextBoxConfigFile_MouseDoubleClick" />
+                            </DockPanel>
+                            <DockPanel
+                                Margin="3">
+                                <Label
+                                    Content="Trim:"
+                                    VerticalContentAlignment="Center"
+                                    Height="25" />
+                                <TextBox
+                                    Text="{Binding TrimFile}"
+                                    IsReadOnly="True"
+                                    VerticalContentAlignment="Center"
+                                    Height="25"
+                                    MouseDoubleClick="TextBoxTrimFile_MouseDoubleClick" />
+                            </DockPanel>
+                            <DockPanel
+                                Margin="3">
+                                <Label
+                                    Content="Zone Selection:"
+                                    VerticalContentAlignment="Center"
+                                    Height="25" />
+                                <ComboBox
+                                    ItemsSource="{Binding WriteZoneList}"
+                                    DisplayMemberPath="Display"
+                                    SelectedValuePath="Value"
+                                    SelectedValue="{Binding SelectedWriteZone}"
+                                    VerticalContentAlignment="Center"
+                                    HorizontalContentAlignment="Center"
+                                    IsReadOnly="True"
+                                    Height="25" />
+                            </DockPanel>
                             <UniformGrid
                                 Rows="1"
                                 Columns="2"
@@ -281,51 +323,138 @@
                                     Click="ButtonProgEsprog_Click" />
                             </UniformGrid>
                         </StackPanel>
-                        <GroupBox
-                            DataContext="{Binding WriteFwContent}"
-                            Header="Firmware Content"
-                            Margin="5">
-                            <DockPanel>
-                                <UniformGrid
-                                    Rows="1"
-                                    Columns="2"
-                                    DockPanel.Dock="Bottom">
-                                    <DockPanel
-                                        Margin="5">
-                                        <Label
-                                            Content="Checksum:"
-                                            VerticalContentAlignment="Center"
-                                            Height="30" />
-                                        <TextBox
-                                            Text="{Binding ChecksumText,Mode=OneWay}"
-                                            Height="30"
-                                            VerticalContentAlignment="Center"
-                                            HorizontalContentAlignment="Center"
-                                            IsReadOnly="True" />
-                                    </DockPanel>
-                                    <DockPanel
-                                        Margin="5">
-                                        <Label
-                                            Content="Size:"
-                                            VerticalContentAlignment="Center"
-                                            Height="30" />
-                                        <TextBox
-                                            Text="{Binding SizeText,Mode=OneWay}"
-                                            Height="30"
-                                            VerticalContentAlignment="Center"
-                                            HorizontalContentAlignment="Center"
-                                            IsReadOnly="True" />
-                                    </DockPanel>
-                                </UniformGrid>
-                                <TextBox
-                                    Text="{Binding ContentText,Mode=OneWay}"
-                                    IsReadOnly="True"
-                                    FontFamily="Consolas"
-                                    FontSize="11"
-                                    VerticalScrollBarVisibility="Auto"
-                                    Margin="5" />
-                            </DockPanel>
-                        </GroupBox>
+                        <TabControl
+                            Margin="3">
+                            <TabItem
+                                Header="Firmware"
+                                DataContext="{Binding WriteFwContent}">
+                                <DockPanel>
+                                    <UniformGrid
+                                        Rows="1"
+                                        Columns="2"
+                                        DockPanel.Dock="Bottom">
+                                        <DockPanel
+                                            Margin="3">
+                                            <Label
+                                                Content="Checksum:"
+                                                VerticalContentAlignment="Center"
+                                                Height="25" />
+                                            <TextBox
+                                                Text="{Binding ChecksumText,Mode=OneWay}"
+                                                Height="25"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                IsReadOnly="True" />
+                                        </DockPanel>
+                                        <DockPanel
+                                            Margin="3">
+                                            <Label
+                                                Content="Size:"
+                                                VerticalContentAlignment="Center"
+                                                Height="25" />
+                                            <TextBox
+                                                Text="{Binding SizeText,Mode=OneWay}"
+                                                Height="25"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                IsReadOnly="True" />
+                                        </DockPanel>
+                                    </UniformGrid>
+                                    <TextBox
+                                        Text="{Binding ContentText,Mode=OneWay}"
+                                        IsReadOnly="True"
+                                        FontFamily="Consolas"
+                                        VerticalScrollBarVisibility="Auto"
+                                        Margin="3" />
+                                </DockPanel>
+                            </TabItem>
+                            <TabItem
+                                Header="Config"
+                                DataContext="{Binding WriteConfigContent}">
+                                <DockPanel>
+                                    <UniformGrid
+                                        Rows="1"
+                                        Columns="2"
+                                        DockPanel.Dock="Bottom">
+                                        <DockPanel
+                                            Margin="3">
+                                            <Label
+                                                Content="Checksum:"
+                                                VerticalContentAlignment="Center"
+                                                Height="25" />
+                                            <TextBox
+                                                Text="{Binding ChecksumText,Mode=OneWay}"
+                                                Height="25"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                IsReadOnly="True" />
+                                        </DockPanel>
+                                        <DockPanel
+                                            Margin="3">
+                                            <Label
+                                                Content="Size:"
+                                                VerticalContentAlignment="Center"
+                                                Height="25" />
+                                            <TextBox
+                                                Text="{Binding SizeText,Mode=OneWay}"
+                                                Height="25"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                IsReadOnly="True" />
+                                        </DockPanel>
+                                    </UniformGrid>
+                                    <TextBox
+                                        Text="{Binding ContentText,Mode=OneWay}"
+                                        IsReadOnly="True"
+                                        FontFamily="Consolas"
+                                        VerticalScrollBarVisibility="Auto"
+                                        Margin="3" />
+                                </DockPanel>
+                            </TabItem>
+                            <TabItem
+                                Header="Trim"
+                                DataContext="{Binding WriteTrimContent}">
+                                <DockPanel>
+                                    <UniformGrid
+                                        Rows="1"
+                                        Columns="2"
+                                        DockPanel.Dock="Bottom">
+                                        <DockPanel
+                                            Margin="3">
+                                            <Label
+                                                Content="Checksum:"
+                                                VerticalContentAlignment="Center"
+                                                Height="25" />
+                                            <TextBox
+                                                Text="{Binding ChecksumText,Mode=OneWay}"
+                                                Height="25"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                IsReadOnly="True" />
+                                        </DockPanel>
+                                        <DockPanel
+                                            Margin="3">
+                                            <Label
+                                                Content="Size:"
+                                                VerticalContentAlignment="Center"
+                                                Height="25" />
+                                            <TextBox
+                                                Text="{Binding SizeText,Mode=OneWay}"
+                                                Height="25"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                IsReadOnly="True" />
+                                        </DockPanel>
+                                    </UniformGrid>
+                                    <TextBox
+                                        Text="{Binding ContentText,Mode=OneWay}"
+                                        IsReadOnly="True"
+                                        FontFamily="Consolas"
+                                        VerticalScrollBarVisibility="Auto"
+                                        Margin="3" />
+                                </DockPanel>
+                            </TabItem>
+                        </TabControl>
                     </DockPanel>
                 </Grid>
             </TabItem>
@@ -336,6 +465,22 @@
                         IsEnabled="{Binding IsIdle}">
                         <StackPanel
                             DockPanel.Dock="Top">
+                            <DockPanel
+                                Margin="3">
+                                <Label
+                                    Content="Zone Selection:"
+                                    VerticalContentAlignment="Center"
+                                    Height="25" />
+                                <ComboBox
+                                    ItemsSource="{Binding ReadZoneList}"
+                                    DisplayMemberPath="Display"
+                                    SelectedValuePath="Value"
+                                    SelectedValue="{Binding SelectedReadZone}"
+                                    VerticalContentAlignment="Center"
+                                    HorizontalContentAlignment="Center"
+                                    IsReadOnly="True"
+                                    Height="25" />
+                            </DockPanel>
                             <UniformGrid
                                 Rows="1"
                                 Columns="2"
@@ -352,51 +497,138 @@
                                     Click="ButtonSaveFw_Click" />
                             </UniformGrid>
                         </StackPanel>
-                        <GroupBox
-                            DataContext="{Binding ReadFwContent}"
-                            Header="Firmware Content"
-                            Margin="5">
-                            <DockPanel>
-                                <UniformGrid
-                                    Rows="1"
-                                    Columns="2"
-                                    DockPanel.Dock="Bottom">
-                                    <DockPanel
-                                        Margin="5">
-                                        <Label
-                                            Content="Checksum:"
-                                            VerticalContentAlignment="Center"
-                                            Height="30" />
-                                        <TextBox
-                                            Text="{Binding ChecksumText,Mode=OneWay}"
-                                            Height="30"
-                                            VerticalContentAlignment="Center"
-                                            HorizontalContentAlignment="Center"
-                                            IsReadOnly="True" />
-                                    </DockPanel>
-                                    <DockPanel
-                                        Margin="5">
-                                        <Label
-                                            Content="Size:"
-                                            VerticalContentAlignment="Center"
-                                            Height="30" />
-                                        <TextBox
-                                            Text="{Binding SizeText,Mode=OneWay}"
-                                            Height="30"
-                                            VerticalContentAlignment="Center"
-                                            HorizontalContentAlignment="Center"
-                                            IsReadOnly="True" />
-                                    </DockPanel>
-                                </UniformGrid>
-                                <TextBox
-                                    Text="{Binding ContentText,Mode=OneWay}"
-                                    IsReadOnly="True"
-                                    FontFamily="Consolas"
-                                    FontSize="11"
-                                    VerticalScrollBarVisibility="Auto"
-                                    Margin="5" />
-                            </DockPanel>
-                        </GroupBox>
+                        <TabControl
+                            Margin="3">
+                            <TabItem
+                                Header="Firmware"
+                                DataContext="{Binding ReadFwContent}">
+                                <DockPanel>
+                                    <UniformGrid
+                                        Rows="1"
+                                        Columns="2"
+                                        DockPanel.Dock="Bottom">
+                                        <DockPanel
+                                            Margin="3">
+                                            <Label
+                                                Content="Checksum:"
+                                                VerticalContentAlignment="Center"
+                                                Height="25" />
+                                            <TextBox
+                                                Text="{Binding ChecksumText,Mode=OneWay}"
+                                                Height="25"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                IsReadOnly="True" />
+                                        </DockPanel>
+                                        <DockPanel
+                                            Margin="3">
+                                            <Label
+                                                Content="Size:"
+                                                VerticalContentAlignment="Center"
+                                                Height="25" />
+                                            <TextBox
+                                                Text="{Binding SizeText,Mode=OneWay}"
+                                                Height="25"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                IsReadOnly="True" />
+                                        </DockPanel>
+                                    </UniformGrid>
+                                    <TextBox
+                                        Text="{Binding ContentText,Mode=OneWay}"
+                                        IsReadOnly="True"
+                                        FontFamily="Consolas"
+                                        VerticalScrollBarVisibility="Auto"
+                                        Margin="3" />
+                                </DockPanel>
+                            </TabItem>
+                            <TabItem
+                                Header="Config"
+                                DataContext="{Binding ReadConfigContent}">
+                                <DockPanel>
+                                    <UniformGrid
+                                        Rows="1"
+                                        Columns="2"
+                                        DockPanel.Dock="Bottom">
+                                        <DockPanel
+                                            Margin="3">
+                                            <Label
+                                                Content="Checksum:"
+                                                VerticalContentAlignment="Center"
+                                                Height="25" />
+                                            <TextBox
+                                                Text="{Binding ChecksumText,Mode=OneWay}"
+                                                Height="25"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                IsReadOnly="True" />
+                                        </DockPanel>
+                                        <DockPanel
+                                            Margin="3">
+                                            <Label
+                                                Content="Size:"
+                                                VerticalContentAlignment="Center"
+                                                Height="25" />
+                                            <TextBox
+                                                Text="{Binding SizeText,Mode=OneWay}"
+                                                Height="25"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                IsReadOnly="True" />
+                                        </DockPanel>
+                                    </UniformGrid>
+                                    <TextBox
+                                        Text="{Binding ContentText,Mode=OneWay}"
+                                        IsReadOnly="True"
+                                        FontFamily="Consolas"
+                                        VerticalScrollBarVisibility="Auto"
+                                        Margin="3" />
+                                </DockPanel>
+                            </TabItem>
+                            <TabItem
+                                Header="Trim"
+                                DataContext="{Binding ReadTrimContent}">
+                                <DockPanel>
+                                    <UniformGrid
+                                        Rows="1"
+                                        Columns="2"
+                                        DockPanel.Dock="Bottom">
+                                        <DockPanel
+                                            Margin="3">
+                                            <Label
+                                                Content="Checksum:"
+                                                VerticalContentAlignment="Center"
+                                                Height="25" />
+                                            <TextBox
+                                                Text="{Binding ChecksumText,Mode=OneWay}"
+                                                Height="25"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                IsReadOnly="True" />
+                                        </DockPanel>
+                                        <DockPanel
+                                            Margin="3">
+                                            <Label
+                                                Content="Size:"
+                                                VerticalContentAlignment="Center"
+                                                Height="25" />
+                                            <TextBox
+                                                Text="{Binding SizeText,Mode=OneWay}"
+                                                Height="25"
+                                                VerticalContentAlignment="Center"
+                                                HorizontalContentAlignment="Center"
+                                                IsReadOnly="True" />
+                                        </DockPanel>
+                                    </UniformGrid>
+                                    <TextBox
+                                        Text="{Binding ContentText,Mode=OneWay}"
+                                        IsReadOnly="True"
+                                        FontFamily="Consolas"
+                                        VerticalScrollBarVisibility="Auto"
+                                        Margin="3" />
+                                </DockPanel>
+                            </TabItem>
+                        </TabControl>
                     </DockPanel>
                 </Grid>
             </TabItem>

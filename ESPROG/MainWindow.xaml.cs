@@ -51,6 +51,19 @@ namespace ESPROG
                 usbArrivalTimer?.Change(Timeout.Infinite, Timeout.Infinite);
                 ReloadSerialPort();
             }), null, Timeout.Infinite, Timeout.Infinite);
+
+            view.ChipSettingView.SelectedChipChanged += ChipSettingView_SelectedChipChanged;
+            view.ChipSettingView.SelectedChip = 0x1708;
+        }
+
+        private void ChipSettingView_SelectedChipChanged(object sender, ChipSettingVM.ChipChangedEventArgs e)
+        {
+            view.WriteFwContent.MaxSize = e.FwSize;
+            view.ReadFwContent.MaxSize = e.FwSize;
+            view.WriteConfigContent.MaxSize = e.CfgSize;
+            view.ReadConfigContent.MaxSize = e.CfgSize;
+            view.WriteTrimContent.MaxSize = e.TrimSize;
+            view.ReadTrimContent.MaxSize = e.TrimSize;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -192,11 +205,11 @@ namespace ESPROG
                 string logMsg = await view.WriteFwContent.LoadFwFile(view.FwFile);
                 if (view.WriteFwContent.FwAvailable)
                 {
-                    log.Info(logMsg);
+                    log.Info("MTP " + logMsg);
                 }
                 else
                 {
-                    log.Error(logMsg);
+                    log.Error("MTP " + logMsg);
                 }
             }
         }
@@ -297,14 +310,11 @@ namespace ESPROG
 
         private async Task<bool> ProgChipSubTask()
         {
-            string logMsg = await view.WriteFwContent.LoadFwFile(view.FwFile);
-            if (!view.WriteFwContent.FwAvailable)
+            if (!await CheckFwFile())
             {
-                log.Error(logMsg);
                 return false;
             }
-            log.Info(logMsg);
-            if (!await SendFwToESPROG())
+            if (!await SendAllFwToESPROG())
             {
                 return false;
             }
@@ -317,22 +327,62 @@ namespace ESPROG
             return true;
         }
 
-        private async Task<bool> SendFwToESPROG()
+        private async Task<bool> SendAllFwToESPROG()
         {
-            if (view.WriteFwContent.FwData == null)
-            {
-                log.Error("Firmware is not available");
-                return false;
-            }
             if (!await nuprog.SetChipAndAddr(view.ChipSettingView.SelectedChip, view.ChipSettingView.SelectedChipAddr))
             {
                 return false;
             }
-            if (!await nuprog.WriteFwToEsprog(view.WriteFwContent.FwData, view.WriteFwContent.Size))
+            if (!await nuprog.SetProgZone(view.SelectedWriteZone))
             {
                 return false;
             }
-            if (!await nuprog.FwWriteChecksum(view.WriteFwContent.FwData))
+            if ((view.SelectedWriteZone & NuProgService.MtpZoneMask) == NuProgService.MtpZoneMask)
+            {
+                if (view.WriteFwContent.FwData == null)
+                {
+                    log.Error("Firmware is not available");
+                    return false;
+                }
+                if (!await SendFwToESPROG(NuProgService.MtpZoneMask, view.WriteFwContent.FwData, view.WriteFwContent.Size))
+                {
+                    return false;
+                }
+            }
+            if ((view.SelectedWriteZone & NuProgService.CfgZoneMask) == NuProgService.CfgZoneMask)
+            {
+                if (view.WriteConfigContent.FwData == null)
+                {
+                    log.Error("Config is not available");
+                    return false;
+                }
+                if (!await SendFwToESPROG(NuProgService.CfgZoneMask, view.WriteConfigContent.FwData, view.WriteConfigContent.Size))
+                {
+                    return false;
+                }
+            }
+            if ((view.SelectedWriteZone & NuProgService.TrimZoneMask) == NuProgService.TrimZoneMask)
+            {
+                if (view.WriteTrimContent.FwData == null)
+                {
+                    log.Error("Trim is not available");
+                    return false;
+                }
+                if (!await SendFwToESPROG(NuProgService.TrimZoneMask, view.WriteTrimContent.FwData, view.WriteTrimContent.Size))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private async Task<bool> SendFwToESPROG(byte zone, byte[] data, long size)
+        {
+            if (!await nuprog.WriteFwToEsprog(zone, data, size))
+            {
+                return false;
+            }
+            if (!await nuprog.FwWriteChecksum(zone, data, size))
             {
                 log.Error("Write checksum fail");
                 return false;
@@ -347,14 +397,11 @@ namespace ESPROG
 
         private async Task<bool> ProgEsprogSubTask()
         {
-            string logMsg = await view.WriteFwContent.LoadFwFile(view.FwFile);
-            if (!view.WriteFwContent.FwAvailable)
+            if (!await CheckFwFile())
             {
-                log.Error(logMsg);
                 return false;
             }
-            log.Info(logMsg);
-            if (!await SendFwToESPROG())
+            if (!await SendAllFwToESPROG())
             {
                 return false;
             }
@@ -364,6 +411,51 @@ namespace ESPROG
                 return false;
             }
             log.Info("Save config to ESPROG succeed");
+            return true;
+        }
+
+        private async Task<bool> CheckFwFile()
+        {
+            string logMsgFw = await view.WriteFwContent.LoadFwFile(view.FwFile);
+            string logMsgCfg = await view.WriteConfigContent.LoadFwFile(view.ConfigFile);
+            string logMsgTrim = await view.WriteTrimContent.LoadFwFile(view.TrimFile);
+
+            if ((view.SelectedWriteZone & NuProgService.MtpZoneMask) == NuProgService.MtpZoneMask)
+            {
+                if (!view.WriteFwContent.FwAvailable)
+                {
+                    log.Error("MTP " + logMsgFw);
+                    return false;
+                }
+                else
+                {
+                    log.Info("MTP " + logMsgFw);
+                }
+            }
+            if ((view.SelectedWriteZone & NuProgService.CfgZoneMask) == NuProgService.CfgZoneMask)
+            {
+                if (!view.WriteConfigContent.FwAvailable)
+                {
+                    log.Error("Config " + logMsgCfg);
+                    return false;
+                }
+                else
+                {
+                    log.Info("Config " + logMsgCfg);
+                }
+            }
+            if ((view.SelectedWriteZone & NuProgService.TrimZoneMask) == NuProgService.TrimZoneMask)
+            {
+                if (!view.WriteTrimContent.FwAvailable)
+                {
+                    log.Error("Trim " + logMsgTrim);
+                    return false;
+                }
+                else
+                {
+                    log.Info("Trim " + logMsgTrim);
+                }
+            }
             return true;
         }
 
@@ -378,15 +470,41 @@ namespace ESPROG
             {
                 return false;
             }
+            if (!await nuprog.SetProgZone(view.SelectedReadZone))
+            {
+                return false;
+            }
             if (!await nuprog.FwReadStart())
             {
                 log.Error("Read firmware from chip fail");
                 return false;
             }
-            bool res = await nuprog.ReadFwFromEsprog(view.ReadFwContent.FwData);
-            view.ReadFwContent.FwAvailable = res;
-            view.ReadFwContent.Size = ChipSettingVM.MaxFwSize;
-            view.ReadFwContent.UpdateDisplay();
+            bool res;
+            switch (view.SelectedReadZone)
+            {
+                case NuProgService.MtpZoneMask:
+                    res = await nuprog.ReadFwFromEsprog(NuProgService.MtpZoneMask, view.ReadFwContent.FwData);
+                    view.ReadFwContent.FwAvailable = res;
+                    view.ReadFwContent.Size = ChipSettingVM.MaxFwSize;
+                    view.ReadFwContent.UpdateDisplay();
+                    break;
+                case NuProgService.CfgZoneMask:
+                    res = await nuprog.ReadFwFromEsprog(NuProgService.CfgZoneMask, view.ReadConfigContent.FwData);
+                    view.ReadConfigContent.FwAvailable = res;
+                    view.ReadConfigContent.Size = ChipSettingVM.MaxConfigSize;
+                    view.ReadConfigContent.UpdateDisplay();
+                    break;
+                case NuProgService.TrimZoneMask:
+                    res = await nuprog.ReadFwFromEsprog(NuProgService.TrimZoneMask, view.ReadTrimContent.FwData);
+                    view.ReadTrimContent.FwAvailable = res;
+                    view.ReadTrimContent.Size = ChipSettingVM.MaxTrimSize;
+                    view.ReadTrimContent.UpdateDisplay();
+                    break;
+                default:
+                    res = false;
+                    log.Error(string.Format("Wrong zone value ({0})", view.SelectedReadZone));
+                    break;
+            }
             return res;
         }
 
@@ -394,19 +512,50 @@ namespace ESPROG
         {
             SaveFileDialog dialog = new()
             {
-                Title = "Save firmware file",
+                Title = "Save data file",
                 Filter = "Binary File (*.bin)|*.bin"
             };
             if (dialog.ShowDialog() == true)
             {
-                (bool res, string logMsg) = await view.ReadFwContent.SaveFwData(dialog.FileName);
-                if (res)
+                (bool res, string logMsg) rsp;
+                switch (view.SelectedReadZone)
                 {
-                    log.Info(logMsg);
-                }
-                else
-                {
-                    log.Error(logMsg);
+                    case NuProgService.MtpZoneMask:
+                        rsp = await view.ReadFwContent.SaveFwData(dialog.FileName);
+                        if (rsp.res)
+                        {
+                            log.Info("MTP " + rsp.logMsg);
+                        }
+                        else
+                        {
+                            log.Error("MTP " + rsp.logMsg);
+                        }
+                        break;
+                    case NuProgService.CfgZoneMask:
+                        rsp = await view.ReadConfigContent.SaveFwData(dialog.FileName);
+                        if (rsp.res)
+                        {
+                            log.Info("Config " + rsp.logMsg);
+                        }
+                        else
+                        {
+                            log.Error("Config " + rsp.logMsg);
+                        }
+                        break;
+                    case NuProgService.TrimZoneMask:
+                        rsp = await view.ReadTrimContent.SaveFwData(dialog.FileName);
+                        if (rsp.res)
+                        {
+                            log.Info("Trim " + rsp.logMsg);
+                        }
+                        else
+                        {
+                            log.Error("Trim " + rsp.logMsg);
+                        }
+                        break;
+                    default:
+                        log.Error(string.Format("Wrong zone value ({0})", view.SelectedReadZone));
+                        break;
                 }
             }
         }
@@ -455,6 +604,52 @@ namespace ESPROG
         {
             string cmd = view.SendCmd.Trim() + "\r\n";
             uart.SendCmd(cmd);
+        }
+
+        private async void TextBoxConfigFile_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            OpenFileDialog dialog = new()
+            {
+                Multiselect = false,
+                Title = "Open config file",
+                Filter = "Binary File (*.bin)|*.bin|All Files|*.*"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                view.ConfigFile = dialog.FileName;
+                string logMsg = await view.WriteConfigContent.LoadFwFile(view.FwFile);
+                if (view.WriteConfigContent.FwAvailable)
+                {
+                    log.Info("Config" + logMsg);
+                }
+                else
+                {
+                    log.Error("Config" + logMsg);
+                }
+            }
+        }
+
+        private async void TextBoxTrimFile_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            OpenFileDialog dialog = new()
+            {
+                Multiselect = false,
+                Title = "Open trim file",
+                Filter = "Binary File (*.bin)|*.bin|All Files|*.*"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                view.TrimFile = dialog.FileName;
+                string logMsg = await view.WriteTrimContent.LoadFwFile(view.FwFile);
+                if (view.WriteTrimContent.FwAvailable)
+                {
+                    log.Info("Trim" + logMsg);
+                }
+                else
+                {
+                    log.Error("Trim" + logMsg);
+                }
+            }
         }
 
         private delegate Task<bool> SubTaskHandler();

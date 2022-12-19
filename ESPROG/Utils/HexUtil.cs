@@ -74,10 +74,10 @@ namespace ESPROG.Utils
             return Convert.ToBase64String(data2);
         }
 
-        public static uint GetChecksum(byte[] data)
+        public static uint GetChecksum(byte[] data, long size)
         {
             uint checksum = 0;
-            for (int ii = 0; ii < data.Length; ii++)
+            for (int ii = 0; ii < size; ii++)
             {
                 checksum += data[ii];
             }
