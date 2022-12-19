@@ -8,14 +8,12 @@ namespace ESPROG.Views
     {
         public static readonly Dictionary<uint, List<ComboBoxModel<string, byte>>> ChipDict = new()
         {
-            { 0x1705, new(){ new("0x50", 0x50), new("0x51", 0x51), new("0x52", 0x52), new("0x53", 0x53) } },
             { 0x1708, new(){ new("0x50", 0x50), new("0x51", 0x51), new("0x52", 0x52), new("0x53", 0x53) } },
             { 0x1718, new(){ new("0x70", 0x70), new("0x71", 0x71), new("0x72", 0x72), new("0x73", 0x73) } }
         };
 
         public static readonly Dictionary<uint, (long mtp, long cfg, long trim)> ChipSizeDict = new()
         {
-            { 0x1705, (32 * 1024, 3 * 512, 1 * 512) },
             { 0x1708, (32 * 1024, 3 * 512, 1 * 512) },
             { 0x1718, (64 * 1024, 3 * 512, 1 * 512) }
         };
