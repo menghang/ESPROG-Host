@@ -13,14 +13,14 @@ namespace ESPROG.Services
         private readonly UartService uart;
         private readonly Queue<UartCmdModel> cmdQueue;
 
-        private static readonly int shortCheckInterval = 20;
-        private static readonly int shortCheckTimeout = 500;
-        private static readonly int midCheckInterval = 50;
-        private static readonly int midCheckTimeout = 1000;
-        private static readonly int longCheckInterval = 100;
-        private static readonly int longCheckTimeout = 2000;
+        private const int shortCheckInterval = 20;
+        private const int shortCheckTimeout = 500;
+        private const int midCheckInterval = 50;
+        private const int midCheckTimeout = 1000;
+        private const int longCheckInterval = 100;
+        private const int longCheckTimeout = 2000;
 
-        private static readonly uint esprogFwBlockSize = 512;
+        private const uint esprogFwBlockSize = 512;
 
         public NuProgService(LogService logService, UartService uartService)
         {

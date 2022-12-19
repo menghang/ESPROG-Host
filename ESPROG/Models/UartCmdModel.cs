@@ -5,27 +5,30 @@ namespace ESPROG.Models
 {
     class UartCmdModel
     {
-        public static readonly string CmdReadReg = "ReadReg";
-        public static readonly string CmdWriteReg = "WriteReg";
-        public static readonly string CmdSetDevAddr = "SetDevAddr";
-        public static readonly string CmdGetDevAddr = "GetDevAddr";
-        public static readonly string CmdSetGateCtrl = "SetGateCtrl";
-        public static readonly string CmdGetGateCtrl = "GetGateCtrl";
-        public static readonly string CmdFwWriteBuf = "FwWriteBuf";
-        public static readonly string CmdFwReadBuf = "FwReadBuf";
-        public static readonly string CmdFwWriteStart = "FwWriteStart";
-        public static readonly string CmdFwReadStart = "FwReadStart";
-        public static readonly string CmdSaveConfig = "SaveConfig";
-        public static readonly string CmdFlashFormat = "FlashFormat";
-        public static readonly string CmdGetAppVersion = "GetInfo";
-        public static readonly string CmdGetChipInfo = "GetChipInfo";
-        public static readonly string CmdGetChipUID = "GetChipUID";
-        public static readonly string CmdGetAppCompileTime = "GetAppCompileTime";
-        public static readonly string CmdFwWriteChecksum = "FwWriteChecksum";
-        public static readonly string CmdFwReadChecksum = "FwReadChecksum";
-        public static readonly string CmdSetChip = "SetChip";
-        public static readonly string CmdGetChip = "GetChip";
-        public static readonly string CmdError = "Error";
+        public const string CmdReadReg = "ReadReg";
+        public const string CmdWriteReg = "WriteReg";
+        public const string CmdSetDevAddr = "SetDevAddr";
+        public const string CmdGetDevAddr = "GetDevAddr";
+        public const string CmdSetGateCtrl = "SetGateCtrl";
+        public const string CmdGetGateCtrl = "GetGateCtrl";
+        public const string CmdFwWriteBuf = "FwWriteBuf";
+        public const string CmdFwReadBuf = "FwReadBuf";
+        public const string CmdFwWriteStart = "FwWriteStart";
+        public const string CmdFwReadStart = "FwReadStart";
+        public const string CmdSaveConfig = "SaveConfig";
+        public const string CmdFlashFormat = "FlashFormat";
+        public const string CmdGetAppVersion = "GetInfo";
+        public const string CmdGetChipInfo = "GetChipInfo";
+        public const string CmdGetChipUID = "GetChipUID";
+        public const string CmdGetAppCompileTime = "GetAppCompileTime";
+        public const string CmdFwWriteChecksum = "FwWriteChecksum";
+        public const string CmdFwReadChecksum = "FwReadChecksum";
+        public const string CmdSetChip = "SetChip";
+        public const string CmdGetChip = "GetChip";
+        public const string CmdSetZone = "SetZone";
+        public const string CmdGetZone = "GetZone";
+
+        public const string CmdError = "Error";
 
         public string Cmd { private set; get; }
 

@@ -22,7 +22,7 @@ namespace ESPROG
         private readonly NuProgService nuprog;
         private readonly UsbMonitorManager usbMonitor;
         private readonly Timer usbRemovalTimer, usbArrivalTimer;
-        private static readonly int usbDelay = 100;
+        private const int usbDelay = 100;
 
         public MainWindow()
         {

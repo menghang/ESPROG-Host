@@ -63,7 +63,7 @@ namespace ESPROG.Views
             OnPropertyChanged(nameof(ContentText));
         }
 
-        private static readonly int readBufferSize = 1024;
+        private const int readBufferSize = 1024;
         public async Task<string> LoadFwFile(string file)
         {
             string log;
@@ -112,7 +112,7 @@ namespace ESPROG.Views
             return log;
         }
 
-        private static readonly int writeBufferSize = 1024;
+        private const int writeBufferSize = 1024;
         public async Task<(bool res, string log)> SaveFwData(string file)
         {
             bool res = false;
