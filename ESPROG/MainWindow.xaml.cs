@@ -617,7 +617,7 @@ namespace ESPROG
             if (dialog.ShowDialog() == true)
             {
                 view.ConfigFile = dialog.FileName;
-                string logMsg = await view.WriteConfigContent.LoadFwFile(view.FwFile);
+                string logMsg = await view.WriteConfigContent.LoadFwFile(view.ConfigFile);
                 if (view.WriteConfigContent.FwAvailable)
                 {
                     log.Info("Config" + logMsg);
@@ -640,7 +640,7 @@ namespace ESPROG
             if (dialog.ShowDialog() == true)
             {
                 view.TrimFile = dialog.FileName;
-                string logMsg = await view.WriteTrimContent.LoadFwFile(view.FwFile);
+                string logMsg = await view.WriteTrimContent.LoadFwFile(view.TrimFile);
                 if (view.WriteTrimContent.FwAvailable)
                 {
                     log.Info("Trim" + logMsg);
