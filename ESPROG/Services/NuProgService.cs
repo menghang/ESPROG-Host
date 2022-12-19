@@ -303,19 +303,23 @@ namespace ESPROG.Services
             byte[] fwBuffer = new byte[esprogFwBlockSize];
             uint fwAddrStart;
             long maxSize;
+            string zoneName;
             switch (zone)
             {
                 case MtpZoneMask:
                     fwAddrStart = (uint)MTPAddrStart;
                     maxSize = ChipSettingVM.MaxFwSize;
+                    zoneName = "firmware";
                     break;
                 case CfgZoneMask:
                     fwAddrStart = (uint)CFGAddrStart;
                     maxSize = ChipSettingVM.MaxConfigSize;
+                    zoneName = "config";
                     break;
                 case TrimZoneMask:
                     fwAddrStart = (uint)TrimAddrStart;
                     maxSize = ChipSettingVM.MaxTrimSize;
+                    zoneName = "trim";
                     break;
                 default:
                     log.Error(string.Format("Wrong zone value ({0})", zone));
@@ -338,11 +342,11 @@ namespace ESPROG.Services
                 }
                 if (!await FwWriteBuf(zone, fwAddr + fwAddrStart, fwBuffer))
                 {
-                    log.Error(string.Format("Write firmware to ESPROG fail at addr ({0}) zone ({1})", fwAddr, zone));
+                    log.Error(string.Format("Write {0} zone to ESPROG fail at addr ({1})", zoneName, fwAddr));
                     return false;
                 }
             }
-            log.Info("Write firmware to ESPROG succeed");
+            log.Info(string.Format("Write {0} zone to ESPROG succeed", zoneName));
             return true;
         }
 
@@ -351,19 +355,23 @@ namespace ESPROG.Services
             Array.Clear(fwData);
             uint fwAddrStart;
             long maxSize;
+            string zoneName;
             switch (zone)
             {
                 case MtpZoneMask:
                     fwAddrStart = (uint)MTPAddrStart;
                     maxSize = ChipSettingVM.MaxFwSize;
+                    zoneName = "firmware";
                     break;
                 case CfgZoneMask:
                     fwAddrStart = (uint)CFGAddrStart;
                     maxSize = ChipSettingVM.MaxConfigSize;
+                    zoneName = "config";
                     break;
                 case TrimZoneMask:
                     fwAddrStart = (uint)TrimAddrStart;
                     maxSize = ChipSettingVM.MaxTrimSize;
+                    zoneName = "trim";
                     break;
                 default:
                     log.Error(string.Format("Wrong zone value ({0})", zone));
@@ -375,7 +383,7 @@ namespace ESPROG.Services
                 byte[]? fwBuffer = await FwReadBuf((uint)(fwAddr + fwAddrStart), zone == MtpZoneMask);
                 if (fwBuffer == null)
                 {
-                    log.Error(string.Format("Read firmware from ESPROG fail at addr ({0}) zone ({1})", fwAddr, zone));
+                    log.Error(string.Format("Read {0} zone from ESPROG fail at addr ({1})", zoneName, fwAddr));
                     return false;
                 }
                 if (fwAddr + fwBuffer.LongLength < maxSize)
@@ -387,13 +395,13 @@ namespace ESPROG.Services
                 else if (fwAddr + fwBuffer.LongLength == maxSize)
                 {
                     Array.Copy(fwBuffer, 0, fwData, fwAddr, fwBuffer.LongLength);
-                    log.Info("Read firmware from ESPROG succeed");
+                    log.Info(string.Format("Read {0} zone from ESPROG succeed", zoneName));
                     return true;
                 }
                 else
                 {
-                    log.Error(string.Format("Buffer size ({0}) exceed firmware size ({1}) at addr ({2}) zone ({3})",
-                        fwBuffer.LongLength, maxSize, fwAddr));
+                    log.Error(string.Format("Buffer size ({0}) exceed {1} zone size ({2}) at addr ({3})",
+                        fwBuffer.LongLength, zoneName, maxSize, fwAddr));
                     return false;
                 }
             }
