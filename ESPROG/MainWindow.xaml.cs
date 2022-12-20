@@ -470,7 +470,7 @@ namespace ESPROG
             {
                 return false;
             }
-            if (!await nuprog.SetProgZone(view.SelectedReadZone))
+            if (!await nuprog.SetProgZone(NuProgService.MtpZoneMask | NuProgService.CfgZoneMask | NuProgService.TrimZoneMask))
             {
                 return false;
             }
@@ -479,33 +479,34 @@ namespace ESPROG
                 log.Error("Read firmware from chip fail");
                 return false;
             }
-            bool res;
-            switch (view.SelectedReadZone)
+
+            view.ReadFwContent.FwAvailable =
+                await nuprog.ReadFwFromEsprog(NuProgService.MtpZoneMask, view.ReadFwContent.FwData);
+            view.ReadFwContent.Size = ChipSettingVM.MaxFwSize;
+            view.ReadFwContent.UpdateDisplay();
+            if (!view.ReadFwContent.FwAvailable)
             {
-                case NuProgService.MtpZoneMask:
-                    res = await nuprog.ReadFwFromEsprog(NuProgService.MtpZoneMask, view.ReadFwContent.FwData);
-                    view.ReadFwContent.FwAvailable = res;
-                    view.ReadFwContent.Size = ChipSettingVM.MaxFwSize;
-                    view.ReadFwContent.UpdateDisplay();
-                    break;
-                case NuProgService.CfgZoneMask:
-                    res = await nuprog.ReadFwFromEsprog(NuProgService.CfgZoneMask, view.ReadConfigContent.FwData);
-                    view.ReadConfigContent.FwAvailable = res;
-                    view.ReadConfigContent.Size = ChipSettingVM.MaxConfigSize;
-                    view.ReadConfigContent.UpdateDisplay();
-                    break;
-                case NuProgService.TrimZoneMask:
-                    res = await nuprog.ReadFwFromEsprog(NuProgService.TrimZoneMask, view.ReadTrimContent.FwData);
-                    view.ReadTrimContent.FwAvailable = res;
-                    view.ReadTrimContent.Size = ChipSettingVM.MaxTrimSize;
-                    view.ReadTrimContent.UpdateDisplay();
-                    break;
-                default:
-                    res = false;
-                    log.Error(string.Format("Wrong zone value ({0})", view.SelectedReadZone));
-                    break;
+                return false;
             }
-            return res;
+
+            view.ReadConfigContent.FwAvailable =
+                await nuprog.ReadFwFromEsprog(NuProgService.CfgZoneMask, view.ReadConfigContent.FwData);
+            view.ReadConfigContent.Size = ChipSettingVM.MaxConfigSize;
+            view.ReadConfigContent.UpdateDisplay();
+            if (!view.ReadConfigContent.FwAvailable)
+            {
+                return false;
+            }
+
+            view.ReadTrimContent.FwAvailable =
+                await nuprog.ReadFwFromEsprog(NuProgService.TrimZoneMask, view.ReadTrimContent.FwData);
+            view.ReadTrimContent.Size = ChipSettingVM.MaxTrimSize;
+            view.ReadTrimContent.UpdateDisplay();
+            if (!view.ReadTrimContent.FwAvailable)
+            {
+                return false;
+            }
+            return true;
         }
 
         private async void ButtonSaveFw_Click(object sender, RoutedEventArgs e)
