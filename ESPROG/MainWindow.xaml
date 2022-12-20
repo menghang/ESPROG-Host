@@ -633,7 +633,7 @@
                 </Grid>
             </TabItem>
             <TabItem
-                Header="I2C">
+                Header="Other">
                 <Grid>
                     <StackPanel
                         IsEnabled="{Binding IsIdle}">
