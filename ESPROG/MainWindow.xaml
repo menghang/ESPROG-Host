@@ -8,7 +8,7 @@
     mc:Ignorable="d"
     Title="ESPROG-HOST"
     Height="700"
-    MinHeight="600"
+    MinHeight="650"
     Width="400"
     MinWidth="400"
     FontSize="10"
@@ -64,15 +64,15 @@
                             DockPanel.Dock="Bottom">
                             <Image
                                 Source="pack://application:,,,/NVT.png"
-                                Height="45"
-                                VerticalAlignment="Bottom"
-                                DockPanel.Dock="Right"
-                                Margin="10" />
+                                Height="60"
+                                HorizontalAlignment="Left"
+                                DockPanel.Dock="Bottom"
+                                Margin="3" />
                             <Image
                                 Source="pack://application:,,,/QR_NuVolta.png"
-                                Height="90"
-                                DockPanel.Dock="Left"
-                                Margin="10" />
+                                Height="100"
+                                HorizontalAlignment="Left"
+                                Margin="3" />
                         </DockPanel>
                         <StackPanel
                             IsEnabled="{Binding IsIdle}"
