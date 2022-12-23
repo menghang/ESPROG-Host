@@ -32,7 +32,7 @@ namespace ESPROG
 
             log = new(TextBoxLog);
             uart = new(log);
-            nuprog = new(log, uart);
+            nuprog = new(log, uart, view.ChipSettingView.SelectedChip);
             usbMonitor = new(this);
             usbMonitor.UsbDeviceInterface += UsbMonitor_UsbDeviceInterface;
 
@@ -58,12 +58,13 @@ namespace ESPROG
 
         private void ChipSettingView_SelectedChipChanged(object sender, ChipSettingVM.ChipChangedEventArgs e)
         {
-            view.WriteFwContent.MaxSize = e.FwSize;
-            view.ReadFwContent.MaxSize = e.FwSize;
-            view.WriteConfigContent.MaxSize = e.CfgSize;
-            view.ReadConfigContent.MaxSize = e.CfgSize;
-            view.WriteTrimContent.MaxSize = e.TrimSize;
-            view.ReadTrimContent.MaxSize = e.TrimSize;
+            nuprog.SetChipModel(e.Chip);
+            view.WriteFwContent.MaxSize = NuProgService.ChipDict[e.Chip].MTP.Size;
+            view.ReadFwContent.MaxSize = NuProgService.ChipDict[e.Chip].MTP.Size;
+            view.WriteConfigContent.MaxSize = NuProgService.ChipDict[e.Chip].Config.Size;
+            view.ReadConfigContent.MaxSize = NuProgService.ChipDict[e.Chip].Config.Size;
+            view.WriteTrimContent.MaxSize = NuProgService.ChipDict[e.Chip].Trim.Size;
+            view.ReadTrimContent.MaxSize = NuProgService.ChipDict[e.Chip].Trim.Size;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -269,9 +270,9 @@ namespace ESPROG
         private async Task<bool> AutodetectChipSubTask()
         {
             view.ChipSettingView.ChipInfo = string.Empty;
-            foreach (uint chip in ChipSettingVM.ChipDict.Keys)
+            foreach (uint chip in NuProgService.ChipDict.Keys)
             {
-                foreach (ComboBoxModel<string, byte> devAddr in ChipSettingVM.ChipDict[chip])
+                foreach (ComboBoxModel<string, byte> devAddr in NuProgService.ChipDict[chip].Addrs)
                 {
                     string? chipInfo = await GetChipInfo(chip, devAddr.Value);
                     if (chipInfo != null)
@@ -376,7 +377,7 @@ namespace ESPROG
             return true;
         }
 
-        private async Task<bool> SendFwToESPROG(byte zone, byte[] data, long size)
+        private async Task<bool> SendFwToESPROG(byte zone, byte[] data, uint size)
         {
             if (!await nuprog.WriteFwToEsprog(zone, data, size))
             {
@@ -482,7 +483,7 @@ namespace ESPROG
 
             view.ReadFwContent.FwAvailable =
                 await nuprog.ReadFwFromEsprog(NuProgService.MtpZoneMask, view.ReadFwContent.FwData);
-            view.ReadFwContent.Size = ChipSettingVM.MaxFwSize;
+            view.ReadFwContent.Size = NuProgService.ChipDict[view.ChipSettingView.SelectedChip].MTP.Size;
             view.ReadFwContent.UpdateDisplay();
             if (!view.ReadFwContent.FwAvailable)
             {
@@ -491,7 +492,7 @@ namespace ESPROG
 
             view.ReadConfigContent.FwAvailable =
                 await nuprog.ReadFwFromEsprog(NuProgService.CfgZoneMask, view.ReadConfigContent.FwData);
-            view.ReadConfigContent.Size = ChipSettingVM.MaxConfigSize;
+            view.ReadConfigContent.Size = NuProgService.ChipDict[view.ChipSettingView.SelectedChip].Config.Size;
             view.ReadConfigContent.UpdateDisplay();
             if (!view.ReadConfigContent.FwAvailable)
             {
@@ -500,7 +501,7 @@ namespace ESPROG
 
             view.ReadTrimContent.FwAvailable =
                 await nuprog.ReadFwFromEsprog(NuProgService.TrimZoneMask, view.ReadTrimContent.FwData);
-            view.ReadTrimContent.Size = ChipSettingVM.MaxTrimSize;
+            view.ReadTrimContent.Size = NuProgService.ChipDict[view.ChipSettingView.SelectedChip].Trim.Size;
             view.ReadTrimContent.UpdateDisplay();
             if (!view.ReadTrimContent.FwAvailable)
             {

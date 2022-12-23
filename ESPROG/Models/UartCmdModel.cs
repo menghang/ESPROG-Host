@@ -79,7 +79,7 @@ namespace ESPROG.Models
             {
                 return cmd;
             }
-            cmd.Rsp = HexUtil.GetByteFromStr(items[1]);
+            cmd.Rsp = HexUtil.GetU8FromStr(items[1]);
             if (cmd.Rsp == null)
             {
                 return null;

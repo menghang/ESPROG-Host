@@ -56,7 +56,7 @@ namespace ESPROG.Views
         public string RegAddrText
         {
             get => regAddr.HasValue ? HexUtil.GetHexStr(regAddr.Value) : string.Empty;
-            set => SetProperty(ref regAddr, HexUtil.GetByteFromStr(value));
+            set => SetProperty(ref regAddr, HexUtil.GetU8FromStr(value));
         }
 
         private byte? regVal;
@@ -68,7 +68,7 @@ namespace ESPROG.Views
         public string RegValText
         {
             get => regVal.HasValue ? HexUtil.GetHexStr(regVal.Value) : string.Empty;
-            set => SetProperty(ref regVal, HexUtil.GetByteFromStr(value));
+            set => SetProperty(ref regVal, HexUtil.GetU8FromStr(value));
         }
 
         private string sendCmd;
@@ -116,12 +116,12 @@ namespace ESPROG.Views
             sendCmd = string.Empty;
             EsprogSettingView = new();
             ChipSettingView = new();
-            WriteFwContent = new(NuProgService.MTPAddrOffset);
-            WriteConfigContent = new(NuProgService.CFGAddrOffset);
-            WriteTrimContent = new(NuProgService.TrimAddrOffset);
-            ReadFwContent = new(NuProgService.MTPAddrOffset);
-            ReadConfigContent = new(NuProgService.CFGAddrOffset);
-            ReadTrimContent = new(NuProgService.TrimAddrOffset);
+            WriteFwContent = new(NuProgService.ChipDict[ChipSettingView.SelectedChip].MTP.Offset);
+            WriteConfigContent = new(NuProgService.ChipDict[ChipSettingView.SelectedChip].Config.Offset);
+            WriteTrimContent = new(NuProgService.ChipDict[ChipSettingView.SelectedChip].Trim.Offset);
+            ReadFwContent = new(NuProgService.ChipDict[ChipSettingView.SelectedChip].MTP.Offset);
+            ReadConfigContent = new(NuProgService.ChipDict[ChipSettingView.SelectedChip].Config.Offset);
+            ReadTrimContent = new(NuProgService.ChipDict[ChipSettingView.SelectedChip].Trim.Offset);
             ProgressView = new();
             WriteZoneList = new() {
                 new("Firmware", 0x01), new("Config", 0x02), new("Firmware + Config", 0x03), new("Trim", 0x04)

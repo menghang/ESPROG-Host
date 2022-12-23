@@ -1,6 +1,5 @@
 ﻿using ESPROG.Models;
 using ESPROG.Utils;
-using ESPROG.Views;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -9,6 +8,12 @@ namespace ESPROG.Services
 {
     class NuProgService
     {
+        public static readonly Dictionary<uint, NuChipModel> ChipDict = new()
+        {
+            { 0x1708, new(0x1708, new() { 0x50, 0x51, 0x52, 0x53 }, new(0x00000000, 32 * 1024), new(0x00008000, 1 * 512), new(0x00008200, 3 * 512)) },
+            { 0x1718, new(0x1718, new() { 0x70, 0x71, 0x72, 0x73 }, new(0x00000000, 64 * 1024), new(0x00010000, 1 * 128), new(0x00010080, 1 * 128)) }
+        };
+
         private readonly LogService log;
         private readonly UartService uart;
         private readonly Queue<UartCmdModel> cmdQueue;
@@ -22,20 +27,24 @@ namespace ESPROG.Services
 
         private const uint esprogFwBlockSize = 512;
 
-        public const long MTPAddrOffset = 0x00000000;
-        public const long CFGAddrOffset = 0x00020200;
-        public const long TrimAddrOffset = 0x00020000;
-
         public const byte MtpZoneMask = 0x01;
         public const byte CfgZoneMask = 0x02;
         public const byte TrimZoneMask = 0x04;
 
-        public NuProgService(LogService logService, UartService uartService)
+        private uint chip;
+
+        public NuProgService(LogService logService, UartService uartService, uint chip)
         {
             log = logService;
             uart = uartService;
             cmdQueue = new Queue<UartCmdModel>();
             uart.CmdReceived += Uart_CmdReceived;
+            this.chip = chip;
+        }
+
+        public void SetChipModel(uint chip)
+        {
+            this.chip = chip;
         }
 
         private void Uart_CmdReceived(object sender, UartService.UartCmdReceivedEventArgs e)
@@ -113,7 +122,7 @@ namespace ESPROG.Services
                 {
                     return null;
                 }
-                if (HexUtil.GetByteFromStr(recvCmd.Val[0]) != successVal) // heart beat cmd
+                if (HexUtil.GetU8FromStr(recvCmd.Val[0]) != successVal) // heart beat cmd
                 {
                     start = DateTime.Now;
                     continue;
@@ -155,7 +164,7 @@ namespace ESPROG.Services
             {
                 return null;
             }
-            return HexUtil.GetByteFromStr(recvCmd.Val[0]);
+            return HexUtil.GetU8FromStr(recvCmd.Val[0]);
         }
 
         public async Task<bool> WriteReg(byte regAddr, byte regVal)
@@ -175,8 +184,8 @@ namespace ESPROG.Services
             {
                 return null;
             }
-            byte? pn = HexUtil.GetByteFromStr(recvCmd.Val[0]);
-            byte? version = HexUtil.GetByteFromStr(recvCmd.Val[1]);
+            byte? pn = HexUtil.GetU8FromStr(recvCmd.Val[0]);
+            byte? version = HexUtil.GetU8FromStr(recvCmd.Val[1]);
             return pn == null || version == null ? null : ((byte pn, byte version)?)(pn, version);
         }
 
@@ -189,7 +198,7 @@ namespace ESPROG.Services
             {
                 return null;
             }
-            return HexUtil.GetUIntFromStr(recvCmd.Val[0]);
+            return HexUtil.GetU32FromStr(recvCmd.Val[0]);
 
         }
 
@@ -210,7 +219,7 @@ namespace ESPROG.Services
             {
                 return null;
             }
-            return HexUtil.GetByteFromStr(recvCmd.Val[0]);
+            return HexUtil.GetU8FromStr(recvCmd.Val[0]);
         }
 
         public async Task<bool> SetChip(uint chip)
@@ -230,7 +239,7 @@ namespace ESPROG.Services
             {
                 return null;
             }
-            return HexUtil.GetUIntFromStr(recvCmd.Val[0]);
+            return HexUtil.GetU32FromStr(recvCmd.Val[0]);
         }
 
         public async Task<bool> FwWriteBuf(uint fwAddr, byte[] fwData)
@@ -242,7 +251,7 @@ namespace ESPROG.Services
             {
                 return false;
             }
-            return HexUtil.GetUIntFromStr(recvCmd.Val[0]) == fwAddr;
+            return HexUtil.GetU32FromStr(recvCmd.Val[0]) == fwAddr;
         }
 
         public async Task<byte[]?> FwReadBuf(uint fwAddr)
@@ -254,8 +263,8 @@ namespace ESPROG.Services
             {
                 return null;
             }
-            uint? fwAddrRead = HexUtil.GetUIntFromStr(recvCmd.Val[0]);
-            uint? checksum = HexUtil.GetUIntFromStr(recvCmd.Val[1]);
+            uint? fwAddrRead = HexUtil.GetU32FromStr(recvCmd.Val[0]);
+            uint? checksum = HexUtil.GetU32FromStr(recvCmd.Val[1]);
             byte[]? fwData = HexUtil.GetBytesFromBase64Str(recvCmd.Val[2]);
             if (fwAddrRead != fwAddr || checksum == null || fwData == null)
             {
@@ -297,27 +306,27 @@ namespace ESPROG.Services
             return recvCmd != null;
         }
 
-        public async Task<bool> WriteFwToEsprog(byte zone, byte[] fwData, long fwSize)
+        public async Task<bool> WriteFwToEsprog(byte zone, byte[] fwData, uint fwSize)
         {
             byte[] fwBuffer = new byte[esprogFwBlockSize];
             uint fwAddrOffset;
-            long maxSize;
+            uint maxSize;
             string zoneName;
             switch (zone)
             {
                 case MtpZoneMask:
-                    fwAddrOffset = (uint)MTPAddrOffset;
-                    maxSize = ChipSettingVM.MaxFwSize;
+                    fwAddrOffset = ChipDict[chip].MTP.Offset;
+                    maxSize = ChipDict[chip].MTP.Size;
                     zoneName = "firmware";
                     break;
                 case CfgZoneMask:
-                    fwAddrOffset = (uint)CFGAddrOffset;
-                    maxSize = ChipSettingVM.MaxConfigSize;
+                    fwAddrOffset = ChipDict[chip].Config.Offset;
+                    maxSize = ChipDict[chip].Config.Size;
                     zoneName = "config";
                     break;
                 case TrimZoneMask:
-                    fwAddrOffset = (uint)TrimAddrOffset;
-                    maxSize = ChipSettingVM.MaxTrimSize;
+                    fwAddrOffset = ChipDict[chip].Trim.Offset;
+                    maxSize = ChipDict[chip].Trim.Size;
                     zoneName = "trim";
                     break;
                 default:
@@ -353,30 +362,30 @@ namespace ESPROG.Services
         {
             Array.Clear(fwData);
             uint fwAddrOffset;
-            long maxSize;
+            uint maxSize;
             string zoneName;
             switch (zone)
             {
                 case MtpZoneMask:
-                    fwAddrOffset = (uint)MTPAddrOffset;
-                    maxSize = ChipSettingVM.MaxFwSize;
+                    fwAddrOffset = ChipDict[chip].MTP.Offset;
+                    maxSize = ChipDict[chip].MTP.Size;
                     zoneName = "firmware";
                     break;
                 case CfgZoneMask:
-                    fwAddrOffset = (uint)CFGAddrOffset;
-                    maxSize = ChipSettingVM.MaxConfigSize;
+                    fwAddrOffset = ChipDict[chip].Config.Offset;
+                    maxSize = ChipDict[chip].Config.Size;
                     zoneName = "config";
                     break;
                 case TrimZoneMask:
-                    fwAddrOffset = (uint)TrimAddrOffset;
-                    maxSize = ChipSettingVM.MaxTrimSize;
+                    fwAddrOffset = ChipDict[chip].Trim.Offset;
+                    maxSize = ChipDict[chip].Trim.Size;
                     zoneName = "trim";
                     break;
                 default:
                     log.Error(string.Format("Wrong zone value ({0})", zone));
                     return false;
             }
-            long fwAddr = 0;
+            uint fwAddr = 0;
             while (true)
             {
                 byte[]? fwBuffer = await FwReadBuf((uint)(fwAddr + fwAddrOffset));
@@ -388,7 +397,7 @@ namespace ESPROG.Services
                 if (fwAddr + fwBuffer.LongLength < maxSize)
                 {
                     Array.Copy(fwBuffer, 0, fwData, fwAddr, fwBuffer.LongLength);
-                    fwAddr += fwBuffer.LongLength;
+                    fwAddr += (uint)fwBuffer.LongLength;
                     continue;
                 }
                 else if (fwAddr + fwBuffer.LongLength == maxSize)
@@ -423,7 +432,7 @@ namespace ESPROG.Services
             {
                 return null;
             }
-            return HexUtil.GetByteFromStr(recvCmd.Val[0]);
+            return HexUtil.GetU8FromStr(recvCmd.Val[0]);
         }
 
         public async Task<bool> SetChipAndAddr(uint chip, byte devAddr)
@@ -441,7 +450,7 @@ namespace ESPROG.Services
             return true;
         }
 
-        public async Task<bool> FwWriteChecksum(byte zone, byte[] fwData, long size)
+        public async Task<bool> FwWriteChecksum(byte zone, byte[] fwData, uint size)
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdFwWriteChecksum);
             sendCmd.AddVal(zone).AddVal(HexUtil.GetChecksum(fwData, size));
@@ -458,7 +467,7 @@ namespace ESPROG.Services
             {
                 return null;
             }
-            return HexUtil.GetUIntFromStr(recvCmd.Val[1]);
+            return HexUtil.GetU32FromStr(recvCmd.Val[1]);
         }
 
         public async Task<bool> SetProgZone(byte zone)
@@ -478,7 +487,7 @@ namespace ESPROG.Services
             {
                 return null;
             }
-            return HexUtil.GetByteFromStr(recvCmd.Val[0]);
+            return HexUtil.GetU8FromStr(recvCmd.Val[0]);
         }
     }
 }

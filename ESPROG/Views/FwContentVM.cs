@@ -20,31 +20,31 @@ namespace ESPROG.Views
             get => HexUtil.GetHexStr(checksum);
         }
 
-        private long size;
-        public long Size
+        private uint size;
+        public uint Size
         {
             get => size;
-            set => size = value <= FwData.LongLength ? value : FwData.LongLength;
+            set => size = value <= FwData.LongLength ? value : (uint)FwData.LongLength;
         }
         public string SizeText
         {
             get => Convert.ToString(size);
         }
 
-        public long MaxSize { get; set; }
+        public uint MaxSize { get; set; }
 
         public byte[] FwData { get; private set; }
 
         public bool FwAvailable { get; set; }
 
-        public long FwAddrOffset { get; private set; }
+        public uint FwAddrOffset { get; private set; }
 
         public void UpdateDisplay()
         {
             if (FwAvailable)
             {
                 StringBuilder sb = new();
-                for (long line = 0; line < size; line += 16)
+                for (uint line = 0; line < size; line += 16)
                 {
                     sb.Append(HexUtil.GetHexStr(line + FwAddrOffset)).Append(' ');
                     for (int ii = 0; (ii < 16) && (line + ii < size); ii++)
@@ -82,7 +82,7 @@ namespace ESPROG.Views
                         {
                             if (bs.Length > 0 && bs.Length <= MaxSize && bs.Length <= FwData.LongLength)
                             {
-                                size = bs.Length;
+                                size = (uint)bs.Length;
                                 Array.Clear(FwData);
                                 byte[] buf = new byte[readBufferSize];
                                 int readBytes = 0;
@@ -156,7 +156,7 @@ namespace ESPROG.Views
             return (res, log);
         }
 
-        public FwContentVM(long fwAddrOffset)
+        public FwContentVM(uint fwAddrOffset)
         {
             ContentText = string.Empty;
             checksum = 0;

@@ -1,4 +1,5 @@
 ﻿using ESPROG.Models;
+using ESPROG.Services;
 using System;
 using System.Collections.Generic;
 
@@ -6,22 +7,6 @@ namespace ESPROG.Views
 {
     class ChipSettingVM : BaseViewModel
     {
-        public static readonly Dictionary<uint, List<ComboBoxModel<string, byte>>> ChipDict = new()
-        {
-            { 0x1708, new(){ new("0x50", 0x50), new("0x51", 0x51), new("0x52", 0x52), new("0x53", 0x53) } },
-            { 0x1718, new(){ new("0x70", 0x70), new("0x71", 0x71), new("0x72", 0x72), new("0x73", 0x73) } }
-        };
-
-        public static readonly Dictionary<uint, (long mtp, long cfg, long trim)> ChipSizeDict = new()
-        {
-            { 0x1708, (32 * 1024, 3 * 512, 1 * 512) },
-            { 0x1718, (64 * 1024, 3 * 512, 1 * 512) }
-        };
-
-        public static long MaxFwSize = ChipSizeDict[0x1708].mtp;
-        public static long MaxConfigSize = ChipSizeDict[0x1708].cfg;
-        public static long MaxTrimSize = ChipSizeDict[0x1708].trim;
-
         public List<ComboBoxModel<string, uint>> ChipList { get; private set; }
 
         private uint selectedChip;
@@ -31,13 +16,9 @@ namespace ESPROG.Views
             set
             {
                 SetProperty(ref selectedChip, value);
-                ChipAddrList = ChipDict[selectedChip];
+                ChipAddrList = NuProgService.ChipDict[selectedChip].Addrs;
                 SelectedChipAddr = chipAddrList[1].Value;
-
-                MaxFwSize = ChipSizeDict[value].mtp;
-                MaxConfigSize = ChipSizeDict[value].cfg;
-                MaxTrimSize = ChipSizeDict[value].trim;
-                SelectedChipChanged?.Invoke(this, new ChipChangedEventArgs(MaxFwSize, MaxConfigSize, MaxTrimSize));
+                SelectedChipChanged?.Invoke(this, new ChipChangedEventArgs(value));
             }
         }
 
@@ -45,17 +26,11 @@ namespace ESPROG.Views
         public event SelectedChipChangedHandler? SelectedChipChanged;
         public class ChipChangedEventArgs : EventArgs
         {
-            public long FwSize { get; private set; }
+            public uint Chip { get; private set; }
 
-            public long CfgSize { get; private set; }
-
-            public long TrimSize { get; private set; }
-
-            public ChipChangedEventArgs(long fw, long cfg, long trim)
+            public ChipChangedEventArgs(uint chip)
             {
-                FwSize = fw;
-                CfgSize = cfg;
-                TrimSize = trim;
+                Chip = chip;
             }
         }
 
@@ -105,12 +80,12 @@ namespace ESPROG.Views
         public ChipSettingVM()
         {
             ChipList = new();
-            foreach (uint chip in ChipDict.Keys)
+            foreach (uint chip in NuProgService.ChipDict.Keys)
             {
-                ChipList.Add(new("NU" + Convert.ToString(chip, 16), chip));
+                ChipList.Add(NuProgService.ChipDict[chip].Name);
             }
             selectedChip = 0x1708;
-            chipAddrList = ChipDict[selectedChip];
+            chipAddrList = NuProgService.ChipDict[selectedChip].Addrs;
             selectedChipAddr = ChipAddrList[1].Value;
             chipInfo = string.Empty;
             isPortConnected = false;

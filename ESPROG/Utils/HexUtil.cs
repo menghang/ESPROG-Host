@@ -6,13 +6,13 @@ namespace ESPROG.Utils
 {
     class HexUtil
     {
-        public static string GetHexStr(long val)
-        {
-            return "0x" + Convert.ToString(val, 16).PadLeft(8, '0');
-        }
         public static string GetHexStr(uint val)
         {
             return "0x" + Convert.ToString(val, 16).PadLeft(8, '0');
+        }
+        public static string GetHexStr(ushort val)
+        {
+            return "0x" + Convert.ToString(val, 16).PadLeft(4, '0');
         }
 
         public static string GetHexStr(byte val)
@@ -20,7 +20,7 @@ namespace ESPROG.Utils
             return "0x" + Convert.ToString(val, 16).PadLeft(2, '0');
         }
 
-        public static uint? GetUIntFromStr(string hex)
+        public static uint? GetU32FromStr(string hex)
         {
             uint val;
             if (hex.StartsWith("0x"))
@@ -33,7 +33,7 @@ namespace ESPROG.Utils
             }
         }
 
-        public static byte? GetByteFromStr(string hex)
+        public static byte? GetU8FromStr(string hex)
         {
             byte val;
             if (hex.StartsWith("0x"))
