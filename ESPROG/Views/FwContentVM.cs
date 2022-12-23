@@ -37,7 +37,7 @@ namespace ESPROG.Views
 
         public bool FwAvailable { get; set; }
 
-        public long FwAddrStart { get; private set; }
+        public long FwAddrOffset { get; private set; }
 
         public void UpdateDisplay()
         {
@@ -46,7 +46,7 @@ namespace ESPROG.Views
                 StringBuilder sb = new();
                 for (long line = 0; line < size; line += 16)
                 {
-                    sb.Append(HexUtil.GetHexStr(line + FwAddrStart)).Append(' ');
+                    sb.Append(HexUtil.GetHexStr(line + FwAddrOffset)).Append(' ');
                     for (int ii = 0; (ii < 16) && (line + ii < size); ii++)
                     {
                         sb.Append(' ').Append(Convert.ToString(FwData[line + ii], 16).PadLeft(2, '0'));
@@ -156,14 +156,14 @@ namespace ESPROG.Views
             return (res, log);
         }
 
-        public FwContentVM(long fwAddrStart)
+        public FwContentVM(long fwAddrOffset)
         {
             ContentText = string.Empty;
             checksum = 0;
             size = 0;
             FwAvailable = false;
             FwData = new byte[128 * 1024];
-            FwAddrStart = fwAddrStart;
+            FwAddrOffset = fwAddrOffset;
         }
     }
 }

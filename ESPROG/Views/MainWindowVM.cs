@@ -116,12 +116,12 @@ namespace ESPROG.Views
             sendCmd = string.Empty;
             EsprogSettingView = new();
             ChipSettingView = new();
-            WriteFwContent = new(NuProgService.MTPAddrStart);
-            WriteConfigContent = new(NuProgService.CFGAddrStart);
-            WriteTrimContent = new(NuProgService.TrimAddrStart);
-            ReadFwContent = new(NuProgService.MTPAddrStart);
-            ReadConfigContent = new(NuProgService.CFGAddrStart);
-            ReadTrimContent = new(NuProgService.TrimAddrStart);
+            WriteFwContent = new(NuProgService.MTPAddrOffset);
+            WriteConfigContent = new(NuProgService.CFGAddrOffset);
+            WriteTrimContent = new(NuProgService.TrimAddrOffset);
+            ReadFwContent = new(NuProgService.MTPAddrOffset);
+            ReadConfigContent = new(NuProgService.CFGAddrOffset);
+            ReadTrimContent = new(NuProgService.TrimAddrOffset);
             ProgressView = new();
             WriteZoneList = new() {
                 new("Firmware", 0x01), new("Config", 0x02), new("Firmware + Config", 0x03), new("Trim", 0x04)

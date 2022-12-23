@@ -22,9 +22,9 @@ namespace ESPROG.Services
 
         private const uint esprogFwBlockSize = 512;
 
-        public const long MTPAddrStart = 0x00000000;
-        public const long CFGAddrStart = 0x00020200;
-        public const long TrimAddrStart = 0x00020000;
+        public const long MTPAddrOffset = 0x00000000;
+        public const long CFGAddrOffset = 0x00020200;
+        public const long TrimAddrOffset = 0x00020000;
 
         public const byte MtpZoneMask = 0x01;
         public const byte CfgZoneMask = 0x02;
@@ -300,23 +300,23 @@ namespace ESPROG.Services
         public async Task<bool> WriteFwToEsprog(byte zone, byte[] fwData, long fwSize)
         {
             byte[] fwBuffer = new byte[esprogFwBlockSize];
-            uint fwAddrStart;
+            uint fwAddrOffset;
             long maxSize;
             string zoneName;
             switch (zone)
             {
                 case MtpZoneMask:
-                    fwAddrStart = (uint)MTPAddrStart;
+                    fwAddrOffset = (uint)MTPAddrOffset;
                     maxSize = ChipSettingVM.MaxFwSize;
                     zoneName = "firmware";
                     break;
                 case CfgZoneMask:
-                    fwAddrStart = (uint)CFGAddrStart;
+                    fwAddrOffset = (uint)CFGAddrOffset;
                     maxSize = ChipSettingVM.MaxConfigSize;
                     zoneName = "config";
                     break;
                 case TrimZoneMask:
-                    fwAddrStart = (uint)TrimAddrStart;
+                    fwAddrOffset = (uint)TrimAddrOffset;
                     maxSize = ChipSettingVM.MaxTrimSize;
                     zoneName = "trim";
                     break;
@@ -339,7 +339,7 @@ namespace ESPROG.Services
                 {
                     Array.Clear(fwBuffer);
                 }
-                if (!await FwWriteBuf(fwAddr + fwAddrStart, fwBuffer))
+                if (!await FwWriteBuf(fwAddr + fwAddrOffset, fwBuffer))
                 {
                     log.Error(string.Format("Write {0} zone to ESPROG fail at addr ({1})", zoneName, fwAddr));
                     return false;
@@ -352,23 +352,23 @@ namespace ESPROG.Services
         public async Task<bool> ReadFwFromEsprog(byte zone, byte[] fwData)
         {
             Array.Clear(fwData);
-            uint fwAddrStart;
+            uint fwAddrOffset;
             long maxSize;
             string zoneName;
             switch (zone)
             {
                 case MtpZoneMask:
-                    fwAddrStart = (uint)MTPAddrStart;
+                    fwAddrOffset = (uint)MTPAddrOffset;
                     maxSize = ChipSettingVM.MaxFwSize;
                     zoneName = "firmware";
                     break;
                 case CfgZoneMask:
-                    fwAddrStart = (uint)CFGAddrStart;
+                    fwAddrOffset = (uint)CFGAddrOffset;
                     maxSize = ChipSettingVM.MaxConfigSize;
                     zoneName = "config";
                     break;
                 case TrimZoneMask:
-                    fwAddrStart = (uint)TrimAddrStart;
+                    fwAddrOffset = (uint)TrimAddrOffset;
                     maxSize = ChipSettingVM.MaxTrimSize;
                     zoneName = "trim";
                     break;
@@ -379,7 +379,7 @@ namespace ESPROG.Services
             long fwAddr = 0;
             while (true)
             {
-                byte[]? fwBuffer = await FwReadBuf((uint)(fwAddr + fwAddrStart));
+                byte[]? fwBuffer = await FwReadBuf((uint)(fwAddr + fwAddrOffset));
                 if (fwBuffer == null)
                 {
                     log.Error(string.Format("Read {0} zone from ESPROG fail at addr ({1})", zoneName, fwAddr));
