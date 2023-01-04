@@ -76,31 +76,27 @@ namespace ESPROG.Views
             {
                 if (File.Exists(file))
                 {
-                    using (FileStream fs = new(file, FileMode.Open))
+                    using FileStream fs = new(file, FileMode.Open);
+                    using BufferedStream bs = new(fs);
+                    if (bs.Length > 0 && bs.Length <= MaxSize && bs.Length <= FwData.LongLength)
                     {
-                        using (BufferedStream bs = new(fs))
+                        size = (uint)bs.Length;
+                        Array.Clear(FwData);
+                        byte[] buf = new byte[readBufferSize];
+                        int readBytes = 0;
+                        long pos = 0;
+                        while ((readBytes = await bs.ReadAsync(buf, 0, readBufferSize)) > 0)
                         {
-                            if (bs.Length > 0 && bs.Length <= MaxSize && bs.Length <= FwData.LongLength)
-                            {
-                                size = (uint)bs.Length;
-                                Array.Clear(FwData);
-                                byte[] buf = new byte[readBufferSize];
-                                int readBytes = 0;
-                                long pos = 0;
-                                while ((readBytes = await bs.ReadAsync(buf, 0, readBufferSize)) > 0)
-                                {
-                                    Array.Copy(buf, 0, FwData, pos, readBytes);
-                                    pos += readBytes;
-                                }
-                                log = "file load succeed";
-                                FwAvailable = true;
-                            }
-                            else
-                            {
-                                log = string.Format("size ({0}) does not fit limit ({1})",
-                                    bs.Length, MaxSize);
-                            }
+                            Array.Copy(buf, 0, FwData, pos, readBytes);
+                            pos += readBytes;
                         }
+                        log = "file load succeed";
+                        FwAvailable = true;
+                    }
+                    else
+                    {
+                        log = string.Format("size ({0}) does not fit limit ({1})",
+                            bs.Length, MaxSize);
                     }
                 }
                 else
@@ -125,24 +121,20 @@ namespace ESPROG.Views
             {
                 if (FwAvailable)
                 {
-                    using (FileStream fs = new(file, FileMode.Create))
+                    using FileStream fs = new(file, FileMode.Create);
+                    using BufferedStream bs = new(fs);
+                    byte[] buf = new byte[writeBufferSize];
+                    long pos = 0;
+                    while (pos < size)
                     {
-                        using (BufferedStream bs = new(fs))
-                        {
-                            byte[] buf = new byte[writeBufferSize];
-                            long pos = 0;
-                            while (pos < size)
-                            {
-                                long bufLength = size - pos < writeBufferSize ? size - pos : writeBufferSize;
-                                Array.Copy(FwData, pos, buf, 0, bufLength);
-                                await bs.WriteAsync(buf, 0, (int)bufLength);
-                                pos += bufLength;
-                            }
-                            bs.Flush();
-                            log = "data save succeed";
-                            res = true;
-                        }
+                        long bufLength = size - pos < writeBufferSize ? size - pos : writeBufferSize;
+                        Array.Copy(FwData, pos, buf, 0, bufLength);
+                        await bs.WriteAsync(buf, 0, (int)bufLength);
+                        pos += bufLength;
                     }
+                    bs.Flush();
+                    log = "data save succeed";
+                    res = true;
                 }
                 else
                 {
