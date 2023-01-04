@@ -34,7 +34,8 @@
                 Header="Help"
                 Width="40">
                 <MenuItem
-                    Header="About" />
+                    Header="About"
+                    Click="MenuItemAbout_Click" />
             </MenuItem>
         </Menu>
         <Grid

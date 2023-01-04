@@ -4,6 +4,7 @@ using ESPROG.Utils;
 using ESPROG.Views;
 using Microsoft.Win32;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -652,6 +653,14 @@ namespace ESPROG
                     log.Error("Trim" + logMsg);
                 }
             }
+        }
+
+        private void MenuItemAbout_Click(object sender, RoutedEventArgs e)
+        {
+            AboutWindow dialog = new();
+            string? version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
+            dialog.SetVersion(version == null ? "missing" : version);
+            dialog.ShowDialog();
         }
 
         private delegate Task<bool> SubTaskHandler();
