@@ -25,8 +25,6 @@ namespace ESPROG.Services
         private const int longCheckInterval = 100;
         private const int longCheckTimeout = 2000;
 
-        private const uint esprogFwBlockSize = 512;
-
         public const byte MtpZoneMask = 0x01;
         public const byte CfgZoneMask = 0x02;
         public const byte TrimZoneMask = 0x04;
@@ -308,7 +306,6 @@ namespace ESPROG.Services
 
         public async Task<bool> WriteFwToEsprog(byte zone, byte[] fwData, uint fwSize)
         {
-            byte[] fwBuffer = new byte[esprogFwBlockSize];
             uint fwAddrOffset;
             uint maxSize;
             string zoneName;
@@ -333,6 +330,8 @@ namespace ESPROG.Services
                     log.Error(string.Format("Wrong zone value ({0})", zone));
                     return false;
             }
+            uint esprogFwBlockSize = maxSize >= 512 ? 512 : maxSize;
+            byte[] fwBuffer = new byte[esprogFwBlockSize];
             for (uint fwAddr = 0; fwAddr < maxSize; fwAddr += esprogFwBlockSize)
             {
                 if (fwAddr + esprogFwBlockSize < fwSize)
