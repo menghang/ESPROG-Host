@@ -249,9 +249,9 @@
             <TabItem
                 Header="Write FW">
                 <Grid>
-                    <DockPanel
-                        IsEnabled="{Binding IsIdle}">
+                    <DockPanel>
                         <StackPanel
+                            IsEnabled="{Binding IsIdle}"
                             DockPanel.Dock="Top">
                             <DockPanel
                                 Margin="3">
@@ -462,9 +462,9 @@
             <TabItem
                 Header="Read FW">
                 <Grid>
-                    <DockPanel
-                        IsEnabled="{Binding IsIdle}">
+                    <DockPanel>
                         <StackPanel
+                            IsEnabled="{Binding IsIdle}"
                             DockPanel.Dock="Top">
                             <DockPanel
                                 Margin="3">
