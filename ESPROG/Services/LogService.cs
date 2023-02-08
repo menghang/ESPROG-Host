@@ -12,7 +12,9 @@ namespace ESPROG.Services
         {
             ui = textbox;
             Log.Logger = new LoggerConfiguration()
+#if DEBUG
                 .WriteTo.Debug(outputTemplate: "{Message}")
+#endif
                 .WriteTo.Async(a => a.File("logs\\log.log", rollingInterval: RollingInterval.Day, outputTemplate: "{Message}"))
                 .MinimumLevel.Debug()
                 .CreateLogger();
