@@ -19,7 +19,6 @@ namespace ESPROG.Models
         public const string CmdFlashFormat = "FlashFormat";
         public const string CmdGetAppVersion = "GetInfo";
         public const string CmdGetChipInfo = "GetChipInfo";
-        public const string CmdGetChipUID = "GetChipUID";
         public const string CmdGetAppCompileTime = "GetAppCompileTime";
         public const string CmdFwWriteChecksum = "FwWriteChecksum";
         public const string CmdFwReadChecksum = "FwReadChecksum";

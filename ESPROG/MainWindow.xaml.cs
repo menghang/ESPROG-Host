@@ -222,20 +222,14 @@ namespace ESPROG
             {
                 return null;
             }
-            (byte chipPn, byte chipVersion)? chipInfo = await nuprog.GetChipInfo();
+            (byte chipPn, byte chipVersion, uint chipUID)? chipInfo = await nuprog.GetChipInfo();
             if (chipInfo == null)
             {
                 log.Error(string.Format("Get chip info fail"));
                 return null;
             }
-            uint? chipUID = await nuprog.GetChipUID();
-            if (chipUID == null)
-            {
-                log.Error(string.Format("Get chip uid fail"));
-                return null;
-            }
             return string.Format("PN:{0}, VER:{1}, UID:{2}", HexUtil.GetHexStr(chipInfo.Value.chipPn),
-                HexUtil.GetHexStr(chipInfo.Value.chipVersion), HexUtil.GetHexStr(chipUID.Value));
+                HexUtil.GetHexStr(chipInfo.Value.chipVersion), HexUtil.GetHexStr(chipInfo.Value.chipUID));
         }
 
         private async void ButtonGetChipInfo_Click(object sender, RoutedEventArgs e)

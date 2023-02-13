@@ -173,31 +173,26 @@ namespace ESPROG.Services
             return recvCmd != null;
         }
 
-        public async Task<(byte pn, byte version)?> GetChipInfo()
+        public async Task<(byte pn, byte version, uint uid)?> GetChipInfo()
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdGetChipInfo);
             sendCmd.AddVal(true);
             UartCmdModel? recvCmd = await SendCmdSlowRspAsync(sendCmd);
-            if (recvCmd == null || recvCmd.ValCount != 2)
+            if (recvCmd == null || recvCmd.ValCount != 3)
             {
                 return null;
             }
             byte? pn = HexUtil.GetU8FromStr(recvCmd.Val[0]);
             byte? version = HexUtil.GetU8FromStr(recvCmd.Val[1]);
-            return pn == null || version == null ? null : ((byte pn, byte version)?)(pn, version);
-        }
-
-        public async Task<uint?> GetChipUID()
-        {
-            UartCmdModel sendCmd = new(UartCmdModel.CmdGetChipUID);
-            sendCmd.AddVal(true);
-            UartCmdModel? recvCmd = await SendCmdSlowRspAsync(sendCmd);
-            if (recvCmd == null || recvCmd.ValCount != 1)
+            uint? uid = HexUtil.GetU32FromStr(recvCmd.Val[2]);
+            if (pn == null || version == null || uid == null)
             {
                 return null;
             }
-            return HexUtil.GetU32FromStr(recvCmd.Val[0]);
-
+            else
+            {
+                return (pn.Value, version.Value, uid.Value);
+            }
         }
 
         public async Task<bool> SetDevAddr(byte devAddr)
