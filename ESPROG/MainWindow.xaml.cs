@@ -269,13 +269,16 @@ namespace ESPROG
             {
                 foreach (ComboBoxModel<string, byte> devAddr in NuProgService.ChipDict[chip].Addrs)
                 {
-                    string? chipInfo = await GetChipInfo(chip, devAddr.Value);
-                    if (chipInfo != null)
+                    if (await nuprog.DetectChip(devAddr.Value))
                     {
-                        view.ChipSettingView.SelectedChip = chip;
-                        view.ChipSettingView.SelectedChipAddr = devAddr.Value;
-                        view.ChipSettingView.ChipInfo = chipInfo;
-                        return true;
+                        string? chipInfo = await GetChipInfo(chip, devAddr.Value);
+                        if (chipInfo != null)
+                        {
+                            view.ChipSettingView.SelectedChip = chip;
+                            view.ChipSettingView.SelectedChipAddr = devAddr.Value;
+                            view.ChipSettingView.ChipInfo = chipInfo;
+                            return true;
+                        }
                     }
                 }
             }

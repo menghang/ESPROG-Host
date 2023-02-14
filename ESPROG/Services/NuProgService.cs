@@ -235,6 +235,14 @@ namespace ESPROG.Services
             return HexUtil.GetU32FromStr(recvCmd.Val[0]);
         }
 
+        public async Task<bool> DetectChip(byte devAddr)
+        {
+            UartCmdModel sendCmd = new(UartCmdModel.CmdDetectChip);
+            sendCmd.AddVal(devAddr);
+            UartCmdModel? recvCmd = await SendCmdSlowRspAsync(sendCmd);
+            return recvCmd != null;
+        }
+
         public async Task<bool> FwWriteBuf(uint fwAddr, byte[] fwData)
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdFwWriteBuf);
