@@ -12,7 +12,8 @@
     Width="400"
     MinWidth="400"
     FontSize="10"
-    Loaded="MainWindow_Loaded">
+    Loaded="MainWindow_Loaded"
+    Closing="Window_Closing">
     <DockPanel>
         <Menu
             DockPanel.Dock="Top">

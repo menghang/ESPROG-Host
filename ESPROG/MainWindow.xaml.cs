@@ -55,6 +55,12 @@ namespace ESPROG
 
             view.ChipSettingView.SelectedChipChanged += ChipSettingView_SelectedChipChanged;
             view.ChipSettingView.SelectedChip = 0x1708;
+
+            ConfigModel config = new();
+            if (config.LoadConfig())
+            {
+                view.LoadConfig(config);
+            }
         }
 
         private void ChipSettingView_SelectedChipChanged(object sender, ChipSettingVM.ChipChangedEventArgs e)
@@ -658,6 +664,11 @@ namespace ESPROG
             string? version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
             dialog.SetVersion(version == null ? "missing" : version);
             dialog.ShowDialog();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            view.ExportConfig().SaveConfig();
         }
 
         private delegate Task<bool> SubTaskHandler();

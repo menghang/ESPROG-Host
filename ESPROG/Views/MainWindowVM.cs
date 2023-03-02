@@ -130,5 +130,29 @@ namespace ESPROG.Views
             ReadZoneList = new() { new("Firmware", 0x01), new("Config", 0x02), new("Trim", 0x04) };
             selectedReadZone = WriteZoneList[0].Value;
         }
+
+        public void LoadConfig(ConfigModel? config)
+        {
+            if (config == null)
+            {
+                return;
+            }
+            ChipSettingView.SelectedChip = config.Chip.Chip;
+            ChipSettingView.SelectedChipAddr = config.Chip.DevAddr;
+            FwFile = config.FwWrite.FwFileWrite;
+            ConfigFile = config.FwWrite.ConfigFileWrite;
+            TrimFile = config.FwWrite.TrimFileWrite;
+        }
+
+        public ConfigModel ExportConfig()
+        {
+            ConfigModel config = new();
+            config.Chip.Chip = ChipSettingView.SelectedChip;
+            config.Chip.DevAddr = ChipSettingView.SelectedChipAddr;
+            config.FwWrite.FwFileWrite = FwFile;
+            config.FwWrite.ConfigFileWrite = ConfigFile;
+            config.FwWrite.TrimFileWrite = TrimFile;
+            return config;
+        }
     }
 }
