@@ -18,12 +18,12 @@ namespace ESPROG.Services
         private readonly UartService uart;
         private readonly Queue<UartCmdModel> cmdQueue;
 
-        private const int shortCheckInterval = 20;
+        private const int shortCheckInterval = 10;
         private const int shortCheckTimeout = 500;
         private const int midCheckInterval = 50;
         private const int midCheckTimeout = 1000;
         private const int longCheckInterval = 100;
-        private const int longCheckTimeout = 2000;
+        private const int longCheckTimeout = 2500;
 
         public const byte MtpZoneMask = 0x01;
         public const byte CfgZoneMask = 0x02;
