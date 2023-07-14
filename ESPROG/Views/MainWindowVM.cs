@@ -1,6 +1,7 @@
 ﻿using ESPROG.Models;
 using ESPROG.Services;
 using ESPROG.Utils;
+using System;
 using System.Collections.Generic;
 
 namespace ESPROG.Views
@@ -57,6 +58,18 @@ namespace ESPROG.Views
         {
             get => regAddr.HasValue ? HexUtil.GetHexStr(regAddr.Value) : string.Empty;
             set => SetProperty(ref regAddr, HexUtil.GetU8FromStr(value));
+        }
+
+        private ushort? regAddr16;
+        public ushort? RegAddr16
+        {
+            get => regAddr16;
+            set => SetProperty(ref regAddr16, value, nameof(RegAddr16Text));
+        }
+        public string RegAddr16Text
+        {
+            get => regAddr16.HasValue ? HexUtil.GetHexStr(regAddr16.Value) : string.Empty;
+            set => SetProperty(ref regAddr16, HexUtil.GetU16FromStr(value));
         }
 
         private byte? regVal;

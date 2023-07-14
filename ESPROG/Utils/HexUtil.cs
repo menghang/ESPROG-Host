@@ -33,6 +33,19 @@ namespace ESPROG.Utils
             }
         }
 
+        public static ushort? GetU16FromStr(string hex)
+        {
+            ushort val;
+            if (hex.StartsWith("0x"))
+            {
+                return ushort.TryParse(hex[2..], NumberStyles.HexNumber, null, out val) ? val : null;
+            }
+            else
+            {
+                return ushort.TryParse(hex, out val) ? val : null;
+            }
+        }
+
         public static byte? GetU8FromStr(string hex)
         {
             byte val;

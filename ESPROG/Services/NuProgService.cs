@@ -176,6 +176,26 @@ namespace ESPROG.Services
             return recvCmd != null;
         }
 
+        public async Task<byte?> ReadRegAddr16(ushort regAddr)
+        {
+            UartCmdModel sendCmd = new(UartCmdModel.CmdReadRegAddr16);
+            sendCmd.AddVal(regAddr);
+            UartCmdModel? recvCmd = await SendCmdSlowRspAsync(sendCmd);
+            if (recvCmd == null || recvCmd.ValCount != 1)
+            {
+                return null;
+            }
+            return HexUtil.GetU8FromStr(recvCmd.Val[0]);
+        }
+
+        public async Task<bool> WriteRegAddr16(ushort regAddr, byte regVal)
+        {
+            UartCmdModel sendCmd = new(UartCmdModel.CmdWriteRegAddr16);
+            sendCmd.AddVal(regAddr).AddVal(regVal);
+            UartCmdModel? recvCmd = await SendCmdSlowRspAsync(sendCmd);
+            return recvCmd != null;
+        }
+
         public async Task<(byte pn, byte version, uint uid)?> GetChipInfo()
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdGetChipInfo);

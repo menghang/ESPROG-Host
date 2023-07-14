@@ -632,11 +632,22 @@
                                 <DockPanel
                                     Margin="3">
                                     <Label
-                                        Content="Reg Addr:"
+                                        Content="Reg Addr (8bit):"
                                         VerticalContentAlignment="Center"
                                         Height="25" />
                                     <TextBox
                                         Text="{Binding RegAddrText}"
+                                        VerticalContentAlignment="Center"
+                                        Height="25" />
+                                </DockPanel>
+                                <DockPanel
+                                    Margin="3">
+                                    <Label
+                                        Content="Reg Addr (16bit):"
+                                        VerticalContentAlignment="Center"
+                                        Height="25" />
+                                    <TextBox
+                                        Text="{Binding RegAddr16Text}"
                                         VerticalContentAlignment="Center"
                                         Height="25" />
                                 </DockPanel>
@@ -652,19 +663,29 @@
                                         Height="25" />
                                 </DockPanel>
                                 <UniformGrid
-                                    Rows="1"
+                                    Rows="2"
                                     Columns="2"
                                     IsEnabled="{Binding IsPortConnected}">
                                     <Button
-                                        Content="Read Reg"
+                                        Content="Read Reg (8bit Addr)"
                                         Height="25"
                                         Margin="3"
                                         Click="ButtonReadReg_Click" />
                                     <Button
-                                        Content="Write Reg"
+                                        Content="Write Reg (8bit Addr)"
                                         Height="25"
                                         Margin="3"
                                         Click="ButtonWriteReg_Click" />
+                                    <Button
+                                        Content="Read Reg (16bit Addr)"
+                                        Height="25"
+                                        Margin="3"
+                                        Click="ButtonReadRegAddr16_Click" />
+                                    <Button
+                                        Content="Write Reg (16bit Addr)"
+                                        Height="25"
+                                        Margin="3"
+                                        Click="ButtonWriteRegAddr16_Click" />
                                 </UniformGrid>
                             </StackPanel>
                         </GroupBox>

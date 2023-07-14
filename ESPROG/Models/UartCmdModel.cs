@@ -7,6 +7,8 @@ namespace ESPROG.Models
     {
         public const string CmdReadReg = "ReadReg";
         public const string CmdWriteReg = "WriteReg";
+        public const string CmdReadRegAddr16 = "ReadReg16";
+        public const string CmdWriteRegAddr16 = "WriteReg16";
         public const string CmdSetDevAddr = "SetDevAddr";
         public const string CmdGetDevAddr = "GetDevAddr";
         public const string CmdSetGateCtrl = "SetGateCtrl";
@@ -97,6 +99,13 @@ namespace ESPROG.Models
         }
 
         public UartCmdModel AddVal(byte val)
+        {
+            Val[ValCount] = HexUtil.GetHexStr(val);
+            ValCount++;
+            return this;
+        }
+
+        public UartCmdModel AddVal(ushort val)
         {
             Val[ValCount] = HexUtil.GetHexStr(val);
             ValCount++;

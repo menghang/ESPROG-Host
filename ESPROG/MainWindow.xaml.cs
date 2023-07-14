@@ -606,6 +606,46 @@ namespace ESPROG
             return true;
         }
 
+        private async void ButtonReadRegAddr16_Click(object sender, RoutedEventArgs e)
+        {
+            await RunTask(ReadRegAddr16SubTask);
+        }
+
+        private async Task<bool> ReadRegAddr16SubTask()
+        {
+            if (view.RegAddr16 == null)
+            {
+                return false;
+            }
+            if ((view.RegVal = await nuprog.ReadRegAddr16(view.RegAddr16.Value)) == null)
+            {
+                log.Error(string.Format("Read reg ({0}) from dev ({1}) fail",
+                    view.RegAddr16, HexUtil.GetHexStr(view.ChipSettingView.SelectedChipAddr)));
+                return false;
+            }
+            return true;
+        }
+
+        private async void ButtonWriteRegAddr16_Click(object sender, RoutedEventArgs e)
+        {
+            await RunTask(WriteRegAddr16SubTask);
+        }
+
+        private async Task<bool> WriteRegAddr16SubTask()
+        {
+            if (view.RegAddr16 == null || view.RegVal == null)
+            {
+                return false;
+            }
+            if (!await nuprog.WriteRegAddr16(view.RegAddr16.Value, view.RegVal.Value))
+            {
+                log.Error(string.Format("Read reg ({0}) from dev ({1}) fail",
+                    view.RegAddr16, HexUtil.GetHexStr(view.ChipSettingView.SelectedChipAddr)));
+                return false;
+            }
+            return true;
+        }
+
         private void ButtonSendCmd_Click(object sender, RoutedEventArgs e)
         {
             string cmd = view.SendCmd.Trim() + "\r\n";
