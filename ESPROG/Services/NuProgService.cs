@@ -11,7 +11,10 @@ namespace ESPROG.Services
         public static readonly Dictionary<uint, NuChipModel> ChipDict = new()
         {
             { 0x1708, new(0x1708, new() { 0x50, 0x51, 0x52, 0x53 }, new(0x00000000, 32 * 1024), new(0x00008000, 1 * 512), new(0x00008200, 3 * 512)) },
-            { 0x1718, new(0x1718, new() { 0x70, 0x71, 0x72, 0x73 }, new(0x00000000, 64 * 1024), new(0x00010000, 1 * 128), new(0x00010080, 1 * 128)) }
+            { 0x1718, new(0x1718, new() { 0x70, 0x71, 0x72, 0x73 }, new(0x00000000, 64 * 1024), new(0x00010000, 1 * 128), new(0x00010080, 1 * 128)) },
+            { 0x1651, new(0x1651, new() { 0x60, 0x61, 0x62, 0x63 }, new(0x00000000, 32 * 1024), new(0x00008000, 1 * 512), new(0x00008200, 3 * 512)) },
+            { 0x1652, new(0x1652, new() { 0x40, 0x41, 0x42, 0x43 }, new(0x00000000, 32 * 1024), new(0x00008000, 1 * 512), new(0x00008200, 3 * 512)) },
+            { 0x1628, new(0x1628, new() { 0x40, 0x41, 0x42, 0x43 }, new(0x00000000, 32 * 1024), new(0x00008000, 1 * 512), new(0x00008200, 3 * 512)) }
         };
 
         private readonly LogService log;
