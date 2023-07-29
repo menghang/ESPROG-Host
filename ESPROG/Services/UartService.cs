@@ -177,15 +177,5 @@ namespace ESPROG.Services
             log.Debug(fullLog);
         }
 
-        public class UartCmdReceivedEventArgs : EventArgs
-        {
-            public Queue<UartCmdModel> Cmds { private set; get; }
-
-            public UartCmdReceivedEventArgs(Queue<UartCmdModel> cmds)
-            {
-                Cmds = cmds;
-            }
-        }
-
     }
 }
