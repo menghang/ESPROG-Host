@@ -76,7 +76,7 @@ namespace ESPROG.Views
             {
                 if (File.Exists(file))
                 {
-                    using FileStream fs = new(file, FileMode.Open);
+                    using FileStream fs = new(file, FileMode.Open, FileAccess.Read, FileShare.Read);
                     using BufferedStream bs = new(fs);
                     if (bs.Length > 0 && bs.Length <= MaxSize && bs.Length <= FwData.LongLength)
                     {
@@ -121,7 +121,7 @@ namespace ESPROG.Views
             {
                 if (FwAvailable)
                 {
-                    using FileStream fs = new(file, FileMode.Create);
+                    using FileStream fs = new(file, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
                     using BufferedStream bs = new(fs);
                     byte[] buf = new byte[writeBufferSize];
                     long pos = 0;
