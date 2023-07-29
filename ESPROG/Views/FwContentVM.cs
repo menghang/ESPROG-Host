@@ -85,7 +85,7 @@ namespace ESPROG.Views
                         byte[] buf = new byte[readBufferSize];
                         int readBytes = 0;
                         long pos = 0;
-                        while ((readBytes = await bs.ReadAsync(buf, 0, readBufferSize)) > 0)
+                        while ((readBytes = await bs.ReadAsync(buf.AsMemory(0, readBufferSize))) > 0)
                         {
                             Array.Copy(buf, 0, FwData, pos, readBytes);
                             pos += readBytes;
@@ -129,7 +129,7 @@ namespace ESPROG.Views
                     {
                         long bufLength = size - pos < writeBufferSize ? size - pos : writeBufferSize;
                         Array.Copy(FwData, pos, buf, 0, bufLength);
-                        await bs.WriteAsync(buf, 0, (int)bufLength);
+                        await bs.WriteAsync(buf.AsMemory(0, (int)bufLength));
                         pos += bufLength;
                     }
                     bs.Flush();

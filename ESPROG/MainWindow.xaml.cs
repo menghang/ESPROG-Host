@@ -702,7 +702,7 @@ namespace ESPROG
         {
             AboutWindow dialog = new();
             string? version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
-            dialog.SetVersion(version == null ? "missing" : version);
+            dialog.SetVersion(version ?? "missing");
             dialog.ShowDialog();
         }
 
