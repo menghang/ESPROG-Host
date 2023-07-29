@@ -6,7 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="clr-namespace:ESPROG"
     mc:Ignorable="d"
-    Title="ESPROG-HOST"
+    Title="{Binding Title}"
     Height="700"
     MinHeight="650"
     Width="400"

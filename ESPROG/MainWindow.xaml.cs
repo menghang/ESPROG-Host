@@ -23,6 +23,7 @@ namespace ESPROG
         private readonly NuProgService nuprog;
         private readonly UsbMonitorManager usbMonitor;
         private readonly Timer usbRemovalTimer, usbArrivalTimer;
+        private readonly string version;
         private const int usbDelay = 100;
 
         public MainWindow()
@@ -53,6 +54,9 @@ namespace ESPROG
                 ReloadSerialPort();
             }), null, Timeout.Infinite, Timeout.Infinite);
 
+            string? v = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
+            version = string.IsNullOrEmpty(v) ? "Unknown Version" : v;
+            view.Title = "ESPROG - " + version;
             view.ChipSettingView.SelectedChipChanged += ChipSettingView_SelectedChipChanged;
             view.ChipSettingView.SelectedChip = 0x1708;
 
@@ -701,8 +705,7 @@ namespace ESPROG
         private void MenuItemAbout_Click(object sender, RoutedEventArgs e)
         {
             AboutWindow dialog = new();
-            string? version = Assembly.GetExecutingAssembly().GetName().Version?.ToString();
-            dialog.SetVersion(version ?? "missing");
+            dialog.SetVersion(version);
             dialog.ShowDialog();
         }
 

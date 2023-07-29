@@ -8,6 +8,13 @@ namespace ESPROG.Views
 {
     internal class MainWindowVM : BaseViewModel
     {
+        private string title = "ESPROG";
+        public string Title
+        {
+            get => title;
+            set => SetProperty(ref title, value);
+        }
+
         private bool isPortConnected;
         public bool IsPortConnected
         {
