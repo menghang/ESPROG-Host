@@ -19,13 +19,9 @@ namespace ESPROG.Services
 
         private readonly LogService log;
         private readonly UartService uart;
-        private readonly Queue<UartCmdModel> cmdQueue;
 
-        private const int shortCheckInterval = 10;
         private const int shortCheckTimeout = 500;
-        private const int midCheckInterval = 50;
         private const int midCheckTimeout = 1000;
-        private const int longCheckInterval = 100;
         private const int longCheckTimeout = 2500;
 
         public const byte MtpZoneMask = 0x01;
@@ -38,8 +34,6 @@ namespace ESPROG.Services
         {
             log = logService;
             uart = uartService;
-            cmdQueue = new Queue<UartCmdModel>();
-            uart.CmdReceived += Uart_CmdReceived;
             this.chip = chip;
         }
 
@@ -48,59 +42,50 @@ namespace ESPROG.Services
             this.chip = chip;
         }
 
-        private void Uart_CmdReceived(object sender, UartService.UartCmdReceivedEventArgs e)
+        private async Task<UartCmdModel?> SendCmdAsync(UartCmdModel cmd, int timeout)
         {
-            while (e.Cmds.Count > 0)
-            {
-                cmdQueue.Enqueue(e.Cmds.Dequeue());
-            }
-        }
-
-        private async Task<UartCmdModel?> SendCmdAsync(UartCmdModel cmd, int interval, int timeout)
-        {
-            cmdQueue.Clear();
             uart.SendCmd(cmd);
             DateTime start = DateTime.Now;
-            await Task.Delay(interval);
             while (true)
             {
                 if ((DateTime.Now - start).TotalMilliseconds > timeout) // Timeout
                 {
                     return null;
                 }
-                if (cmdQueue.Count == 0) // No available cmd
-                {
-                    await Task.Delay(interval);
-                    continue;
-                }
-                UartCmdModel recvCmd = cmdQueue.Dequeue();
-                if (recvCmd.Cmd != cmd.Cmd) // Not the right cmd
+                Queue<UartCmdModel>? cmds = await uart.ReadCmd(timeout);
+                if (cmds == null) // No available cmd
                 {
                     continue;
                 }
-                if (recvCmd.Rsp == null || recvCmd.Rsp != 0) // wrong rsp
+                while (cmds.Count > 0)
                 {
-                    return null;
+                    UartCmdModel recvCmd = cmds.Dequeue();
+                    if (recvCmd.Cmd != cmd.Cmd) // Not the right cmd
+                    {
+                        continue;
+                    }
+                    if (recvCmd.Rsp == null || recvCmd.Rsp != 0) // wrong rsp
+                    {
+                        return null;
+                    }
+                    return recvCmd;
                 }
-                return recvCmd;
             }
         }
 
         private async Task<UartCmdModel?> SendCmdFastRspAsync(UartCmdModel cmd)
         {
-            return await SendCmdAsync(cmd, shortCheckInterval, shortCheckTimeout);
+            return await SendCmdAsync(cmd, shortCheckTimeout);
         }
 
         private async Task<UartCmdModel?> SendCmdSlowRspAsync(UartCmdModel cmd)
         {
-            return await SendCmdAsync(cmd, midCheckInterval, midCheckTimeout);
+            return await SendCmdAsync(cmd, midCheckTimeout);
         }
 
         private async Task<UartCmdModel?> SendCmdMultiRspAsync(UartCmdModel cmd, byte successVal)
         {
-            int interval = longCheckInterval;
             int timeout = longCheckTimeout;
-            cmdQueue.Clear();
             uart.SendCmd(cmd);
             DateTime start = DateTime.Now;
             while (true)
@@ -109,26 +94,30 @@ namespace ESPROG.Services
                 {
                     return null;
                 }
-                if (cmdQueue.Count == 0) // No available cmd
-                {
-                    await Task.Delay(interval);
-                    continue;
-                }
-                UartCmdModel recvCmd = cmdQueue.Dequeue();
-                if (recvCmd.Cmd != cmd.Cmd) // Not the right cmd
+
+                Queue<UartCmdModel>? cmds = await uart.ReadCmd(timeout);
+                if (cmds == null) // No available cmd
                 {
                     continue;
                 }
-                if (recvCmd.Rsp == null || recvCmd.Rsp != 0 || recvCmd.ValCount != 1) // wrong rsp or wrong val size
+                while (cmds.Count > 0)
                 {
-                    return null;
+                    UartCmdModel recvCmd = cmds.Dequeue();
+                    if (recvCmd.Cmd != cmd.Cmd) // Not the right cmd
+                    {
+                        continue;
+                    }
+                    if (recvCmd.Rsp == null || recvCmd.Rsp != 0 || recvCmd.ValCount != 1) // wrong rsp or wrong val size
+                    {
+                        return null;
+                    }
+                    if (HexUtil.GetU8FromStr(recvCmd.Val[0]) != successVal) // heart beat cmd
+                    {
+                        start = DateTime.Now;
+                        continue;
+                    }
+                    return recvCmd;
                 }
-                if (HexUtil.GetU8FromStr(recvCmd.Val[0]) != successVal) // heart beat cmd
-                {
-                    start = DateTime.Now;
-                    continue;
-                }
-                return recvCmd;
             }
         }
 

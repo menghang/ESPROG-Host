@@ -6,24 +6,25 @@ using System.Linq;
 using System.Management;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ESPROG.Services
 {
     class UartService
     {
-        public delegate void CmdReceivedHandler(object sender, UartCmdReceivedEventArgs e);
-        public event CmdReceivedHandler? CmdReceived;
-
         private readonly LogService log;
         private SerialPort? port;
         private string readBuffer;
+        private const int bufSize = 8 * 1024;
+        private readonly byte[] buf;
 
         public UartService(LogService logControl)
         {
             log = logControl;
             port = null;
             readBuffer = string.Empty;
-            CmdReceived = null;
+            buf = new byte[bufSize];
         }
 
         public List<string> Scan()
@@ -66,14 +67,13 @@ namespace ESPROG.Services
                 StopBits = StopBits.One,
                 Parity = Parity.None,
                 Handshake = Handshake.None,
-                ReadBufferSize = 1024 * 1024,
-                WriteBufferSize = 1024 * 1024,
+                ReadBufferSize = bufSize,
+                WriteBufferSize = bufSize,
                 Encoding = Encoding.ASCII,
                 ReadTimeout = 100,
                 WriteTimeout = 100,
                 ReceivedBytesThreshold = 4
             };
-            port.DataReceived += Port_DataReceived;
             readBuffer = string.Empty;
             try
             {
@@ -88,18 +88,42 @@ namespace ESPROG.Services
             return false;
         }
 
-        private void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        public void SendCmd(UartCmdModel cmd)
+        {
+            SendCmd(cmd.ToString());
+        }
+
+        public async Task<Queue<UartCmdModel>?> ReadCmd(int timeout)
         {
             if (port == null)
             {
-                return;
+                return null;
             }
-            readBuffer += port.ReadExisting();
+            while (true)
+            {
+                using (CancellationTokenSource cts = new())
+                {
+                    Task<int> readTask = port.BaseStream.ReadAsync(buf, 0, buf.Length, cts.Token);
+                    if (await Task.WhenAny(readTask, Task.Delay(timeout)) == readTask)
+                    {
+                        readBuffer += Encoding.ASCII.GetString(buf, 0, readTask.Result);
+                        if (readTask.Result < buf.Length)
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        cts.Cancel();
+                        return null;
+                    }
+                }
+            }
 
+            Queue<UartCmdModel>? cmds = null;
             MatchCollection mc = Regex.Matches(readBuffer, @"\[([a-zA-Z]+[0-9]*,[0-9]+(,[a-zA-Z0-9-:=\s\.\+\/]+)*|Error)]\r\n");
             if (mc.Count > 0)
             {
-                Queue<UartCmdModel> cmds = new();
                 int matchIndex = 0;
                 int matchLength = 0;
                 foreach (Match m in mc.Cast<Match>())
@@ -108,26 +132,19 @@ namespace ESPROG.Services
                     UartCmdModel? cmd = UartCmdModel.ParseRecv(m.Value);
                     if (cmd != null)
                     {
+                        cmds ??= new();
                         cmds.Enqueue(cmd);
                         matchIndex = m.Index;
                         matchLength = m.Length;
                     }
                 }
-                if (cmds.Count > 0)
-                {
-                    readBuffer = readBuffer[(matchIndex + matchLength)..];
-                    CmdReceived?.Invoke(this, new(cmds));
-                }
+                readBuffer = readBuffer[(matchIndex + matchLength)..];
             }
-            if (readBuffer.Length > 8 * 1024)
+            if (readBuffer.Length > bufSize)
             {
                 readBuffer = string.Empty;
             }
-        }
-
-        public void SendCmd(UartCmdModel cmd)
-        {
-            SendCmd(cmd.ToString());
+            return cmds;
         }
 
         public void SendCmd(string cmd)
@@ -138,6 +155,7 @@ namespace ESPROG.Services
                 {
                     return;
                 }
+                port.ReadExisting(); // Clear buffer before write
                 port.Write(cmd);
                 LogCmd(true, cmd);
             }
