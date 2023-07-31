@@ -78,7 +78,15 @@ namespace ESPROG.Views
                 {
                     using FileStream fs = new(file, FileMode.Open, FileAccess.Read, FileShare.Read);
                     using BufferedStream bs = new(fs);
-                    if (bs.Length > 0 && bs.Length <= MaxSize && bs.Length <= FwData.LongLength)
+                    if (bs.Length > MaxSize || bs.Length > FwData.LongLength)
+                    {
+                        log = string.Format("size ({0}) does not fit limit ({1})", bs.Length, MaxSize);
+                    }
+                    else if (bs.Length % 4 != 0)
+                    {
+                        log = string.Format("size ({0}) does not meet requirement", bs.Length);
+                    }
+                    else
                     {
                         size = (uint)bs.Length;
                         Array.Clear(FwData);
@@ -92,11 +100,6 @@ namespace ESPROG.Views
                         }
                         log = "file load succeed";
                         FwAvailable = true;
-                    }
-                    else
-                    {
-                        log = string.Format("size ({0}) does not fit limit ({1})",
-                            bs.Length, MaxSize);
                     }
                 }
                 else
