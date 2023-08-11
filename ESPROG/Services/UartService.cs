@@ -62,7 +62,7 @@ namespace ESPROG.Services
             port = new()
             {
                 PortName = m.Value[1..^1],
-                BaudRate = 2000000,
+                BaudRate = 1000000,
                 DataBits = 8,
                 StopBits = StopBits.One,
                 Parity = Parity.None,
