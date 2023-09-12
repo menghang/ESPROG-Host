@@ -317,37 +317,52 @@
                                 Header="Firmware"
                                 DataContext="{Binding WriteFwContent}">
                                 <DockPanel>
-                                    <UniformGrid
-                                        Rows="1"
-                                        Columns="2"
+                                    <StackPanel
                                         DockPanel.Dock="Bottom">
+                                        <UniformGrid
+                                            Rows="1"
+                                            Columns="2">
+                                            <DockPanel
+                                                Margin="3">
+                                                <Label
+                                                    Content="Checksum:"
+                                                    VerticalContentAlignment="Center"
+                                                    Height="25" />
+                                                <TextBox
+                                                    Text="{Binding ChecksumText,Mode=OneWay}"
+                                                    Height="25"
+                                                    VerticalContentAlignment="Center"
+                                                    HorizontalContentAlignment="Center"
+                                                    IsReadOnly="True" />
+                                            </DockPanel>
+                                            <DockPanel
+                                                Margin="3">
+                                                <Label
+                                                    Content="Size:"
+                                                    VerticalContentAlignment="Center"
+                                                    Height="25" />
+                                                <TextBox
+                                                    Text="{Binding SizeText,Mode=OneWay}"
+                                                    Height="25"
+                                                    VerticalContentAlignment="Center"
+                                                    HorizontalContentAlignment="Center"
+                                                    IsReadOnly="True" />
+                                            </DockPanel>
+                                        </UniformGrid>
                                         <DockPanel
                                             Margin="3">
                                             <Label
-                                                Content="Checksum:"
+                                                Content="Last Modified:"
                                                 VerticalContentAlignment="Center"
                                                 Height="25" />
                                             <TextBox
-                                                Text="{Binding ChecksumText,Mode=OneWay}"
+                                                Text="{Binding LastModified,Mode=OneWay}"
                                                 Height="25"
                                                 VerticalContentAlignment="Center"
                                                 HorizontalContentAlignment="Center"
                                                 IsReadOnly="True" />
                                         </DockPanel>
-                                        <DockPanel
-                                            Margin="3">
-                                            <Label
-                                                Content="Size:"
-                                                VerticalContentAlignment="Center"
-                                                Height="25" />
-                                            <TextBox
-                                                Text="{Binding SizeText,Mode=OneWay}"
-                                                Height="25"
-                                                VerticalContentAlignment="Center"
-                                                HorizontalContentAlignment="Center"
-                                                IsReadOnly="True" />
-                                        </DockPanel>
-                                    </UniformGrid>
+                                    </StackPanel>
                                     <TextBox
                                         Text="{Binding ContentText,Mode=OneWay}"
                                         IsReadOnly="True"
@@ -360,37 +375,52 @@
                                 Header="Config"
                                 DataContext="{Binding WriteConfigContent}">
                                 <DockPanel>
-                                    <UniformGrid
-                                        Rows="1"
-                                        Columns="2"
+                                    <StackPanel
                                         DockPanel.Dock="Bottom">
+                                        <UniformGrid
+                                            Rows="1"
+                                            Columns="2">
+                                            <DockPanel
+                                                Margin="3">
+                                                <Label
+                                                    Content="Checksum:"
+                                                    VerticalContentAlignment="Center"
+                                                    Height="25" />
+                                                <TextBox
+                                                    Text="{Binding ChecksumText,Mode=OneWay}"
+                                                    Height="25"
+                                                    VerticalContentAlignment="Center"
+                                                    HorizontalContentAlignment="Center"
+                                                    IsReadOnly="True" />
+                                            </DockPanel>
+                                            <DockPanel
+                                                Margin="3">
+                                                <Label
+                                                    Content="Size:"
+                                                    VerticalContentAlignment="Center"
+                                                    Height="25" />
+                                                <TextBox
+                                                    Text="{Binding SizeText,Mode=OneWay}"
+                                                    Height="25"
+                                                    VerticalContentAlignment="Center"
+                                                    HorizontalContentAlignment="Center"
+                                                    IsReadOnly="True" />
+                                            </DockPanel>
+                                        </UniformGrid>
                                         <DockPanel
                                             Margin="3">
                                             <Label
-                                                Content="Checksum:"
+                                                Content="Last Modified:"
                                                 VerticalContentAlignment="Center"
                                                 Height="25" />
                                             <TextBox
-                                                Text="{Binding ChecksumText,Mode=OneWay}"
+                                                Text="{Binding LastModified,Mode=OneWay}"
                                                 Height="25"
                                                 VerticalContentAlignment="Center"
                                                 HorizontalContentAlignment="Center"
                                                 IsReadOnly="True" />
                                         </DockPanel>
-                                        <DockPanel
-                                            Margin="3">
-                                            <Label
-                                                Content="Size:"
-                                                VerticalContentAlignment="Center"
-                                                Height="25" />
-                                            <TextBox
-                                                Text="{Binding SizeText,Mode=OneWay}"
-                                                Height="25"
-                                                VerticalContentAlignment="Center"
-                                                HorizontalContentAlignment="Center"
-                                                IsReadOnly="True" />
-                                        </DockPanel>
-                                    </UniformGrid>
+                                    </StackPanel>
                                     <TextBox
                                         Text="{Binding ContentText,Mode=OneWay}"
                                         IsReadOnly="True"
@@ -403,37 +433,52 @@
                                 Header="Trim"
                                 DataContext="{Binding WriteTrimContent}">
                                 <DockPanel>
-                                    <UniformGrid
-                                        Rows="1"
-                                        Columns="2"
+                                    <StackPanel
                                         DockPanel.Dock="Bottom">
+                                        <UniformGrid
+                                            Rows="1"
+                                            Columns="2">
+                                            <DockPanel
+                                                Margin="3">
+                                                <Label
+                                                    Content="Checksum:"
+                                                    VerticalContentAlignment="Center"
+                                                    Height="25" />
+                                                <TextBox
+                                                    Text="{Binding ChecksumText,Mode=OneWay}"
+                                                    Height="25"
+                                                    VerticalContentAlignment="Center"
+                                                    HorizontalContentAlignment="Center"
+                                                    IsReadOnly="True" />
+                                            </DockPanel>
+                                            <DockPanel
+                                                Margin="3">
+                                                <Label
+                                                    Content="Size:"
+                                                    VerticalContentAlignment="Center"
+                                                    Height="25" />
+                                                <TextBox
+                                                    Text="{Binding SizeText,Mode=OneWay}"
+                                                    Height="25"
+                                                    VerticalContentAlignment="Center"
+                                                    HorizontalContentAlignment="Center"
+                                                    IsReadOnly="True" />
+                                            </DockPanel>
+                                        </UniformGrid>
                                         <DockPanel
                                             Margin="3">
                                             <Label
-                                                Content="Checksum:"
+                                                Content="Last Modified:"
                                                 VerticalContentAlignment="Center"
                                                 Height="25" />
                                             <TextBox
-                                                Text="{Binding ChecksumText,Mode=OneWay}"
+                                                Text="{Binding LastModified,Mode=OneWay}"
                                                 Height="25"
                                                 VerticalContentAlignment="Center"
                                                 HorizontalContentAlignment="Center"
                                                 IsReadOnly="True" />
                                         </DockPanel>
-                                        <DockPanel
-                                            Margin="3">
-                                            <Label
-                                                Content="Size:"
-                                                VerticalContentAlignment="Center"
-                                                Height="25" />
-                                            <TextBox
-                                                Text="{Binding SizeText,Mode=OneWay}"
-                                                Height="25"
-                                                VerticalContentAlignment="Center"
-                                                HorizontalContentAlignment="Center"
-                                                IsReadOnly="True" />
-                                        </DockPanel>
-                                    </UniformGrid>
+                                    </StackPanel>
                                     <TextBox
                                         Text="{Binding ContentText,Mode=OneWay}"
                                         IsReadOnly="True"

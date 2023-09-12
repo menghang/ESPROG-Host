@@ -31,6 +31,12 @@ namespace ESPROG.Views
             get => Convert.ToString(size);
         }
 
+        private string lastModified;
+        public string LastModified
+        {
+            get => lastModified;
+        }
+
         public uint MaxSize { get; set; }
 
         public byte[] FwData { get; private set; }
@@ -65,6 +71,7 @@ namespace ESPROG.Views
             OnPropertyChanged(nameof(SizeText));
             OnPropertyChanged(nameof(ChecksumText));
             OnPropertyChanged(nameof(ContentText));
+            OnPropertyChanged(nameof(LastModified));
         }
 
         private const int readBufferSize = 8 * 1024;
@@ -99,6 +106,8 @@ namespace ESPROG.Views
                             pos += readBytes;
                         }
                         log = "file load succeed";
+                        FileInfo fi = new(file);
+                        lastModified = fi.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss");
                         FwAvailable = true;
                     }
                 }
@@ -156,6 +165,7 @@ namespace ESPROG.Views
             ContentText = string.Empty;
             checksum = 0;
             size = 0;
+            lastModified = string.Empty;
             FwAvailable = false;
             FwData = new byte[128 * 1024];
             FwAddrOffset = fwAddrOffset;
