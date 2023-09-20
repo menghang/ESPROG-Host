@@ -122,6 +122,7 @@ namespace ESPROG.Views
         public FwContentVM ReadConfigContent { get; private set; }
         public FwContentVM ReadTrimContent { get; private set; }
         public ProgressVM ProgressView { get; private set; }
+        public BinaryGeneratorVM BinaryGeneratorView { get; private set; }
 
         public MainWindowVM()
         {
@@ -142,6 +143,7 @@ namespace ESPROG.Views
             ReadConfigContent = new(NuProgService.ChipDict[ChipSettingView.SelectedChip].Config.Offset);
             ReadTrimContent = new(NuProgService.ChipDict[ChipSettingView.SelectedChip].Trim.Offset);
             ProgressView = new();
+            BinaryGeneratorView = new();
             WriteZoneList = new() {
                 new("Firmware", 0x01), new("Config", 0x02), new("Firmware + Config", 0x03), new("Trim", 0x04)
             };

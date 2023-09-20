@@ -3,7 +3,9 @@ using ESPROG.Services;
 using ESPROG.Utils;
 using ESPROG.Views;
 using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -712,6 +714,54 @@ namespace ESPROG
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             view.ExportConfig().SaveConfig();
+        }
+
+        private const int writeBufferSize = 256 * 4;
+
+        private async void ButtonGenBinFile_Click(object sender, RoutedEventArgs e)
+        {
+            if (view.BinaryGeneratorView.BinSize == 0 || view.BinaryGeneratorView.BinSize % 4 != 0)
+            {
+                log.Error("Wrong binary size");
+                return;
+            }
+
+            SaveFileDialog dialog = new()
+            {
+                Title = "Save binary file",
+                Filter = "Binary File (*.bin)|*.bin"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    using FileStream fs = new(dialog.FileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
+                    using BufferedStream bs = new(fs);
+                    uint pattern = view.BinaryGeneratorView.DataPattern;
+                    byte[] buf = new byte[writeBufferSize];
+                    for (int ii = 0; ii < buf.Length; ii += 4)
+                    {
+                        buf[ii] = (byte)pattern;
+                        buf[ii + 1] = (byte)(pattern >> 8);
+                        buf[ii + 2] = (byte)(pattern >> 16);
+                        buf[ii + 3] = (byte)(pattern >> 24);
+                    }
+                    long pos = 0;
+                    long size = view.BinaryGeneratorView.BinSize;
+                    while (pos < view.BinaryGeneratorView.BinSize)
+                    {
+                        long bufLength = size - pos < writeBufferSize ? size - pos : writeBufferSize;
+                        await bs.WriteAsync(buf.AsMemory(0, (int)bufLength));
+                        pos += bufLength;
+                    }
+                    bs.Flush();
+                    log.Info("Save binary file succeed");
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Save binary file fail" + Environment.NewLine + ex.ToString());
+                }
+            }
         }
 
         private delegate Task<bool> SubTaskHandler();

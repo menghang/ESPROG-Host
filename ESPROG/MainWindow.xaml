@@ -668,10 +668,10 @@
             <TabItem
                 Header="Other">
                 <Grid>
-                    <StackPanel
-                        IsEnabled="{Binding IsIdle}">
+                    <StackPanel>
                         <GroupBox
                             Header="Read/Write I2C Reg"
+                            IsEnabled="{Binding IsIdle}"
                             Margin="3">
                             <StackPanel>
                                 <DockPanel
@@ -732,6 +732,40 @@
                                         Margin="3"
                                         Click="ButtonWriteRegAddr16_Click" />
                                 </UniformGrid>
+                            </StackPanel>
+                        </GroupBox>
+                        <GroupBox
+                            Header="Binary Generator"
+                            DataContext="{Binding BinaryGeneratorView}"
+                            Margin="3">
+                            <StackPanel>
+                                <DockPanel
+                                    Margin="3">
+                                    <Label
+                                        Content="Data Pattern (4byte):"
+                                        VerticalContentAlignment="Center"
+                                        Height="25" />
+                                    <TextBox
+                                        Text="{Binding DataPatternText}"
+                                        VerticalContentAlignment="Center"
+                                        Height="25" />
+                                </DockPanel>
+                                <DockPanel
+                                    Margin="3">
+                                    <Label
+                                        Content="Binary Size:"
+                                        VerticalContentAlignment="Center"
+                                        Height="25" />
+                                    <TextBox
+                                        Text="{Binding BinSizeText}"
+                                        VerticalContentAlignment="Center"
+                                        Height="25" />
+                                </DockPanel>
+                                <Button
+                                    Content="Generate Binary File"
+                                    Height="25"
+                                    Margin="3"
+                                    Click="ButtonGenBinFile_Click" />
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
