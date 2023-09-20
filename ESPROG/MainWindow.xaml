@@ -51,14 +51,8 @@
                         <DockPanel
                             DockPanel.Dock="Bottom">
                             <Image
-                                Source="pack://application:,,,/NVT.png"
-                                Height="60"
-                                HorizontalAlignment="Left"
-                                DockPanel.Dock="Bottom"
-                                Margin="3" />
-                            <Image
-                                Source="pack://application:,,,/QR_NuVolta.png"
-                                Height="100"
+                                Source="pack://application:,,,/QR_Github.png"
+                                Height="120"
                                 HorizontalAlignment="Left"
                                 Margin="3" />
                         </DockPanel>

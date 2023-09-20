@@ -16,8 +16,7 @@
 
   <ItemGroup>
     <None Remove="NuVolta.png" />
-    <None Remove="NVT.png" />
-    <None Remove="QR_NuVolta.png" />
+    <None Remove="QR_Github.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,8 +37,7 @@
 
   <ItemGroup>
     <Resource Include="NuVolta.png" />
-    <Resource Include="NVT.png" />
-    <Resource Include="QR_NuVolta.png" />
+    <Resource Include="QR_Github.png" />
   </ItemGroup>
 
 </Project>
