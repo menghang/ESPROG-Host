@@ -78,6 +78,12 @@ namespace ESPROG
             view.ReadConfigContent.MaxSize = NuProgService.ChipDict[e.Chip].Config.Size;
             view.WriteTrimContent.MaxSize = NuProgService.ChipDict[e.Chip].Trim.Size;
             view.ReadTrimContent.MaxSize = NuProgService.ChipDict[e.Chip].Trim.Size;
+            view.WriteFwContent.FwAddrOffset = NuProgService.ChipDict[e.Chip].MTP.Offset;
+            view.ReadFwContent.FwAddrOffset = NuProgService.ChipDict[e.Chip].MTP.Offset;
+            view.WriteConfigContent.FwAddrOffset = NuProgService.ChipDict[e.Chip].Config.Offset;
+            view.ReadConfigContent.FwAddrOffset = NuProgService.ChipDict[e.Chip].Config.Offset;
+            view.WriteTrimContent.FwAddrOffset = NuProgService.ChipDict[e.Chip].Trim.Offset;
+            view.ReadTrimContent.FwAddrOffset = NuProgService.ChipDict[e.Chip].Trim.Offset;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)

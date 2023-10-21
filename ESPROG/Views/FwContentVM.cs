@@ -43,7 +43,7 @@ namespace ESPROG.Views
 
         public bool FwAvailable { get; set; }
 
-        public uint FwAddrOffset { get; private set; }
+        public uint FwAddrOffset { get; set; }
 
         public void UpdateDisplay()
         {
