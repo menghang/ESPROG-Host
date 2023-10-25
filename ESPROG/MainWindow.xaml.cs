@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -743,14 +744,22 @@ namespace ESPROG
                 {
                     using FileStream fs = new(dialog.FileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None);
                     using BufferedStream bs = new(fs);
-                    uint pattern = view.BinaryGeneratorView.DataPattern;
-                    byte[] buf = new byte[writeBufferSize];
-                    for (int ii = 0; ii < buf.Length; ii += 4)
+                    byte[] buf;
+                    if (view.BinaryGeneratorView.DataPattern > uint.MaxValue)
                     {
-                        buf[ii] = (byte)pattern;
-                        buf[ii + 1] = (byte)(pattern >> 8);
-                        buf[ii + 2] = (byte)(pattern >> 16);
-                        buf[ii + 3] = (byte)(pattern >> 24);
+                        buf = RandomNumberGenerator.GetBytes(writeBufferSize);
+                    }
+                    else
+                    {
+                        buf = new byte[writeBufferSize];
+                        uint pattern = (uint)view.BinaryGeneratorView.DataPattern;
+                        for (int ii = 0; ii < buf.Length; ii += 4)
+                        {
+                            buf[ii] = (byte)pattern;
+                            buf[ii + 1] = (byte)(pattern >> 8);
+                            buf[ii + 2] = (byte)(pattern >> 16);
+                            buf[ii + 3] = (byte)(pattern >> 24);
+                        }
                     }
                     long pos = 0;
                     long size = view.BinaryGeneratorView.BinSize;

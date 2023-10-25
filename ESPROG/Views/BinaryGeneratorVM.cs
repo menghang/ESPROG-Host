@@ -4,19 +4,36 @@ namespace ESPROG.Views
 {
     class BinaryGeneratorVM : BaseViewModel
     {
-        private uint dataPattern = 0;
-        public uint DataPattern
+        private ulong dataPattern = 0;
+        public ulong DataPattern
         {
             get => dataPattern;
             set => SetProperty(ref dataPattern, value, nameof(DataPatternText));
         }
         public string DataPatternText
         {
-            get => HexUtil.GetHexStr(dataPattern);
+            get
+            {
+                if (dataPattern > uint.MaxValue)
+                {
+                    return "Random";
+                }
+                else
+                {
+                    return HexUtil.GetHexStr((uint)dataPattern);
+                }
+            }
             set
             {
-                uint? tmp = HexUtil.GetU32FromStr(value);
-                SetProperty(ref dataPattern, tmp ?? 0);
+                if (value.ToLower().Equals("random"))
+                {
+                    SetProperty(ref dataPattern, ulong.MaxValue);
+                }
+                else
+                {
+                    uint? tmp = HexUtil.GetU32FromStr(value);
+                    SetProperty(ref dataPattern, tmp ?? 0);
+                }
             }
         }
 
