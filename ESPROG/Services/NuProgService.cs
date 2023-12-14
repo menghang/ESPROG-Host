@@ -20,8 +20,8 @@ namespace ESPROG.Services
         private readonly LogService log;
         private readonly UartService uart;
 
-        private const int shortCheckTimeout = 200;
-        private const int midCheckTimeout = 500;
+        private const int shortCheckTimeout = 300;
+        private const int midCheckTimeout = 600;
         private const int longCheckTimeout = 1500;
 
         public const byte MtpZoneMask = 0x01;
