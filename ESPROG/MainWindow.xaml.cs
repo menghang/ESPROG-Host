@@ -90,22 +90,25 @@ namespace ESPROG
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             ReloadSerialPort();
-            view.EsprogSettingView.SelectedGateCtrlModeChanged += EsprogSelView_SelectedGateCtrlModeChanged;
+            view.EsprogSettingView.SelectedVddModeChanged += EsprogSelView_SelectedVddModeChanged;
         }
 
-        private async void EsprogSelView_SelectedGateCtrlModeChanged(object sender, EsprogSettingVM.GateCtrlModeEventArgs e)
+        private async void EsprogSelView_SelectedVddModeChanged(object sender, EsprogSettingVM.VddModeEventArgs e)
         {
             view.IsIdle = false;
             view.ProgressView.SetSate(ProgressVM.State.Running);
-            if (!await nuprog.SetGateCtrl(e.NewMode))
+            if (!await nuprog.SetVddCtrl(e.NewCtrlMode, e.NewVol))
             {
-                log.Error(string.Format("Set gate mode ({0}) fail", view.EsprogSettingView.SelectedGateCtrlMode));
-                view.EsprogSettingView.UpdateSelectedGateCtrlMode(e.LastMode);
+                log.Error(string.Format("Set vdd mode ({0} {1}) fail",
+                    view.EsprogSettingView.SelectedVddCtrlMode, view.EsprogSettingView.SelectedVddVol));
+                view.EsprogSettingView.UpdateSelectedVddCtrlMode(e.LastCtrlMode);
+                view.EsprogSettingView.UpdateSelectedVddVol(e.LastVol);
                 view.ProgressView.SetSate(ProgressVM.State.Fail);
             }
             else
             {
-                log.Info(string.Format("Set gate mode ({0}) succeed", view.EsprogSettingView.SelectedGateCtrlMode));
+                log.Info(string.Format("Set vdd mode ({0} {1}) succeed",
+                    view.EsprogSettingView.SelectedVddCtrlMode, view.EsprogSettingView.SelectedVddVol));
                 view.ProgressView.SetSate(ProgressVM.State.Succeed);
             }
             view.IsIdle = true;
@@ -149,15 +152,16 @@ namespace ESPROG
                 log.Debug(string.Format("Can not get ESPROG compile time on port({0})", port));
                 return false;
             }
-            byte? gateCtrlMode = await nuprog.GetGateCtrl();
-            if (gateCtrlMode == null)
+            (byte CtrlMode, byte Vol)? VddMode = await nuprog.GetVddCtrl();
+            if (VddMode == null)
             {
-                log.Debug(string.Format("Can not get ESPROG gate ctrl mode on port({0})", port));
+                log.Debug(string.Format("Can not get ESPROG vdd ctrl mode on port({0})", port));
                 return false;
             }
             view.EsprogSettingView.EsprogInfo = version;
             view.EsprogSettingView.EsprogCompileTime = compileTime;
-            view.EsprogSettingView.UpdateSelectedGateCtrlMode(gateCtrlMode.Value);
+            view.EsprogSettingView.UpdateSelectedVddCtrlMode(VddMode.Value.CtrlMode);
+            view.EsprogSettingView.UpdateSelectedVddVol(VddMode.Value.Vol);
             log.Info(string.Format("Find ESPROG on port({0})", port));
             return true;
         }

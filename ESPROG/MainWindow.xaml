@@ -108,14 +108,31 @@
                                     <DockPanel
                                         Margin="3">
                                         <Label
-                                            Content="Gate Control Mode:"
+                                            Content="Vdd Control Mode:"
                                             VerticalContentAlignment="Center"
                                             Height="25" />
                                         <ComboBox
-                                            ItemsSource="{Binding GateCtrlModeList}"
+                                            ItemsSource="{Binding VddCtrlModeList}"
                                             DisplayMemberPath="Display"
                                             SelectedValuePath="Value"
-                                            SelectedValue="{Binding SelectedGateCtrlMode}"
+                                            SelectedValue="{Binding SelectedVddCtrlMode}"
+                                            IsEnabled="{Binding IsPortConnected}"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            IsReadOnly="True"
+                                            Height="25" />
+                                    </DockPanel>
+                                    <DockPanel
+                                        Margin="3">
+                                        <Label
+                                            Content="Vdd Voltage:"
+                                            VerticalContentAlignment="Center"
+                                            Height="25" />
+                                        <ComboBox
+                                            ItemsSource="{Binding VddVolList}"
+                                            DisplayMemberPath="Display"
+                                            SelectedValuePath="Value"
+                                            SelectedValue="{Binding SelectedVddVol}"
                                             IsEnabled="{Binding IsPortConnected}"
                                             VerticalContentAlignment="Center"
                                             HorizontalContentAlignment="Center"

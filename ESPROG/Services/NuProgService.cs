@@ -429,24 +429,27 @@ namespace ESPROG.Services
             }
         }
 
-        public async Task<bool> SetGateCtrl(byte mode)
+        public async Task<bool> SetVddCtrl(byte ctrlMode, byte vol)
         {
-            UartCmdModel sendCmd = new(UartCmdModel.CmdSetGateCtrl);
-            sendCmd.AddVal(mode);
+            UartCmdModel sendCmd = new(UartCmdModel.CmdSetVddCtrl);
+            sendCmd.AddVal(vol).AddVal(ctrlMode);
             UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
             return recvCmd != null;
         }
 
-        public async Task<byte?> GetGateCtrl()
+        public async Task<(byte, byte)?> GetVddCtrl()
         {
-            UartCmdModel sendCmd = new(UartCmdModel.CmdGetGateCtrl);
+            UartCmdModel sendCmd = new(UartCmdModel.CmdGetVddCtrl);
             sendCmd.AddVal(true);
             UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
-            if (recvCmd == null || recvCmd.ValCount != 1)
+            if (recvCmd == null || recvCmd.ValCount != 2)
             {
                 return null;
             }
-            return HexUtil.GetU8FromStr(recvCmd.Val[0]);
+            byte? vol = HexUtil.GetU8FromStr(recvCmd.Val[0]);
+            byte? ctrlMode = HexUtil.GetU8FromStr(recvCmd.Val[1]);
+
+            return ctrlMode != null && vol != null ? (ctrlMode.Value, vol.Value) : null;
         }
 
         public async Task<bool> SetChipAndAddr(uint chip, byte devAddr)

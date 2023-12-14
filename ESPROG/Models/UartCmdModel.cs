@@ -11,8 +11,8 @@ namespace ESPROG.Models
         public const string CmdWriteRegAddr16 = "WriteReg16";
         public const string CmdSetDevAddr = "SetDevAddr";
         public const string CmdGetDevAddr = "GetDevAddr";
-        public const string CmdSetGateCtrl = "SetGateCtrl";
-        public const string CmdGetGateCtrl = "GetGateCtrl";
+        public const string CmdSetVddCtrl = "SetVddCtrl";
+        public const string CmdGetVddCtrl = "GetVddCtrl";
         public const string CmdFwWriteBuf = "FwWriteBuf";
         public const string CmdFwReadBuf = "FwReadBuf";
         public const string CmdFwWriteStart = "FwWriteStart";
