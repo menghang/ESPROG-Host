@@ -99,21 +99,40 @@ namespace ESPROG.Services
             {
                 return null;
             }
+            int readBytes = 0;
             while (true)
             {
-                CancellationTokenSource cts = new();
-                Task<int> readTask = port.BaseStream.ReadAsync(buf, 0, buf.Length, cts.Token);
-                if (await Task.WhenAny(readTask, Task.Delay(timeout)) == readTask)
+                using CancellationTokenSource cts1 = new();
+                using CancellationTokenSource cts2 = new();
+                Task<int> readTask = port.BaseStream.ReadAsync(buf, 0, buf.Length, cts1.Token);
+                Task timeoutTask = Task.Delay(timeout, cts2.Token);
+                if (await Task.WhenAny(readTask, timeoutTask) == readTask)
                 {
-                    readBuffer += Encoding.ASCII.GetString(buf, 0, readTask.Result);
-                    if (readTask.Result < buf.Length)
+                    cts2.Cancel(true);
+                    if (readTask.Result > 0)
                     {
-                        break;
+                        readBytes += readTask.Result;
+                        readBuffer += Encoding.ASCII.GetString(buf, 0, readTask.Result);
+                        if (readTask.Result == buf.Length)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (readBytes > 0)
+                        {
+                            break;
+                        }
                     }
                 }
                 else
                 {
-                    cts.Cancel();
+                    cts1.Cancel(true);
                     return null;
                 }
             }
