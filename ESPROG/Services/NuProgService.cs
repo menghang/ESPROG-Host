@@ -506,5 +506,25 @@ namespace ESPROG.Services
             }
             return HexUtil.GetU8FromStr(recvCmd.Val[0]);
         }
+
+        public async Task<bool> SetIoVol(byte vol)
+        {
+            UartCmdModel sendCmd = new(UartCmdModel.CmdSetIoVol);
+            sendCmd.AddVal(vol);
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            return recvCmd != null;
+        }
+
+        public async Task<byte?> GetIoVol()
+        {
+            UartCmdModel sendCmd = new(UartCmdModel.CmdGetIoVol);
+            sendCmd.AddVal(true);
+            UartCmdModel? recvCmd = await SendCmdFastRspAsync(sendCmd);
+            if (recvCmd == null || recvCmd.ValCount != 1)
+            {
+                return null;
+            }
+            return HexUtil.GetU8FromStr(recvCmd.Val[0]);
+        }
     }
 }

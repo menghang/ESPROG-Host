@@ -91,6 +91,25 @@ namespace ESPROG
         {
             ReloadSerialPort();
             view.EsprogSettingView.SelectedVddModeChanged += EsprogSelView_SelectedVddModeChanged;
+            view.EsprogSettingView.SelectedIoModeChanged += EsprogSettingView_SelectedIoModeChanged;
+        }
+
+        private async void EsprogSettingView_SelectedIoModeChanged(object sender, EsprogSettingVM.IoModeEventArgs e)
+        {
+            view.IsIdle = false;
+            view.ProgressView.SetSate(ProgressVM.State.Running);
+            if (!await nuprog.SetIoVol(e.NewVol))
+            {
+                log.Error(string.Format("Set io mode ({0}) fail", view.EsprogSettingView.SelectedIoVol));
+                view.EsprogSettingView.UpdateSelectedIoVol(e.LastVol);
+                view.ProgressView.SetSate(ProgressVM.State.Fail);
+            }
+            else
+            {
+                log.Info(string.Format("Set vdd mode ({0}) succeed", view.EsprogSettingView.SelectedIoVol));
+                view.ProgressView.SetSate(ProgressVM.State.Succeed);
+            }
+            view.IsIdle = true;
         }
 
         private async void EsprogSelView_SelectedVddModeChanged(object sender, EsprogSettingVM.VddModeEventArgs e)
@@ -158,10 +177,17 @@ namespace ESPROG
                 log.Debug(string.Format("Can not get ESPROG vdd ctrl mode on port({0})", port));
                 return false;
             }
+            byte? IoVol = await nuprog.GetIoVol();
+            if (IoVol == null)
+            {
+                log.Debug(string.Format("Can not get ESPROG io vol on port({0})", port));
+                return false;
+            }
             view.EsprogSettingView.EsprogInfo = version;
             view.EsprogSettingView.EsprogCompileTime = compileTime;
             view.EsprogSettingView.UpdateSelectedVddCtrlMode(VddMode.Value.CtrlMode);
             view.EsprogSettingView.UpdateSelectedVddVol(VddMode.Value.Vol);
+            view.EsprogSettingView.UpdateSelectedIoVol(IoVol.Value);
             log.Info(string.Format("Find ESPROG on port({0})", port));
             return true;
         }

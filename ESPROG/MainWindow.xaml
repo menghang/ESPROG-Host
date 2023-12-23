@@ -139,6 +139,23 @@
                                             IsReadOnly="True"
                                             Height="25" />
                                     </DockPanel>
+                                    <DockPanel
+                                        Margin="3">
+                                        <Label
+                                            Content="IO Voltage:"
+                                            VerticalContentAlignment="Center"
+                                            Height="25" />
+                                        <ComboBox
+                                            ItemsSource="{Binding IoVolList}"
+                                            DisplayMemberPath="Display"
+                                            SelectedValuePath="Value"
+                                            SelectedValue="{Binding SelectedIoVol}"
+                                            IsEnabled="{Binding IsPortConnected}"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            IsReadOnly="True"
+                                            Height="25" />
+                                    </DockPanel>
                                     <UniformGrid
                                         Rows="2"
                                         Columns="2">

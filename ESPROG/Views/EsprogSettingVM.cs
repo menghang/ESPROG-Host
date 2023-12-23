@@ -119,6 +119,41 @@ namespace ESPROG.Views
             SetProperty(ref selectedVddVol, vol, nameof(SelectedVddVol));
         }
 
+        public delegate void SelectedIoModeChangedHandler(object sender, IoModeEventArgs e);
+        public event SelectedIoModeChangedHandler? SelectedIoModeChanged;
+
+        public List<ComboBoxModel<string, byte>> IoVolList { get; private set; }
+
+        private byte selectedIoVol;
+        public byte SelectedIoVol
+        {
+            get => selectedIoVol;
+            set
+            {
+                if (selectedIoVol != value)
+                {
+                    SelectedIoModeChanged?.Invoke(this, new(value, selectedIoVol));
+                    SetProperty(ref selectedIoVol, value);
+                }
+            }
+        }
+
+        public class IoModeEventArgs : EventArgs
+        {
+            public byte NewVol { get; private set; }
+            public byte LastVol { get; private set; }
+            public IoModeEventArgs(byte newVol, byte lastVol)
+            {
+                NewVol = newVol;
+                LastVol = lastVol;
+            }
+        }
+
+        public void UpdateSelectedIoVol(byte vol)
+        {
+            SetProperty(ref selectedIoVol, vol, nameof(SelectedIoVol));
+        }
+
         public EsprogSettingVM()
         {
             portList = new();
@@ -130,6 +165,8 @@ namespace ESPROG.Views
             selectedVddCtrlMode = VddCtrlModeList[0].Value;
             VddVolList = new() { new("5V", 0x00), new("3.3V", 0x01) };
             selectedVddVol = VddVolList[0].Value;
+            IoVolList = new() { new("1.8V", 0x00), new("3.3V", 0x01), new("5.0V", 0x02), new("5.0V with High-sink SCL", 0x03) };
+            selectedIoVol = IoVolList[2].Value;
         }
     }
 }

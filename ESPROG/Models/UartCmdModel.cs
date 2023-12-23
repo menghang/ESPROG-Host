@@ -29,6 +29,8 @@ namespace ESPROG.Models
         public const string CmdSetZone = "SetZone";
         public const string CmdGetZone = "GetZone";
         public const string CmdDetectChip = "DetectChip";
+        public const string CmdSetIoVol = "SetIoVol";
+        public const string CmdGetIoVol = "GetIoVol";
 
         public const string CmdError = "Error";
 
