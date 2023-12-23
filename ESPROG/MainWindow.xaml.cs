@@ -371,7 +371,7 @@ namespace ESPROG
                 log.Error("Program chip fail");
                 return false;
             }
-            log.Error("Program chip succeed");
+            log.Info("Program chip succeed");
             return true;
         }
 
