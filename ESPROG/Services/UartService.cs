@@ -108,7 +108,7 @@ namespace ESPROG.Services
                 Task timeoutTask = Task.Delay(timeout, cts2.Token);
                 if (await Task.WhenAny(readTask, timeoutTask) == readTask)
                 {
-                    cts2.Cancel(true);
+                    cts2.Cancel(false);
                     if (readTask.Result > 0)
                     {
                         readBytes += readTask.Result;
@@ -132,7 +132,11 @@ namespace ESPROG.Services
                 }
                 else
                 {
-                    cts1.Cancel(true);
+                    if (port != null && port.IsOpen)
+                    {
+                        port.DiscardInBuffer();
+                    }
+                    cts1.Cancel(false);
                     return null;
                 }
             }
