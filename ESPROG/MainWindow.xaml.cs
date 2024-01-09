@@ -266,7 +266,7 @@ namespace ESPROG
             }
         }
 
-        private async Task<string?> GetChipInfo(uint chip, byte devAddr)
+        private async Task<string?> GetChipInfo(ushort chip, byte devAddr)
         {
             if (!await nuprog.SetChipAndAddr(chip, devAddr))
             {
