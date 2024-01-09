@@ -315,7 +315,7 @@ namespace ESPROG
         private async Task<bool> AutodetectChipSubTask()
         {
             view.ChipSettingView.ChipInfo = string.Empty;
-            foreach (uint chip in NuProgService.ChipDict.Keys)
+            foreach (ushort chip in NuProgService.ChipDict.Keys)
             {
                 foreach (ComboBoxModel<string, byte> devAddr in NuProgService.ChipDict[chip].Addrs)
                 {

@@ -8,7 +8,7 @@ namespace ESPROG.Services
 {
     class NuProgService
     {
-        public static readonly Dictionary<uint, NuChipModel> ChipDict = new()
+        public static readonly Dictionary<ushort, NuChipModel> ChipDict = new()
         {
             { 0x1708, new(0x1708, new() { 0x50, 0x51, 0x52, 0x53 }, new(0x00000000, 32 * 1024), new(0x00008000, 1 * 512), new(0x00008200, 3 * 512)) },
             { 0x1718, new(0x1718, new() { 0x70, 0x71, 0x72, 0x73 }, new(0x00000000, 64 * 1024), new(0x00010000, 1 * 128), new(0x00010080, 1 * 128)) },
@@ -28,16 +28,16 @@ namespace ESPROG.Services
         public const byte CfgZoneMask = 0x02;
         public const byte TrimZoneMask = 0x04;
 
-        private uint chip;
+        private ushort chip;
 
-        public NuProgService(LogService logService, UartService uartService, uint chip)
+        public NuProgService(LogService logService, UartService uartService, ushort chip)
         {
             log = logService;
             uart = uartService;
             this.chip = chip;
         }
 
-        public void SetChipModel(uint chip)
+        public void SetChipModel(ushort chip)
         {
             this.chip = chip;
         }
@@ -227,7 +227,7 @@ namespace ESPROG.Services
             return HexUtil.GetU8FromStr(recvCmd.Val[0]);
         }
 
-        public async Task<bool> SetChip(uint chip)
+        public async Task<bool> SetChip(ushort chip)
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdSetChip);
             sendCmd.AddVal(chip);
@@ -235,7 +235,7 @@ namespace ESPROG.Services
             return recvCmd != null;
         }
 
-        public async Task<uint?> GetChip()
+        public async Task<ushort?> GetChip()
         {
             UartCmdModel sendCmd = new(UartCmdModel.CmdGetChip);
             sendCmd.AddVal(true);
@@ -244,7 +244,7 @@ namespace ESPROG.Services
             {
                 return null;
             }
-            return HexUtil.GetU32FromStr(recvCmd.Val[0]);
+            return HexUtil.GetU16FromStr(recvCmd.Val[0]);
         }
 
         public async Task<bool> DetectChip(byte devAddr)
@@ -452,7 +452,7 @@ namespace ESPROG.Services
             return ctrlMode != null && vol != null ? (ctrlMode.Value, vol.Value) : null;
         }
 
-        public async Task<bool> SetChipAndAddr(uint chip, byte devAddr)
+        public async Task<bool> SetChipAndAddr(ushort chip, byte devAddr)
         {
             if (!await SetChip(chip))
             {

@@ -7,10 +7,10 @@ namespace ESPROG.Views
 {
     class ChipSettingVM : BaseViewModel
     {
-        public List<ComboBoxModel<string, uint>> ChipList { get; private set; }
+        public List<ComboBoxModel<string, ushort>> ChipList { get; private set; }
 
-        private uint selectedChip;
-        public uint SelectedChip
+        private ushort selectedChip;
+        public ushort SelectedChip
         {
             get => selectedChip;
             set
@@ -26,9 +26,9 @@ namespace ESPROG.Views
         public event SelectedChipChangedHandler? SelectedChipChanged;
         public class ChipChangedEventArgs : EventArgs
         {
-            public uint Chip { get; private set; }
+            public ushort Chip { get; private set; }
 
-            public ChipChangedEventArgs(uint chip)
+            public ChipChangedEventArgs(ushort chip)
             {
                 Chip = chip;
             }
@@ -80,7 +80,7 @@ namespace ESPROG.Views
         public ChipSettingVM()
         {
             ChipList = new();
-            foreach (uint chip in NuProgService.ChipDict.Keys)
+            foreach (ushort chip in NuProgService.ChipDict.Keys)
             {
                 ChipList.Add(NuProgService.ChipDict[chip].Name);
             }

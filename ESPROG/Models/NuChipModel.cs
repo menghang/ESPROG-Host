@@ -6,7 +6,7 @@ namespace ESPROG.Models
 {
     internal class NuChipModel
     {
-        public ComboBoxModel<string, uint> Name { get; private set; }
+        public ComboBoxModel<string, ushort> Name { get; private set; }
 
         public List<ComboBoxModel<string, byte>> Addrs { get; private set; }
 
@@ -29,7 +29,7 @@ namespace ESPROG.Models
             }
         }
 
-        public NuChipModel(uint chip, List<byte> addrs, RomModel mtp, RomModel trim, RomModel config)
+        public NuChipModel(ushort chip, List<byte> addrs, RomModel mtp, RomModel trim, RomModel config)
         {
             Name = new("NU" + Convert.ToString(chip, 16).PadLeft(4, '0'), chip);
             Addrs = new();

@@ -67,7 +67,7 @@ namespace ESPROG.Models
 
         public class ChipModel
         {
-            public uint Chip { get; set; }
+            public ushort Chip { get; set; }
 
             public byte DevAddr { get; set; }
         }
