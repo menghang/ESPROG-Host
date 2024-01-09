@@ -130,7 +130,7 @@ namespace ESPROG.Services
             {
                 return null;
             }
-            return string.Format("{0}({1}/{2})", recvCmd.Val[0], recvCmd.Val[1], recvCmd.Val[2]);
+            return string.Format("{0} ({1} / {2})", recvCmd.Val[0], recvCmd.Val[1], recvCmd.Val[2]);
         }
 
         public async Task<string?> GetEsprogCompileTimeAsync()

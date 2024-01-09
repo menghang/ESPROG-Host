@@ -171,7 +171,7 @@ namespace ESPROGConsole.Services
                 Console.WriteLine("Get ESPROG info fail");
                 return false;
             }
-            Console.WriteLine(string.Format("ESPROG info: {0}({1}/{2})", recvCmd.Val[0], recvCmd.Val[1], recvCmd.Val[2]));
+            Console.WriteLine(string.Format("ESPROG info: {0} ({1} / {2})", recvCmd.Val[0], recvCmd.Val[1], recvCmd.Val[2]));
             return true;
         }
 
