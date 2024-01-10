@@ -10,11 +10,11 @@ namespace ESPROGConsole.Services
     {
         public static readonly Dictionary<ushort, NuChipModel> ChipDict = new()
         {
-            { 0x1708, new(0x1708, new(0x00000000, 32 * 1024), new(0x00008000, 1 * 512), new(0x00008200, 3 * 512)) },
-            { 0x1718, new(0x1718, new(0x00000000, 64 * 1024), new(0x00010000, 1 * 128), new(0x00010080, 1 * 128)) },
-            { 0x1651, new(0x1651, new(0x00000000, 32 * 1024), new(0x00008000, 1 * 512), new(0x00008200, 3 * 512)) },
-            { 0x1652, new(0x1652, new(0x00000000, 32 * 1024), new(0x00008000, 1 * 512), new(0x00008200, 3 * 512)) },
-            { 0x1628, new(0x1628, new(0x00000000, 32 * 1024), new(0x00008000, 1 * 512), new(0x00008200, 3 * 512)) }
+            { 0x1708, new(0x1708, [ 0x50, 0x51, 0x52, 0x53 ], new(0x00000000, 32 * 1024), new(0x00008000, 1 * 512), new(0x00008200, 3 * 512)) },
+            { 0x1718, new(0x1718, [ 0x70, 0x71, 0x72, 0x73 ], new(0x00000000, 64 * 1024), new(0x00010000, 1 * 128), new(0x00010080, 1 * 128)) },
+            { 0x1651, new(0x1651, [ 0x60, 0x61, 0x62, 0x63 ], new(0x00000000, 32 * 1024), new(0x00008000, 1 * 512), new(0x00008200, 3 * 512)) },
+            { 0x1652, new(0x1652, [ 0x40, 0x41, 0x42, 0x43 ], new(0x00000000, 32 * 1024), new(0x00008000, 1 * 512), new(0x00008200, 3 * 512)) },
+            { 0x1628, new(0x1628, [ 0x40, 0x41, 0x42, 0x43 ], new(0x00000000, 32 * 1024), new(0x00008000, 1 * 512), new(0x00008200, 3 * 512)) }
         };
 
         private readonly string fwFile;
@@ -73,22 +73,10 @@ namespace ESPROGConsole.Services
                     Console.WriteLine(string.Format("Firmware size ({0}) does not meet requirement", bs.Length));
                     return false;
                 }
-
-                if (chip == 0x1718)
+                if (bs.Length > ChipDict[chip].MTP.Size)
                 {
-                    if (bs.Length > 64 * 1024)
-                    {
-                        Console.WriteLine(string.Format("Firmware size ({0}) does not meet requirement", bs.Length));
-                        return false;
-                    }
-                }
-                else
-                {
-                    if (bs.Length > 32 * 1024)
-                    {
-                        Console.WriteLine(string.Format("Firmware size ({0}) does not meet requirement", bs.Length));
-                        return false;
-                    }
+                    Console.WriteLine(string.Format("Firmware size ({0}) does not meet requirement", bs.Length));
+                    return false;
                 }
 
                 fwDataSize = (uint)bs.Length;

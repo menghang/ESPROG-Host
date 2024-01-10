@@ -2,6 +2,10 @@
 {
     internal class NuChipModel
     {
+        public ushort Chip { get; private set; }
+
+        public byte[] Addr { get; private set; }
+
         public RomModel MTP { get; private set; }
 
         public RomModel Trim { get; private set; }
@@ -21,8 +25,10 @@
             }
         }
 
-        public NuChipModel(ushort chip, RomModel mtp, RomModel trim, RomModel config)
+        public NuChipModel(ushort chip, byte[] addr, RomModel mtp, RomModel trim, RomModel config)
         {
+            Chip = chip;
+            Addr = addr;
             MTP = mtp;
             Trim = trim;
             Config = config;

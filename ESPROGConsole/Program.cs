@@ -81,9 +81,32 @@ namespace ESPROGConsole
                 Console.WriteLine("Firmware name is empty.");
                 return false;
             }
-            if (chip != 0x1708 && chip != 0x1718 && chip != 0x1651 && chip != 0x1652 && chip != 0x1628)
+            bool f = false;
+            foreach (ushort c in NuProgService.ChipDict.Keys)
+            {
+                if (c == chip)
+                {
+                    f = true;
+                    break;
+                }
+            }
+            if (!f)
             {
                 Console.WriteLine("Chip is invalid - NU" + Convert.ToString(chip, 16).PadLeft(4, '0'));
+                return false;
+            }
+            f = false;
+            foreach (byte a in NuProgService.ChipDict[chip].Addr)
+            {
+                if (a == addr)
+                {
+                    f = true;
+                    break;
+                }
+            }
+            if (!f)
+            {
+                Console.WriteLine("Chip addr is invalid - 0x" + Convert.ToString(addr, 16).PadLeft(2, '0'));
                 return false;
             }
             if (string.IsNullOrEmpty(port))
