@@ -46,6 +46,8 @@ namespace ESPROGConsole
 
         private static void Run(string fw, ushort chip, byte addr, string port, byte vddCtrlMode, byte vddVol, byte IoVol)
         {
+            Console.WriteLine("ESPROG Console Application");
+            Console.WriteLine("----- ----- ----- ----- ----- ----- ----- ----- ----- -----");
             DateTime start = DateTime.Now;
             if (!CheckArgs(fw, chip, addr, port, vddCtrlMode, vddVol, IoVol))
             {
