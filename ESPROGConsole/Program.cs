@@ -46,8 +46,10 @@ namespace ESPROGConsole
 
         private static void Run(string fw, ushort chip, byte addr, string port, byte vddCtrlMode, byte vddVol, byte IoVol)
         {
+            DateTime start = DateTime.Now;
             if (!CheckArgs(fw, chip, addr, port, vddCtrlMode, vddVol, IoVol))
             {
+                DispResult(false, start);
                 return;
             }
             DispInfo(fw, chip, addr, port, vddCtrlMode, vddVol, IoVol);
@@ -56,8 +58,15 @@ namespace ESPROGConsole
             NuProgService nuProg = new(fw, chip, addr, port, vddCtrlMode, vddVol, IoVol);
             bool res = nuProg.Run();
 
+            DispResult(res, start);
+        }
+
+        private static void DispResult(bool res, DateTime start)
+        {
             Console.WriteLine("----- ----- ----- ----- ----- ----- ----- ----- ----- -----");
             Console.WriteLine("Programming chip " + (res ? "succeed" : "fail"));
+            double period = (DateTime.Now - start).TotalMilliseconds / 1000.0;
+            Console.WriteLine("Time escape: " + period.ToString("n3") + "s");
         }
 
         private static void DispInfo(string fw, ushort chip, byte addr, string port, byte vddCtrlMode, byte vddVol, byte ioVol)
