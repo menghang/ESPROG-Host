@@ -17,14 +17,14 @@ namespace ESPROG.Services
         private SerialPort? port;
         private string readBuffer;
         private const int bufSize = 8 * 1024;
-        private readonly byte[] buf;
+        private readonly ManualResetEvent dataRecvEvent;
 
         public UartService(LogService logControl)
         {
             log = logControl;
             port = null;
             readBuffer = string.Empty;
-            buf = new byte[bufSize];
+            dataRecvEvent = new(false);
         }
 
         public List<string> Scan()
@@ -74,6 +74,7 @@ namespace ESPROG.Services
                 WriteTimeout = 100,
                 ReceivedBytesThreshold = 4
             };
+            port.DataReceived += Port_DataReceived;
             readBuffer = string.Empty;
             try
             {
@@ -88,8 +89,14 @@ namespace ESPROG.Services
             return false;
         }
 
+        private void Port_DataReceived(object sender, SerialDataReceivedEventArgs e)
+        {
+            dataRecvEvent.Set();
+        }
+
         public void SendCmd(UartCmdModel cmd)
         {
+            dataRecvEvent.Reset();
             SendCmd(cmd.ToString());
         }
 
@@ -99,47 +106,25 @@ namespace ESPROG.Services
             {
                 return null;
             }
-            int readBytes = 0;
-            while (true)
+
+            bool isTimeout = false;
+            Task readTask = Task.Run(() =>
             {
-                using CancellationTokenSource cts1 = new();
-                using CancellationTokenSource cts2 = new();
-                Task<int> readTask = port.BaseStream.ReadAsync(buf, 0, buf.Length, cts1.Token);
-                Task timeoutTask = Task.Delay(timeout, cts2.Token);
-                if (await Task.WhenAny(readTask, timeoutTask) == readTask)
-                {
-                    cts2.Cancel(false);
-                    if (readTask.Result > 0)
-                    {
-                        readBytes += readTask.Result;
-                        readBuffer += Encoding.ASCII.GetString(buf, 0, readTask.Result);
-                        if (readTask.Result == buf.Length)
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        if (readBytes > 0)
-                        {
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    if (port != null && port.IsOpen)
-                    {
-                        port.DiscardInBuffer();
-                    }
-                    cts1.Cancel(false);
-                    return null;
-                }
+                dataRecvEvent.WaitOne();
+            });
+            Task timeoutTask = Task.Run(async () =>
+            {
+                await Task.Delay(timeout);
+                isTimeout = true;
+            });
+            await Task.WhenAny(readTask, timeoutTask);
+
+            if (isTimeout)
+            {
+                return null;
             }
+            dataRecvEvent.Reset();
+            readBuffer += port.ReadExisting();
 
             Queue<UartCmdModel>? cmds = null;
             MatchCollection mc = Regex.Matches(readBuffer, @"\[([a-zA-Z]+[0-9]*,[0-9]+(,[a-zA-Z0-9-:=\s\.\+\/]+)*|Error)]\r\n");

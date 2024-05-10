@@ -239,7 +239,7 @@ namespace ESPROG
                     view.IsPortConnected = true;
                     return;
                 }
-                await Task.Delay(100);
+                uart.Close();
             }
         }
 
