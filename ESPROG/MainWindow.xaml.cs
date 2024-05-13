@@ -233,6 +233,10 @@ namespace ESPROG
             ReloadSerialPort();
             foreach (string port in view.EsprogSettingView.PortList)
             {
+                if (!port.Contains("[ESPROG COMM]"))
+                {
+                    continue;
+                }
                 if (await TryConnectPort(port))
                 {
                     view.EsprogSettingView.SelectedPort = port;

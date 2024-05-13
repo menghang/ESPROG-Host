@@ -34,12 +34,30 @@ namespace ESPROG.Services
             {
                 using (ManagementObjectSearcher searcher = new("select * from Win32_PnPEntity where Name like '%(COM%)'"))
                 {
-                    foreach (ManagementObject hwInfo in searcher.Get().Cast<ManagementObject>())
+                    foreach (ManagementObject hwInfo in searcher.Get())
                     {
-                        string? fullName = hwInfo.Properties["Name"].Value.ToString();
-                        if (fullName != null)
+                        string? fullName = hwInfo.GetPropertyValue("Name").ToString();
+                        if (fullName == null)
                         {
-                            ports.Add(fullName);
+                            continue;
+                        }
+                        ManagementBaseObject result = hwInfo.InvokeMethod("GetDeviceProperties",
+                            hwInfo.GetMethodParameters("GetDeviceProperties"), new InvokeMethodOptions());
+
+                        ManagementBaseObject[]? deviceProperties = result.GetPropertyValue("deviceProperties") as ManagementBaseObject[];
+                        if (deviceProperties == null)
+                        {
+                            continue;
+                        }
+
+                        foreach (ManagementBaseObject deviceProperty in deviceProperties)
+                        {
+                            if (deviceProperty?.GetPropertyValue("KeyName").ToString() == "DEVPKEY_Device_BusReportedDeviceDesc")
+                            {
+                                string? deviceDesc = deviceProperty.GetPropertyValue("Data").ToString();
+                                ports.Add(string.Format("[{0}] {1}", deviceDesc, fullName));
+                                break;
+                            }
                         }
                     }
                 }
